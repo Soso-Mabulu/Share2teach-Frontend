@@ -2,7 +2,12 @@
   <main class="w-full h-screen flex flex-col items-center justify-center px-4">
     <div class="max-w-sm w-full text-gray-600 space-y-5">
       <div class="text-center pb-8">
-        <img src="@/assets/logo.jpg" width="150" class="mx-auto" alt="Vault-Xpence Logo" />
+        <img
+          src="@/assets/logo.jpg"
+          width="150"
+          class="mx-auto rounded-xl"
+          alt="Vault-Xpence Logo"
+        />
         <div class="mt-5">
           <h3 class="text-gray-800 text-2xl font-bold sm:text-3xl">Log in to your account</h3>
         </div>
@@ -94,7 +99,7 @@ export default {
       this.loading = true // Set loading to true at the beginning
       this.errorMessage = '' // Reset error message
       try {
-        const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/login`, {
+        const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/v1/auth/login`, {
           email: this.email,
           password: this.password
         })
