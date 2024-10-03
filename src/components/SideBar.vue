@@ -65,7 +65,7 @@ nav {
   overflow-x: hidden;
   position: relative;
   display: none; /* Initially hide the sidebar */
-  background: linear-gradient(to bottom, #9333ea, #e09ef8);
+  background: linear-gradient(to bottom, #9333ea, #ffffff);
   border-right: 2px solid rgba(255, 255, 255, 0.2);
 }
 

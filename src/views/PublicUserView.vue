@@ -15,12 +15,12 @@ import MainNavbar from '@/components/MainNavbar.vue';
       <!-- Main Content (PublicHero) -->
       <div class="flex-grow flex flex-col">
         <PublicHero /> <!-- Ensure PublicHero takes up available space -->
-        
-        <!-- Footer -->
-        <LandingFooter />
       </div>
     </div>
   </div>
+  
+  <!-- Footer -->
+  <LandingFooter />
 </template>
 
 <style scoped>
