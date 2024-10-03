@@ -17,7 +17,7 @@
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            class="size-10 text-blue-500"
+            class="size-10 text-purple-500"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -43,12 +43,12 @@
         </a>
 
         <a
-          class="block rounded-xl border border-gray-300 p-8 shadow-xl transition hover:border-blue-500/10 hover:shadow-blue-500/10"
+          class="block rounded-xl border border-gray-300 p-8 shadow-xl transition hover:border-purple-500/10 hover:shadow-purple-500/10"
           href="#"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            class="size-10 text-blue-500"
+            class="size-10 text-purple-500"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -74,12 +74,12 @@
         </a>
 
         <a
-          class="block rounded-xl border border-gray-300 p-8 shadow-xl transition hover:border-blue-500/10 hover:shadow-blue-500/10"
+          class="block rounded-xl border border-gray-300 p-8 shadow-xl transition hover:border-purple-500/10 hover:shadow-purple-500/10"
           href="#"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            class="size-10 text-blue-500"
+            class="size-10 text-purple-500"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -110,7 +110,7 @@
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            class="size-10 text-blue-500"
+            class="size-10 text-purple-500"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -135,12 +135,12 @@
         </a>
 
         <a
-          class="block rounded-xl border border-gray-300 p-8 shadow-xl transition hover:border-blue-500/10 hover:shadow-blue-500/10"
+          class="block rounded-xl border border-gray-300 p-8 shadow-xl transition hover:border-purple-500/10 hover:shadow-purple-500/10"
           href="#"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            class="size-10 text-blue-500"
+            class="size-10 text-purple-500"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -166,12 +166,12 @@
         </a>
 
         <a
-          class="block rounded-xl border border-gray-300 p-8 shadow-xl transition hover:border-blue-500/10 hover:shadow-blue-500/10"
+          class="block rounded-xl border border-gray-300 p-8 shadow-xl transition hover:border-purple-500/10 hover:shadow-purple-500/10"
           href="#"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            class="size-10 text-blue-500"
+            class="size-10 text-purple-500"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -200,7 +200,7 @@
       <div class="mt-8 text-center">
         <a
           href="#"
-          class="inline-block rounded-lg bg-blue-600 px-4 py-2 text-white font-semibold transition hover:bg-blue-500"
+          class="inline-block rounded-full bg-purple-600 px-4 py-2 text-white font-semibold transition hover:bg-purple-500"
         >
           View More Features
         </a>
