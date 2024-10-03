@@ -10,16 +10,18 @@ const toggleSidebar = () => {
 </script>
 
 <template>
-  <div class="flex">
+  <div class="min-h-screen flex">
     <!-- Sidebar -->
-    <div v-bind:class="{'hidden': !isSidebarVisible, 'flex': isSidebarVisible}" class="flex-col w-64 h-screen border-r bg-gradient-to-b from-blue-600 to-blue-700 shadow-lg transition-transform duration-300">
+    <div :class="{'flex': isSidebarVisible, 'w-16': !isSidebarVisible, 'w-64': isSidebarVisible}" 
+         class="flex-col h-screen border-r bg-gradient-to-b from-blue-600 to-blue-700 shadow-lg transition-all duration-300">
       <!-- Sidebar Header -->
       <div class="flex items-center justify-between p-4 border-b border-blue-800 bg-blue-500">
-        <span class="text-lg font-semibold text-white">Dashboard</span>
+        <span v-if="isSidebarVisible" class="text-lg font-semibold text-white">Dashboard</span>
         <!-- Toggle Sidebar Button -->
         <button @click="toggleSidebar" class="text-white hover:text-gray-200 transition duration-150 ease-in-out">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            <path v-if="isSidebarVisible" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            <path v-else stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
           </svg>
         </button>
       </div>
@@ -28,131 +30,77 @@ const toggleSidebar = () => {
       <div class="p-4 flex-grow">
         <ul class="space-y-2">
           <li>
-            <RouterLink to="/publicuser" class="flex items-center text-white hover:text-gray-200 hover:bg-blue-700 transition duration-150 ease-in-out px-4 py-2 rounded-lg">
-              <span>General</span>
+            <RouterLink to="/dashboard" class="flex items-center text-white hover:text-gray-200 hover:bg-blue-700 transition duration-150 ease-in-out px-4 py-2 rounded-lg">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2a10 10 0 00-10 10 9.96 9.96 0 003.52 7.85c.17.14.37.26.58.37l.26.1.26-.1c.21-.11.41-.23.58-.37A9.96 9.96 0 0022 12 10 10 0 0012 2zm0 18a7.991 7.991 0 01-7-4.5A8.007 8.007 0 0012 4a8.007 8.007 0 007 7.5A7.991 7.991 0 0112 20zm0-14h-2v4H9v2h4a1 1 0 001-1V6zm0 8H9v2h4a1 1 0 001-1v-2z"/>
+              </svg>
+              <span v-if="isSidebarVisible" class="ml-2">Dashboard</span>
             </RouterLink>
           </li>
           <li>
-            <RouterLink to="/about" class="flex items-center text-white hover:text-gray-200 hover:bg-blue-700 transition duration-150 ease-in-out px-4 py-2 rounded-lg">
-              <span>About</span>
+            <RouterLink to="/subjects" class="flex items-center text-white hover:text-gray-200 hover:bg-blue-700 transition duration-150 ease-in-out px-4 py-2 rounded-lg">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 3C6.48 3 2 7.48 2 12s4.48 9 10 9 10-4.48 10-9-4.48-9-10-9zm0 16c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z"/>
+              </svg>
+              <span v-if="isSidebarVisible" class="ml-2">Subjects</span>
             </RouterLink>
           </li>
           <li>
-            <RouterLink to="/services" class="flex items-center text-white hover:text-gray-200 hover:bg-blue-700 transition duration-150 ease-in-out px-4 py-2 rounded-lg">
-              <span>Services</span>
+            <RouterLink to="/search" class="flex items-center text-white hover:text-gray-200 hover:bg-blue-700 transition duration-150 ease-in-out px-4 py-2 rounded-lg">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M11 2a9 9 0 100 18 9 9 0 000-18zm0 16a7 7 0 100-14 7 7 0 000 14z"/>
+                <path d="M19 19l-4-4"/>
+              </svg>
+              <span v-if="isSidebarVisible" class="ml-2">Search</span>
+            </RouterLink>
+          </li>
+          <li>
+            <RouterLink to="/contributors" class="flex items-center text-white hover:text-gray-200 hover:bg-blue-700 transition duration-150 ease-in-out px-4 py-2 rounded-lg">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 3C8.69 3 5.55 4.56 3.65 7.35 2.48 9.16 2 11.54 2 12s.48 2.84 1.65 4.65C5.55 19.44 8.69 21 12 21s6.45-1.56 8.35-3.35C21.52 14.84 22 12.46 22 12s-.48-2.84-1.65-4.65C18.45 4.56 15.31 3 12 3zM12 19c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z"/>
+                <circle cx="12" cy="12" r="2"/>
+              </svg>
+              <span v-if="isSidebarVisible" class="ml-2">Contributors</span>
+            </RouterLink>
+          </li>
+          <li>
+            <RouterLink to="/faq" class="flex items-center text-white hover:text-gray-200 hover:bg-blue-700 transition duration-150 ease-in-out px-4 py-2 rounded-lg">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm0-4h-2v-2h2v2zm0-4h-2V7h2v2z"/>
+              </svg>
+              <span v-if="isSidebarVisible" class="ml-2">FAQ</span>
+            </RouterLink>
+          </li>
+          <li>
+            <RouterLink to="/self-directed-learning" class="flex items-center text-white hover:text-gray-200 hover:bg-blue-700 transition duration-150 ease-in-out px-4 py-2 rounded-lg">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2L3 12h3v8h6v-6h3l-9-10zm0 0h6v8h3l-9-10z"/>
+              </svg>
+              <span v-if="isSidebarVisible" class="ml-2">Self-Directed Learning</span>
+            </RouterLink>
+          </li>
+          <li>
+            <RouterLink to="/logout" class="flex items-center text-white hover:text-gray-200 hover:bg-blue-700 transition duration-150 ease-in-out px-4 py-2 rounded-lg">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M10 9v6l5-3-5-3zm6 11H6V4h10v2H8v12h8v2zm3-13h2v8h-2z"/>
+              </svg>
+              <span v-if="isSidebarVisible" class="ml-2">Logout</span>
             </RouterLink>
           </li>
         </ul>
       </div>
-
-      <!-- Sidebar Footer -->
-      <div class="mt-auto p-4 border-t border-blue-800">
-        <form action="#">
-          <button type="submit" class="w-full bg-blue-600 text-white hover:bg-blue-700 transition duration-150 ease-in-out px-4 py-2 rounded-lg">
-            Sign Out
-          </button>
-        </form>
-      </div>
     </div>
 
     <!-- Main Content -->
-    <div class="flex-grow">
-      <div class="flex">
-        <nav class="flex h-16 items-center bg-white shadow">
-          <div class="flex items-center">
-            <button @click="toggleSidebar" class="p-4 text-gray-600 hover:bg-gray-100 rounded-md">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
-              </svg>
-            </button>
-          </div>
-          <div class="ml-auto mr-4">
-            <ul class="flex space-x-4">
-              <li>
-                <RouterLink to="/publicuser" class="text-gray-600 hover:text-blue-700">
-                  General
-                </RouterLink>
-              </li>
-              <li>
-                <RouterLink to="/about" class="text-gray-600 hover:text-blue-700">
-                  About
-                </RouterLink>
-              </li>
-              <li>
-                <RouterLink to="/services" class="text-gray-600 hover:text-blue-700">
-                  Services
-                </RouterLink>
-              </li>
-            </ul>
-          </div>
-        </nav>
-      </div>
-
-      <!-- Dashboard Content -->
-      <div class="p-6">
-        <h1 class="text-2xl font-bold mb-4">Welcome to Your Dashboard</h1>
-        <div class="grid grid-cols-3 gap-4">
-          <!-- Card 1: User Stats -->
-          <div class="bg-white shadow rounded-lg p-4 flex items-center justify-between">
-            <div>
-              <h2 class="text-xl font-semibold">Total Users</h2>
-              <p class="text-3xl">1,250</p>
-            </div>
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h4l3 7h6l3-7h4" />
-            </svg>
-          </div>
-
-          <!-- Card 2: Revenue -->
-          <div class="bg-white shadow rounded-lg p-4 flex items-center justify-between">
-            <div>
-              <h2 class="text-xl font-semibold">Total Revenue</h2>
-              <p class="text-3xl">$25,000</p>
-            </div>
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l5-2v15l5-2v-15" />
-            </svg>
-          </div>
-
-          <!-- Card 3: New Signups -->
-          <div class="bg-white shadow rounded-lg p-4 flex items-center justify-between">
-            <div>
-              <h2 class="text-xl font-semibold">New Signups</h2>
-              <p class="text-3xl">150</p>
-            </div>
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 21V8c0-1.1-.9-2-2-2H6c-1.1 0-2 .9-2 2v13c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2z" />
-            </svg>
-          </div>
-        </div>
-
-        <!-- Quick Actions -->
-        <div class="mt-6 bg-white shadow rounded-lg p-4">
-          <h2 class="text-xl font-semibold mb-4">Quick Actions</h2>
-          <div class="flex space-x-4">
-            <RouterLink to="/create" class="bg-blue-500 text-white rounded-lg px-4 py-2 hover:bg-blue-600 transition">Create New</RouterLink>
-            <RouterLink to="/manage" class="bg-green-500 text-white rounded-lg px-4 py-2 hover:bg-green-600 transition">Manage Users</RouterLink>
-            <RouterLink to="/reports" class="bg-orange-500 text-white rounded-lg px-4 py-2 hover:bg-orange-600 transition">View Reports</RouterLink>
-          </div>
-        </div>
-      </div>
+    <div class="flex-grow p-4">
+      <slot />
     </div>
   </div>
 </template>
 
 <style scoped>
-/* Additional styling to match the hero section */
-.bg-blue-600 {
-  background-color: #2563eb; /* Customize if needed */
+/* Optional: Add styles to enhance the appearance of the sidebar */
+.sidebar {
+  background-color: #1e3a8a; /* Example color */
 }
-
-.bg-blue-500 {
-  background-color: #3b82f6; /* Customize if needed */
-}
-
-.bg-blue-700 {
-  background-color: #1d4ed8; /* Customize if needed */
-}
-
-/* Add any additional styles here */
 </style>
