@@ -1,106 +1,156 @@
-<script setup>
-import { ref } from 'vue'
-import { RouterLink } from 'vue-router'
-
-const isSidebarVisible = ref(true)
-
-const toggleSidebar = () => {
-  isSidebarVisible.value = !isSidebarVisible.value
-}
-</script>
-
 <template>
-  <div class="min-h-screen flex">
-    <!-- Sidebar -->
-    <div :class="{'flex': isSidebarVisible, 'w-16': !isSidebarVisible, 'w-64': isSidebarVisible}" 
-         class="flex-col h-screen border-r bg-gradient-to-b from-blue-600 to-blue-700 shadow-lg transition-all duration-300">
-      <!-- Sidebar Header -->
-      <div class="flex items-center justify-between p-4 border-b border-blue-800 bg-blue-500">
-        <span v-if="isSidebarVisible" class="text-lg font-semibold text-white">Dashboard</span>
-        <!-- Toggle Sidebar Button -->
-        <button @click="toggleSidebar" class="text-white hover:text-gray-200 transition duration-150 ease-in-out">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path v-if="isSidebarVisible" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            <path v-else stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-          </svg>
-        </button>
-      </div>
-
-      <!-- Sidebar Links -->
-      <div class="p-4 flex-grow">
-        <ul class="space-y-2">
-          <li>
-            <RouterLink to="/dashboard" class="flex items-center text-white hover:text-gray-200 hover:bg-blue-700 transition duration-150 ease-in-out px-4 py-2 rounded-lg">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 2a10 10 0 00-10 10 9.96 9.96 0 003.52 7.85c.17.14.37.26.58.37l.26.1.26-.1c.21-.11.41-.23.58-.37A9.96 9.96 0 0022 12 10 10 0 0012 2zm0 18a7.991 7.991 0 01-7-4.5A8.007 8.007 0 0012 4a8.007 8.007 0 007 7.5A7.991 7.991 0 0112 20zm0-14h-2v4H9v2h4a1 1 0 001-1V6zm0 8H9v2h4a1 1 0 001-1v-2z"/>
-              </svg>
-              <span v-if="isSidebarVisible" class="ml-2">Dashboard</span>
-            </RouterLink>
-          </li>
-          <li>
-            <RouterLink to="/subjects" class="flex items-center text-white hover:text-gray-200 hover:bg-blue-700 transition duration-150 ease-in-out px-4 py-2 rounded-lg">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 3C6.48 3 2 7.48 2 12s4.48 9 10 9 10-4.48 10-9-4.48-9-10-9zm0 16c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z"/>
-              </svg>
-              <span v-if="isSidebarVisible" class="ml-2">Subjects</span>
-            </RouterLink>
-          </li>
-          <li>
-            <RouterLink to="/search" class="flex items-center text-white hover:text-gray-200 hover:bg-blue-700 transition duration-150 ease-in-out px-4 py-2 rounded-lg">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M11 2a9 9 0 100 18 9 9 0 000-18zm0 16a7 7 0 100-14 7 7 0 000 14z"/>
-                <path d="M19 19l-4-4"/>
-              </svg>
-              <span v-if="isSidebarVisible" class="ml-2">Search</span>
-            </RouterLink>
-          </li>
-          <li>
-            <RouterLink to="/contributors" class="flex items-center text-white hover:text-gray-200 hover:bg-blue-700 transition duration-150 ease-in-out px-4 py-2 rounded-lg">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 3C8.69 3 5.55 4.56 3.65 7.35 2.48 9.16 2 11.54 2 12s.48 2.84 1.65 4.65C5.55 19.44 8.69 21 12 21s6.45-1.56 8.35-3.35C21.52 14.84 22 12.46 22 12s-.48-2.84-1.65-4.65C18.45 4.56 15.31 3 12 3zM12 19c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z"/>
-                <circle cx="12" cy="12" r="2"/>
-              </svg>
-              <span v-if="isSidebarVisible" class="ml-2">Contributors</span>
-            </RouterLink>
-          </li>
-          <li>
-            <RouterLink to="/faq" class="flex items-center text-white hover:text-gray-200 hover:bg-blue-700 transition duration-150 ease-in-out px-4 py-2 rounded-lg">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm0-4h-2v-2h2v2zm0-4h-2V7h2v2z"/>
-              </svg>
-              <span v-if="isSidebarVisible" class="ml-2">FAQ</span>
-            </RouterLink>
-          </li>
-          <li>
-            <RouterLink to="/self-directed-learning" class="flex items-center text-white hover:text-gray-200 hover:bg-blue-700 transition duration-150 ease-in-out px-4 py-2 rounded-lg">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 2L3 12h3v8h6v-6h3l-9-10zm0 0h6v8h3l-9-10z"/>
-              </svg>
-              <span v-if="isSidebarVisible" class="ml-2">Self-Directed Learning</span>
-            </RouterLink>
-          </li>
-          <li>
-            <RouterLink to="/logout" class="flex items-center text-white hover:text-gray-200 hover:bg-blue-700 transition duration-150 ease-in-out px-4 py-2 rounded-lg">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M10 9v6l5-3-5-3zm6 11H6V4h10v2H8v12h8v2zm3-13h2v8h-2z"/>
-              </svg>
-              <span v-if="isSidebarVisible" class="ml-2">Logout</span>
-            </RouterLink>
-          </li>
-        </ul>
-      </div>
+  <div :class="['sidebar', { expanded: isExpanded }, 'bg-gradient-to-b from-[var(--color-purple-light)] to-[var(--color-purple-lighter)]']">
+    <!-- Toggle Button -->
+    <div class="toggle-btn" @click="toggleSidebar">
+      <i class="icon">{{ isExpanded ? '◀️' : '▶️' }}</i>
     </div>
 
-    <!-- Main Content -->
-    <div class="flex-grow p-4">
-      <slot />
+    <!-- User Info -->
+    <div v-if="isExpanded" class="user-info">
+      <p>{{ user.firstName }} {{ user.lastName }}</p>
     </div>
+
+    <!-- Navigation -->
+    <nav>
+      <ul>
+        <li v-for="link in links" :key="link.text">
+          <router-link :to="link.route" class="nav-link">
+            <i class="icon">{{ link.icon }}</i>
+            <span v-if="isExpanded">{{ link.text }}</span>
+          </router-link>
+        </li>
+      </ul>
+    </nav>
   </div>
 </template>
 
+<script>
+export default {
+  data() {
+    return {
+      isExpanded: true,
+      user: {
+        firstName: "Firstname",
+        lastName: "Lastname",
+      },
+      links: [
+        { text: "Dashboard", icon: "🏠", route: "/dashboard" },
+        { text: "Subject", icon: "📚", route: "/subject" },
+        { text: "Search", icon: "🔍", route: "/search" },
+        { text: "Contributors", icon: "👥", route: "/contributors" },
+        { text: "FAQ", icon: "❓", route: "/faq" },
+        { text: "Self Directed Learning", icon: "💡", route: "/self-learning" },
+        { text: "Logout", icon: "🚪", route: "/logout" },
+      ],
+    };
+  },
+  methods: {
+    toggleSidebar() {
+      this.isExpanded = !this.isExpanded;
+    },
+  },
+};
+</script>
+
 <style scoped>
-/* Optional: Add styles to enhance the appearance of the sidebar */
+nav {
+  --color-purple-light: #9333ea; /* Lighter purple */
+  --color-purple-lighter: #e09ef8; /* Even lighter purple */
+}
+
 .sidebar {
-  background-color: #1e3a8a; /* Example color */
+  width: 60px; /* Width when collapsed */
+  height: 100vh;
+  transition: width 0.3s ease;
+  overflow-x: hidden;
+  position: relative;
+  display: none; /* Initially hide the sidebar */
+  background: linear-gradient(to bottom, #9333ea, #ffffff);
+  border-right: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.sidebar.expanded {
+  width: 250px; /* Width when expanded */
+}
+
+/* New style for the collapsed state */
+.sidebar:not(.expanded) {
+  width: 60px; /* Collapsed state width */
+}
+
+.toggle-btn {
+  background-color: #9333ea;
+  color: #ffffff;
+  padding: 10px;
+  text-align: center;
+  cursor: pointer;
+  border-radius: 8px;
+  margin: 10px;
+}
+
+.user-info {
+  padding: 20px;
+  color: #ffffff;
+  text-align: center;
+}
+
+nav ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+nav ul li {
+  margin: 15px 0;
+}
+
+nav ul li .nav-link {
+  text-decoration: none;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  padding: 5px 15px; /* Smaller link padding */
+  border-radius: 25px; /* Round links */
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  font-size: 0.9em; /* Smaller font size */
+}
+
+nav ul li .nav-link:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  transform: scale(1.05); /* Slight scale effect on hover */
+}
+
+.icon {
+  font-size: 1.3em; /* Slightly smaller icon size */
+  margin-right: 10px; /* Reduced margin */
+  transition: margin 0.3s ease;
+  display: inline-block; /* Ensure icons are inline */
+}
+
+.sidebar:not(.expanded) .icon {
+  margin-right: 0;
+}
+
+.sidebar:not(.expanded) nav ul li .nav-link {
+  justify-content: center;
+}
+
+/* Responsive styles */
+@media (min-width: 768px) { /* Show sidebar on larger screens */
+  .sidebar {
+    display: block;
+    width: 12%; /* Responsive width when expanded */
+  }
+}
+
+@media (min-width: 1200px) { /* Increase sidebar width on larger screens */
+  .sidebar {
+    width: 15%; /* Adjust width for larger screens */
+  }
+}
+
+@media (max-width: 600px) { /* Hide sidebar on mobile */
+  .sidebar {
+    display: none;
+  }
 }
 </style>
