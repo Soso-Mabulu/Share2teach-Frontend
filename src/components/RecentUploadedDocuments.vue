@@ -1,44 +1,67 @@
 <template>
   <section class="bg-white text-gray-900 m-6">
-    <h2 class="text-2xl font-bold sm:text-4xl text-center m-6">Continue Reading</h2>
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+    <h2 class="text-2xl font-bold sm:text-4xl text-center m-6 text-purple-800">Continue Reading</h2>
+
+    <!-- Limit to 4 Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       <div
-        v-for="document in documents"
+        v-for="document in limitedDocuments"
         :key="document.fileName"
-        class="block rounded-lg border border-gray-300 p-4 shadow-lg transition-transform hover:shadow-blue-500/10"
+        class="block rounded-lg p-4 bg-gradient-to-r from-purple-200 via-purple-100 to-purple-50 shadow-lg"
       >
-        <!-- Image Preview for Document -->
+        <!-- Document Icon Preview -->
         <div
-          :style="{ width: '100%', height: '120px', backgroundColor: imageBackgroundColor }"
+          :style="{ width: '100%', height: '150px', backgroundColor: imageBackgroundColor }"
           class="flex justify-center items-center border border-dashed border-gray-300 rounded-lg"
         >
-          <span class="text-gray-700 font-semibold">{{ document.fileName }}</span>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            class="h-10 w-10 text-gray-500"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M7 3h10a2 2 0 012 2v14a2 2 0 01-2 2H7a2 2 0 01-2-2V5a2 2 0 012-2z"
+            />
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M10 12h4m-4 4h4m-2-8h.01"
+            />
+          </svg>
         </div>
-        <h3 class="mt-2 text-lg font-semibold">{{ document.module }}</h3>
-        <p class="text-sm text-gray-600">{{ document.description }}</p>
 
-        <!-- Additional Metadata -->
-        <div class="mt-2 text-sm text-gray-500">
-          <p><strong>University:</strong> {{ document.university }}</p>
-          <p><strong>Category:</strong> {{ document.category }}</p>
-          <p><strong>Academic Year:</strong> {{ document.academicYear }}</p>
-          <p><strong>Published:</strong> {{ formatDate(document.creationDate) }}</p>
-          <p><strong>File Size:</strong> {{ formatFileSize(document.fileSize) }}</p>
+        <!-- Document Title -->
+        <h3 class="mt-2 text-lg font-semibold text-purple-800 truncate">{{ document.module }}</h3>
+
+        <!-- Key Information -->
+        <div class="mt-2 text-sm text-gray-600">
+          <p class="truncate"><strong>Category:</strong> {{ document.category }}</p>
+          <p class="truncate">
+            <strong>Published:</strong> {{ formatDate(document.creationDate) }}
+          </p>
         </div>
 
-        <div class="mt-4 flex justify-between">
-          <span class="text-sm text-gray-500">By {{ document.author }}</span>
+        <!-- Button with Interesting Colors and Hover Effect -->
+        <div class="mt-4 flex justify-between items-center">
+          <span class="text-xs text-gray-500">By {{ document.author }}</span>
           <a
             :href="document.location"
             target="_blank"
             rel="noopener noreferrer"
-            class="inline-block rounded-lg bg-blue-600 px-3 py-1 text-white font-semibold transition hover:bg-blue-500"
+            class="inline-block rounded-full bg-gradient-to-r from-purple-500 via-purple-200 to-purple-400 px-4 py-2 text-gray-700 font-semibold transition-transform hover:scale-105"
           >
-            View Full Doc
+            View
           </a>
         </div>
       </div>
     </div>
+
     <div v-if="loading" class="flex justify-center my-4">
       <span>Loading documents...</span>
     </div>
@@ -46,15 +69,18 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import debounce from 'lodash/debounce'
 
 // Reactive properties
 const documents = ref([])
 const loading = ref(true)
 
+// Limit displayed documents to 4
+const limitedDocuments = computed(() => documents.value.slice(0, 4))
+
 // Define a color variable for image backgrounds
-const imageBackgroundColor = '#ebf8ff' // Change this to any color you prefer
+const imageBackgroundColor = '#e9d8ef' // Change this to any color you prefer
 
 // Function to fetch documents from the API
 const fetchDocuments = async () => {
@@ -78,23 +104,26 @@ const formatDate = (dateString) => {
   return new Date(dateString).toLocaleDateString(undefined, options)
 }
 
-// Function to format file size from bytes to KB
-const formatFileSize = (sizeInBytes) => {
-  const sizeInKB = (sizeInBytes / 1024).toFixed(2)
-  return `${sizeInKB} KB`
-}
-
 // Fetch documents when the component is mounted
 onMounted(debounce(fetchDocuments, 300))
 </script>
 
 <style scoped>
-/* Additional styling */
-.card {
-  max-width: 250px; /* Set max width for smaller cards */
+/* Adjustments for responsive layout and card appearance */
+
+/* Horizontal Layout for Smaller Screens */
+@media (max-width: 768px) {
+  .grid-cols-4 {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+  }
 }
 
-img {
-  border-radius: 8px; /* Round corners for images */
+/* Button hover effect with color gradient */
+a {
+  transition: transform 0.3s ease-in-out;
+}
+
+svg {
+  transition: all 0.3s ease-in-out;
 }
 </style>
