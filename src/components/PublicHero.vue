@@ -1,10 +1,18 @@
 <template>
   <div class="hero">
     <h1>Welcome to your dashboard!</h1>
-    
+
     <!-- Search Bar -->
     <div class="search-bar">
-      <input type="text" placeholder="Search documents..." v-model="searchQuery" />
+      <div class="search-icon">
+        <img src="https://via.placeholder.com/20" alt="Search" />
+      </div>
+      <input
+        type="text"
+        placeholder="Search documents..."
+        v-model="searchQuery"
+      />
+      <button class="search-button">Search</button>
     </div>
 
     <!-- Filters -->
@@ -104,14 +112,41 @@ const nextSlide = () => {
   display: flex;
   align-items: center;
   margin-bottom: 20px;
+  border: 1px solid #ccc; /* Grey border */
+  border-radius: 5px;
+  overflow: hidden;
 }
 
 .search-bar input {
   width: 100%;
   padding: 10px;
-  border: 1px solid var(--color-border);
-  border-radius: 5px;
-  margin-right: 10px;
+  border: none; /* Remove default border */
+  outline: none; /* Remove outline on focus */
+}
+
+.search-icon {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  background-color: #f1f1f1; /* Light background for icon */
+}
+
+.search-icon img {
+  width: 20px; /* Size of the icon */
+  height: 20px;
+}
+
+.search-button {
+  padding: 10px 20px;
+  background-color: #f90; /* Amazon-like button color */
+  border: none;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.search-button:hover {
+  background-color: #d68e1c; /* Darker shade on hover */
 }
 
 /* Filters */
@@ -142,6 +177,7 @@ const nextSlide = () => {
   flex-shrink: 0;
   margin-right: 20px;
   text-align: center;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Shadow effect for cards */
 }
 
 .document img {
@@ -190,6 +226,3 @@ const nextSlide = () => {
   width: calc(25% - 20px);
 }
 </style>
-
-git config --global user.email "you@example.com"
-git config --global user.name "Your Name"
