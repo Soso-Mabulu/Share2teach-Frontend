@@ -1,7 +1,7 @@
 <script setup>
 import Sidebar from '@/components/SideBar.vue'; // Adjust the import path as necessary
 import PublicHero from '@/components/PublicHero.vue'; // Import the PublicHero component
-import LandingFooter from '@/components/LandingFooter.vue'; // Import the Footer
+import MainFooter from '@/components/MainFooter.vue'; // Import the Footer
 import MainNavbar from '@/components/MainNavbar.vue';
 </script>
 
@@ -15,12 +15,12 @@ import MainNavbar from '@/components/MainNavbar.vue';
       <!-- Main Content (PublicHero) -->
       <div class="flex-grow flex flex-col">
         <PublicHero /> <!-- Ensure PublicHero takes up available space -->
+          <!-- Footer -->
       </div>
     </div>
   </div>
   
-  <!-- Footer -->
-  <LandingFooter />
+  <MainFooter />
 </template>
 
 <style scoped>
