@@ -118,6 +118,10 @@ const prevSlide = () => {
     currentIndex.value -= displayCount; // Decrement index by displayCount
   }
 };
+
+
+
+
 </script>
 
 <style scoped>
