@@ -37,15 +37,26 @@
     <!-- Carousel for High Rated Documents -->
     <h2>High Rated Documents</h2>
     <div class="carousel">
-      <div class="document" v-for="document in highRatedDocuments" :key="document.id">
-        <img :src="document.image" :alt="document.title" />
-        <h3>{{ document.title }}</h3>
-        <p>{{ document.description }}</p>
-        <div class="ratings">
-          <span>{{ document.rating }}</span> {{ document.ratingValue }}
+      <div class="carousel-controls left">
+        <button @click="prevSlide" :disabled="currentIndex === 0">&#60;</button>
+      </div>
+      <div class="documents-container">
+        <div
+          class="document"
+          v-for="(document) in displayedDocuments"
+          :key="document.id"
+        >
+          <img :src="document.image" :alt="document.title" />
+          <h3>{{ document.title }}</h3>
+          <p>{{ document.description }}</p>
+          <div class="ratings">
+            <span>{{ document.rating }}</span> {{ document.ratingValue }}
+          </div>
         </div>
       </div>
-      <button @click="nextSlide" class="next-button">Next</button>
+      <div class="carousel-controls right">
+        <button @click="nextSlide" :disabled="currentIndex + displayCount >= highRatedDocuments.length">&#62;</button>
+      </div>
     </div>
 
     <!-- Recent Documents Section -->
@@ -65,18 +76,24 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 
 const searchQuery = ref('');
 const selectedModule = ref('');
 const selectedYear = ref('');
 const selectedUniversity = ref('');
+const displayCount = 4; // Number of documents to display at a time
+const currentIndex = ref(0); // Current index for the displayed documents
 
 const highRatedDocuments = ref([
   { id: 1, image: 'https://via.placeholder.com/200x120', title: 'Document Title 1', description: 'Short description of document 1.', rating: '⭐⭐⭐⭐⭐', ratingValue: 5.0 },
   { id: 2, image: 'https://via.placeholder.com/200x120', title: 'Document Title 2', description: 'Short description of document 2.', rating: '⭐⭐⭐⭐', ratingValue: 4.0 },
   { id: 3, image: 'https://via.placeholder.com/200x120', title: 'Document Title 3', description: 'Short description of document 3.', rating: '⭐⭐⭐⭐⭐', ratingValue: 5.0 },
   { id: 4, image: 'https://via.placeholder.com/200x120', title: 'Document Title 4', description: 'Short description of document 4.', rating: '⭐⭐⭐⭐⭐', ratingValue: 5.0 },
+  { id: 5, image: 'https://via.placeholder.com/200x120', title: 'Document Title 5', description: 'Short description of document 5.', rating: '⭐⭐⭐⭐', ratingValue: 4.0 },
+  { id: 6, image: 'https://via.placeholder.com/200x120', title: 'Document Title 6', description: 'Short description of document 6.', rating: '⭐⭐⭐⭐⭐', ratingValue: 5.0 },
+  { id: 7, image: 'https://via.placeholder.com/200x120', title: 'Document Title 7', description: 'Short description of document 7.', rating: '⭐⭐⭐⭐', ratingValue: 4.0 },
+  { id: 8, image: 'https://via.placeholder.com/200x120', title: 'Document Title 8', description: 'Short description of document 8.', rating: '⭐⭐⭐⭐⭐', ratingValue: 5.0 },
 ]);
 
 const recentDocuments = ref([
@@ -86,8 +103,20 @@ const recentDocuments = ref([
   { id: 4, image: 'https://via.placeholder.com/200x120', title: 'Recent Document 4', rating: '⭐⭐⭐⭐⭐', ratingValue: 5.0 },
 ]);
 
+const displayedDocuments = computed(() => {
+  return highRatedDocuments.value.slice(currentIndex.value, currentIndex.value + displayCount);
+});
+
 const nextSlide = () => {
-  alert("Next slide functionality to be implemented!");
+  if (currentIndex.value + displayCount < highRatedDocuments.value.length) {
+    currentIndex.value += displayCount; // Increment index by displayCount
+  }
+};
+
+const prevSlide = () => {
+  if (currentIndex.value > 0) {
+    currentIndex.value -= displayCount; // Decrement index by displayCount
+  }
 };
 </script>
 
@@ -164,65 +193,86 @@ const nextSlide = () => {
 /* Carousel Styles */
 .carousel {
   display: flex;
-  overflow-x: auto;
+  position: relative; /* To position controls */
   padding: 20px 0;
+}
+
+.documents-container {
+  display: flex;
+  overflow: hidden; /* Hide overflow for sliding effect */
 }
 
 .carousel .document {
   background: rgba(255, 255, 255, 0.8);
-  border: 1px solid var(--color-border);
+  border: 3px solid var(--color-border); /* Border for documents */
   border-radius: 5px;
   padding: 10px;
   width: 220px;
-  flex-shrink: 0;
-  margin-right: 20px;
+  margin: 0 10px; /* Margin for spacing */
   text-align: center;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Shadow effect for cards */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Shadow for document */
+  transition: transform 0.3s; /* Smooth transition for sliding */
 }
 
-.document img {
+.carousel .document img {
   max-width: 100%;
   height: 120px;
   border-radius: 5px;
-  margin-bottom: 10px;
 }
 
-.document h3 {
-  margin: 10px 0;
-  font-size: 18px;
-  color: var(--color-text-dark);
-}
-
-.document p {
-  font-size: 14px;
-}
-
-/* Ratings */
-.ratings {
-  margin: 5px 0;
-}
-
-.ratings span {
-  color: gold;
-}
-
-/* Recent Documents Section */
-.recent-documents {
-  margin-top: 30px;
-}
-
-.recent-documents h2 {
-  margin-bottom: 10px;
-  color: var(--color-text-dark);
-}
-
-.recent-documents .document-list {
+/* Carousel Controls */
+.carousel-controls {
   display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
+  align-items: center;
+}
+
+.carousel-controls button {
+  background: #f90;
+  border: none;
+  color: white;
+  padding: 10px;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background-color 0.3s;
+}
+.carousel .document:hover {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3); /* Shadow effect on hover */
+  transform: translateY(-2px); /* Slight lift effect on hover */
+}
+
+.carousel-controls button:disabled {
+  background: #ccc; /* Grey out disabled buttons */
+  cursor: not-allowed; /* Change cursor for disabled */
+}
+
+.carousel-controls button:hover:not(:disabled) {
+  background: #d68e1c; /* Darker shade on hover */
+}
+
+/* Recent Documents */
+.recent-documents {
+  margin-top: 40px;
+}
+
+.document-list {
+  display: flex;
+  flex-wrap: wrap; /* Wrap documents if needed */
 }
 
 .recent-documents .document {
-  width: calc(25% - 20px);
+  margin: 10px; /* Spacing between documents */
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.8);
+  border: 2px solid var(--color-border); /* Added border for recent documents */
+  border-radius: 5px;
+  width: 220px; /* Fixed width for recent documents */
+  text-align: center;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.recent-documents img {
+  max-width: 100%;
+  height: 120px;
+  border-radius: 5px;
 }
 </style>
