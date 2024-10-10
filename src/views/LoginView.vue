@@ -111,15 +111,19 @@ async function login() {
     const userRole = decodedToken.role
 
     if (userRole === 'admin') {
-      router.push({ path: '/admin-dashboard', query: { token } })
-    } else {
-      router.push({ path: '/user-dashboard', query: { token } })
+        router.push({ path: '/admin-dashboard', query: { token } });
+    } 
+    else if (userRole === 'educator') {
+      router.push({ path: '/educator-dashboard', query: { token } });
+    } 
+    else if (userRole === 'moderator') {
+      router.push({ path: '/moderator-dashboard', query: { token } });
+    } 
+    else {
+      // Handle unknown roles or redirect to a default dashboard
+      router.push({ path: '/user-dashboard', query: { token } });
     }
-    if (userRole === 'educator') {
-      router.push({ path: '/educator-dashboard', query: { token } })
-    } else {
-      router.push({ path: '/user-dashboard', query: { token } })
-    }
+
   } catch (error) {
     // Handle errors appropriately
     if (error.response) {
