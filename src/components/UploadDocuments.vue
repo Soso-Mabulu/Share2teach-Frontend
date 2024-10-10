@@ -176,7 +176,7 @@ const selectAcademicYearSuggestion = (suggestion) => {
       <form @submit.prevent="uploadDocuments" class="space-y-6">
         <!-- Title -->
         <div>
-          <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">Title</label>
+          <label class="block text-sm font-semibold text-gray-700 ">Title</label>
           <input
             v-model="title"
             type="text"
