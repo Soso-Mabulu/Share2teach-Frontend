@@ -87,7 +87,6 @@ const currentImageIndex = ref(0);
 const router = useRouter();
 
 onMounted(() => {
-  console.log('Component mounted, fetching documents...');
   fetchDocuments();
 });
 
@@ -109,7 +108,6 @@ async function fetchDocuments() {
 
     const approvedResponse = await axios.get(`${import.meta.env.VITE_API_URL}api/v1/documents/approved`, { headers });
     documents.value.approved = mapDocuments(approvedResponse.data.documents);
-
   } catch (error) {
     console.error('Failed to fetch documents:', error.message);
   }
@@ -151,7 +149,6 @@ function prevImage() {
 
 function handleSearch() {
   if (searchQuery.value) {
-    // Navigate to the search results page with the search query as a parameter
     router.push({ name: 'search-results', query: { term: searchQuery.value } });
   }
 }
