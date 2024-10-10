@@ -14,6 +14,13 @@
             <span v-if="isExpanded">{{ link.text }}</span>
           </router-link>
         </li>
+        <li>
+          <!-- Logout Link -->
+          <a href="#" @click="logout" class="nav-link">
+            <i class="icon">🚪</i>
+            <span v-if="isExpanded">Logout</span>
+          </a>
+        </li>
       </ul>
     </nav>
 
@@ -35,6 +42,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
+import { useRouter } from 'vue-router'; // Import Vue Router
 
 // Default avatar image
 import defaultAvatar from '@/assets/images/profile.webp';
@@ -52,7 +60,10 @@ const userAvatar = ref('');
 // Reactive reference for sidebar state
 const isExpanded = ref(true);
 
-// Navigation links
+// Use Vue Router for navigation
+const router = useRouter();
+
+// Navigation links (without logout)
 const links = ref([
   { text: "Dashboard", icon: "🏠", route: "/dashboard" },
   { text: "Subject", icon: "📚", route: "/subject" },
@@ -60,12 +71,18 @@ const links = ref([
   { text: "Contributors", icon: "👥", route: "/contributors" },
   { text: "FAQ", icon: "❓", route: "/faq" },
   { text: "Self Directed Learning", icon: "💡", route: "/self-learning" },
-  { text: "Logout", icon: "🚪", route: "/logout" },
 ]);
 
 // Method to toggle sidebar
 const toggleSidebar = () => {
   isExpanded.value = !isExpanded.value;
+};
+
+// Logout function
+const logout = () => {
+  localStorage.removeItem('token'); // Clear the token
+  localStorage.removeItem('user'); // Clear user data
+  router.push('/login'); // Redirect to login page
 };
 
 // Function to fetch user info from API based on token
@@ -237,3 +254,6 @@ nav ul li .nav-link:hover {
   }
 }
 </style>
+
+git config --global user.email "mxolisiprince87@gmail.com"
+git config --global user.name "Leece"
