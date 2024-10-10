@@ -6,6 +6,8 @@ import SignupView from '@/views/SignupView.vue'
 import PublicUserView from '@/views/PublicUserView.vue'
 import ForgotPasswordView from '@/views/ForgotPasswordView.vue'
 import ResetPasswordView from '@/views/ResetPasswordView.vue'
+import ModeratorDashboardView from '@/views/ModeratorDashboardView.vue'
+import UploadDocuments from '@/components/UploadDocuments.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -45,6 +47,17 @@ const router = createRouter({
       name: 'ResetPasswordView',
       component: ResetPasswordView
     }
+    ,
+    {
+      path: '/moderator-dashboard',
+      name: 'ModeratorDashboardView',
+      component: ModeratorDashboardView
+    },
+    {
+      path: '/upload-documents',
+      name: 'UploadDocuments',
+      component: UploadDocuments,
+    },
   ]
 })
 
