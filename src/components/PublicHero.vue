@@ -311,7 +311,7 @@ input:checked + .slider:before {
   border-radius: 5px;
 }
 
-/* Carousel */
+/* Carousel Styles */
 .carousel {
   display: flex;
   align-items: center;
@@ -325,33 +325,43 @@ input:checked + .slider:before {
 
 .document {
   margin: 0 10px; /* Space between cards */
-  padding: 15px;
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Shadow effect */
-  width: 200px; /* Fixed width */
+  padding: 10px; /* Consistent padding for cards */
+  background-color: white; /* Background for document cards */
+  border-radius: 8px; /* Rounded corners */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Light shadow for depth */
+  width: 250px; /* Fixed width for rectangular cards */
+  height: 180px; /* Fixed height for rectangular cards */
   text-align: center; /* Center text */
 }
 
 .document img {
-  width: 100%; /* Full width */
-  border-radius: 4px; /* Rounded corners */
+  width: 80px; /* Set consistent width for images */
+  height: 80px; /* Set consistent height for images */
+  object-fit: cover; /* Cover to maintain aspect ratio */
+  margin-bottom: 10px; /* Space below the image */
 }
 
 .document-title {
-  font-size: 20px; /* Increased font size */
+  font-size: 20px; /* Increased font size for document title */
   margin: 10px 0; /* Space above and below title */
   color: #333; /* Title color */
 }
 
+.document-description {
+  font-size: 12px; /* Smaller font for description */
+  color: #666; /* Grey color for description text */
+  margin-bottom: 10px; /* Space below the description */
+}
+
+/* Ratings */
 .ratings {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: center; /* Center ratings */
 }
 
 .stars {
-  color: gold; /* Gold color for stars */
+  color: gold; /* Color for stars */
 }
 
 .rating-value {
@@ -393,11 +403,24 @@ input:checked + .slider:before {
 
 .document-list {
   display: flex;
-  flex-wrap: wrap; /* Wrap to next line if necessary */
+  flex-wrap: wrap; /* Allow wrapping */
 }
 
 .document-list .document {
   margin: 10px; /* Space between recent document cards */
+  padding: 10px; /* Consistent padding for recent documents */
+  width: 250px; /* Fixed width for recent documents */
+  height: 180px; /* Fixed height for recent documents */
+  border: 1px solid #ccc; /* Border for recent documents */
+  border-radius: 8px; /* Rounded corners */
+  background: rgba(255, 255, 255, 0.8); /* Light background */
+}
+
+.recent-documents .document img {
+  width: 80px; /* Set consistent width for recent document images */
+  height: 80px; /* Set consistent height for recent document images */
+  object-fit: cover; /* Cover to maintain aspect ratio */
 }
 </style>
+
 
