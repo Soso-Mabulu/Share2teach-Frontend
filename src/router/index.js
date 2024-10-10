@@ -8,6 +8,8 @@ import ForgotPasswordView from '@/views/ForgotPasswordView.vue'
 import ResetPasswordView from '@/views/ResetPasswordView.vue'
 import ModeratorDashboardView from '@/views/ModeratorDashboardView.vue'
 import UploadDocuments from '@/components/UploadDocuments.vue';
+import ViewAllDocumentsView from '@/views/ViewAllDocumentsView.vue';
+import ModerateDocumentsView from '@/views/ModerateDocumentsView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -58,6 +60,22 @@ const router = createRouter({
       name: 'UploadDocuments',
       component: UploadDocuments,
     },
+    { 
+      path: '/pending-documents', 
+      name: 'PendingDocuments', 
+      component: ViewAllDocumentsView 
+    },
+    { 
+      path: '/approved-documents', 
+      name: 'ApprovedDocuments', 
+      component: ViewAllDocumentsView 
+    },
+    {
+      path: '/moderate-documents',
+      name: 'ModerateDocumentsView',
+      component: ModerateDocumentsView
+    }
+
   ]
 })
 

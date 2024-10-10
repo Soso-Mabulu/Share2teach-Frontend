@@ -35,7 +35,7 @@
           </div>
         </div>
       </div>
-      <button class="view-all-btn">View All {{ sectionName }} Documents</button>
+      <button class="view-all-btn"  @click="viewAllDocuments(sectionName)">View All {{ sectionName }} Documents</button>
     </div>
 
     <!-- Preview Modal -->
@@ -63,6 +63,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
+import { useRouter } from 'vue-router'; // Import the router
 import axios from 'axios';
 import defaultImage from '@/assets/documentIcon.png';
 
@@ -77,6 +78,7 @@ const showModal = ref(false);
 const currentDocument = ref(null);
 const currentDocumentPreviewImages = ref([]);
 const currentImageIndex = ref(0);
+const router = useRouter(); // Initialize router
 
 onMounted(() => {
   console.log('Component mounted, fetching documents...');
@@ -102,9 +104,13 @@ const limitedDocuments = computed(() => {
   return limited;
 });
 
-const currentPreviewImage = computed(() => {
-  return currentDocumentPreviewImages.value[currentImageIndex.value] || defaultImage;
-});
+function viewAllDocuments(sectionName) {
+  if (sectionName === 'pending') {
+    router.push({ name: 'PendingDocuments' });
+  } else if (sectionName === 'approved') {
+    router.push({ name: 'ApprovedDocuments' });
+  }
+}
 
 async function fetchDocuments() {
   try {
