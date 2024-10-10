@@ -1,6 +1,18 @@
+<!-- eslint-disable vue/no-unused-vars -->
 <template>
-  <div class="hero">
+  <div :class="['hero', { 'dark-mode': isDarkMode }]">
     <h1>Welcome to your dashboard!</h1>
+
+    <!-- Light/Dark Mode Switch -->
+    <div class="mode-switch">
+      <label class="switch">
+        <input type="checkbox" v-model="isDarkMode" />
+        <span class="slider">
+          <i v-if="isDarkMode" class="moon-icon">🌙</i>
+          <i v-if="!isDarkMode" class="sun-icon">☀️</i>
+        </span>
+      </label>
+    </div>
 
     <!-- Search Bar -->
     <div class="search-bar">
@@ -38,24 +50,25 @@
     <h2>High Rated Documents</h2>
     <div class="carousel">
       <div class="carousel-controls left">
-        <button @click="prevSlide" :disabled="currentIndex === 0">&#60;</button>
+        <button class="carousel-button" @click="prevSlide" :disabled="currentIndex === 0">&#60;</button>
       </div>
       <div class="documents-container">
         <div
           class="document"
-          v-for="(document) in displayedDocuments"
+          v-for="(document, index) in displayedDocuments"
           :key="document.id"
         >
-          <img :src="document.image" :alt="document.title" />
-          <h3>{{ document.title }}</h3>
-          <p>{{ document.description }}</p>
+          <img :src="document.preview_image_url" :alt="document.title" />
+          <h3 class="document-title">{{ document.title }}</h3>
+          <p class="document-description">{{ document.description }}</p>
           <div class="ratings">
-            <span>{{ document.rating }}</span> {{ document.ratingValue }}
+            <span class="stars">★★★★★</span>
+            <span class="rating-value">{{ document.ratingValue }}</span>
           </div>
         </div>
       </div>
       <div class="carousel-controls right">
-        <button @click="nextSlide" :disabled="currentIndex + displayCount >= highRatedDocuments.length">&#62;</button>
+        <button class="carousel-button" @click="nextSlide" :disabled="currentIndex + displayCount >= approvedDocuments.length">&#62;</button>
       </div>
     </div>
 
@@ -64,10 +77,11 @@
       <h2>Recent Documents</h2>
       <div class="document-list">
         <div class="document" v-for="document in recentDocuments" :key="document.id">
-          <img :src="document.image" :alt="document.title" />
-          <h3>{{ document.title }}</h3>
+          <img :src="document.preview_image_url" :alt="document.title" />
+          <h3 class="document-title">{{ document.title }}</h3>
           <div class="ratings">
-            <span>{{ document.rating }}</span> {{ document.ratingValue }}
+            <span class="stars">★★★★★</span>
+            <span class="rating-value">{{ document.ratingValue }}</span>
           </div>
         </div>
       </div>
@@ -76,8 +90,49 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
+import axios from 'axios';
+import defaultImage from '@/assets/documentIcon.png';
 
+const isDarkMode = ref(false); // State for dark mode
+const approvedDocuments = ref([]);
+const recentDocuments = ref([]);
+
+// Fetch documents when the component is mounted
+onMounted(() => {
+  fetchDocuments();
+});
+
+// Fetch approved documents from the API
+async function fetchDocuments() {
+  try {
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('token');
+
+    const headers = { Authorization: `Bearer ${token}` };
+
+    // Fetch approved documents
+    const approvedResponse = await axios.get(`${import.meta.env.VITE_API_URL}api/v1/documents/approved`, { headers });
+    approvedDocuments.value = approvedResponse.data.documents.map(doc => ({
+      title: doc.title || 'Unknown title',
+      fileName: doc.fileName || 'Unknown Document',
+      preview_image_url: doc.preview_image_url || defaultImage,
+      description: doc.description || 'No description available',
+      rating: doc.rating || 'N/A',
+      ratingValue: doc.ratingValue || 'No Rating Value',
+    }));
+
+    console.log('Fetched approved documents:', approvedDocuments.value);
+
+    // Set recent documents
+    recentDocuments.value = approvedDocuments.value.slice(0, 5); // Example: first 5 approved documents
+
+  } catch (error) {
+    console.error('Failed to fetch documents:', error.message);
+  }
+}
+
+// Filtering logic based on search query and selected filters
 const searchQuery = ref('');
 const selectedModule = ref('');
 const selectedYear = ref('');
@@ -85,43 +140,21 @@ const selectedUniversity = ref('');
 const displayCount = 4; // Number of documents to display at a time
 const currentIndex = ref(0); // Current index for the displayed documents
 
-const highRatedDocuments = ref([
-  { id: 1, image: 'https://via.placeholder.com/200x120', title: 'Document Title 1', description: 'Short description of document 1.', rating: '⭐⭐⭐⭐⭐', ratingValue: 5.0 },
-  { id: 2, image: 'https://via.placeholder.com/200x120', title: 'Document Title 2', description: 'Short description of document 2.', rating: '⭐⭐⭐⭐', ratingValue: 4.0 },
-  { id: 3, image: 'https://via.placeholder.com/200x120', title: 'Document Title 3', description: 'Short description of document 3.', rating: '⭐⭐⭐⭐⭐', ratingValue: 5.0 },
-  { id: 4, image: 'https://via.placeholder.com/200x120', title: 'Document Title 4', description: 'Short description of document 4.', rating: '⭐⭐⭐⭐⭐', ratingValue: 5.0 },
-  { id: 5, image: 'https://via.placeholder.com/200x120', title: 'Document Title 5', description: 'Short description of document 5.', rating: '⭐⭐⭐⭐', ratingValue: 4.0 },
-  { id: 6, image: 'https://via.placeholder.com/200x120', title: 'Document Title 6', description: 'Short description of document 6.', rating: '⭐⭐⭐⭐⭐', ratingValue: 5.0 },
-  { id: 7, image: 'https://via.placeholder.com/200x120', title: 'Document Title 7', description: 'Short description of document 7.', rating: '⭐⭐⭐⭐', ratingValue: 4.0 },
-  { id: 8, image: 'https://via.placeholder.com/200x120', title: 'Document Title 8', description: 'Short description of document 8.', rating: '⭐⭐⭐⭐⭐', ratingValue: 5.0 },
-]);
-
-const recentDocuments = ref([
-  { id: 1, image: 'https://via.placeholder.com/200x120', title: 'Recent Document 1', rating: '⭐⭐⭐⭐', ratingValue: 4.0 },
-  { id: 2, image: 'https://via.placeholder.com/200x120', title: 'Recent Document 2', rating: '⭐⭐⭐⭐⭐', ratingValue: 5.0 },
-  { id: 3, image: 'https://via.placeholder.com/200x120', title: 'Recent Document 3', rating: '⭐⭐⭐⭐', ratingValue: 4.0 },
-  { id: 4, image: 'https://via.placeholder.com/200x120', title: 'Recent Document 4', rating: '⭐⭐⭐⭐⭐', ratingValue: 5.0 },
-]);
-
 const displayedDocuments = computed(() => {
-  return highRatedDocuments.value.slice(currentIndex.value, currentIndex.value + displayCount);
+  return approvedDocuments.value.slice(currentIndex.value, currentIndex.value + displayCount);
 });
 
 const nextSlide = () => {
-  if (currentIndex.value + displayCount < highRatedDocuments.value.length) {
-    currentIndex.value += displayCount; // Increment index by displayCount
+  if (currentIndex.value + displayCount < approvedDocuments.value.length) {
+    currentIndex.value += displayCount;
   }
 };
 
 const prevSlide = () => {
   if (currentIndex.value > 0) {
-    currentIndex.value -= displayCount; // Decrement index by displayCount
+    currentIndex.value -= displayCount;
   }
 };
-
-
-
-
 </script>
 
 <style scoped>
@@ -132,12 +165,94 @@ const prevSlide = () => {
   min-height: calc(100vh - 60px);
   border-radius: 8px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s;
+}
+
+.dark-mode {
+  background-color: #121212; /* Dark mode background */
+  color: white; /* Light text color */
 }
 
 .hero h1 {
   font-size: 28px;
   margin-bottom: 20px;
   color: var(--color-text-dark);
+}
+
+/* Increased font size for section titles */
+h2 {
+  font-size: 24px; /* Increased font size for section titles */
+  margin-bottom: 15px; /* Space below titles */
+  color: #333; /* Title color */
+}
+
+/* Mode Switch */
+.mode-switch {
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 30px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc; /* Default switch color */
+  transition: .4s;
+  border-radius: 34px; /* Rounded corners */
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 2px;
+  bottom: 2px;
+  background-color: white; /* Circle color */
+  transition: .4s;
+  border-radius: 50%; /* Circle shape */
+}
+
+input:checked + .slider {
+  background-color: #6200ea; /* Color when checked */
+}
+
+input:checked + .slider:before {
+  transform: translateX(30px); /* Move circle to the right */
+}
+
+/* Icons */
+.moon-icon,
+.sun-icon {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 16px; /* Icon size */
+}
+
+.moon-icon {
+  left: 8px; /* Position for moon icon */
+}
+
+.sun-icon {
+  right: 8px; /* Position for sun icon */
 }
 
 /* Search Bar */
@@ -155,6 +270,8 @@ const prevSlide = () => {
   padding: 10px;
   border: none; /* Remove default border */
   outline: none; /* Remove outline on focus */
+  background-color: inherit; /* Match background color */
+  color: inherit; /* Match text color */
 }
 
 .search-icon {
@@ -171,7 +288,7 @@ const prevSlide = () => {
 
 .search-button {
   padding: 10px 20px;
-  background-color: #f90; /* Amazon-like button color */
+  background-color: #6200ea; /* Purple button color */
   border: none;
   color: white;
   cursor: pointer;
@@ -179,7 +296,7 @@ const prevSlide = () => {
 }
 
 .search-button:hover {
-  background-color: #d68e1c; /* Darker shade on hover */
+  background-color: #3700b3; /* Darker purple on hover */
 }
 
 /* Filters */
@@ -188,95 +305,99 @@ const prevSlide = () => {
 }
 
 .filters select {
-  padding: 10px;
-  border: 1px solid var(--color-border);
-  border-radius: 5px;
   margin-right: 10px;
+  padding: 10px;
+  border: 1px solid #ccc; /* Grey border */
+  border-radius: 5px;
 }
 
-/* Carousel Styles */
+/* Carousel */
 .carousel {
   display: flex;
-  position: relative; /* To position controls */
-  padding: 20px 0;
+  align-items: center;
+  margin-bottom: 20px;
 }
 
 .documents-container {
   display: flex;
-  overflow: hidden; /* Hide overflow for sliding effect */
+  overflow-x: auto; /* Allow horizontal scrolling */
 }
 
-.carousel .document {
-  background: rgba(255, 255, 255, 0.8);
-  border: 3px solid var(--color-border); /* Border for documents */
-  border-radius: 5px;
-  padding: 10px;
-  width: 220px;
-  margin: 0 10px; /* Margin for spacing */
-  text-align: center;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Shadow for document */
-  transition: transform 0.3s; /* Smooth transition for sliding */
+.document {
+  margin: 0 10px; /* Space between cards */
+  padding: 15px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Shadow effect */
+  width: 200px; /* Fixed width */
+  text-align: center; /* Center text */
 }
 
-.carousel .document img {
-  max-width: 100%;
-  height: 120px;
-  border-radius: 5px;
+.document img {
+  width: 100%; /* Full width */
+  border-radius: 4px; /* Rounded corners */
+}
+
+.document-title {
+  font-size: 20px; /* Increased font size */
+  margin: 10px 0; /* Space above and below title */
+  color: #333; /* Title color */
+}
+
+.ratings {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stars {
+  color: gold; /* Gold color for stars */
+}
+
+.rating-value {
+  margin-left: 5px; /* Space between stars and rating value */
+  color: #666; /* Grey color for rating value */
 }
 
 /* Carousel Controls */
 .carousel-controls {
   display: flex;
-  align-items: center;
 }
 
-.carousel-controls button {
-  background: #f90;
-  border: none;
-  color: white;
+.carousel-button {
   padding: 10px;
+  background-color: #6200ea; /* Button color */
+  color: white;
+  border: none;
   cursor: pointer;
-  border-radius: 5px;
   transition: background-color 0.3s;
-}
-.carousel .document:hover {
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3); /* Shadow effect on hover */
-  transform: translateY(-2px); /* Slight lift effect on hover */
+  border-radius: 5px; /* Rounded corners */
 }
 
-.carousel-controls button:disabled {
-  background: #ccc; /* Grey out disabled buttons */
-  cursor: not-allowed; /* Change cursor for disabled */
+.carousel-button:hover {
+  background-color: #3700b3; /* Darker color on hover */
 }
 
-.carousel-controls button:hover:not(:disabled) {
-  background: #d68e1c; /* Darker shade on hover */
+.carousel-controls.left {
+  margin-right: 10px; /* Space on the right */
+}
+
+.carousel-controls.right {
+  margin-left: 10px; /* Space on the left */
 }
 
 /* Recent Documents */
 .recent-documents {
-  margin-top: 40px;
+  margin-top: 20px; /* Space above recent documents */
 }
 
 .document-list {
   display: flex;
-  flex-wrap: wrap; /* Wrap documents if needed */
+  flex-wrap: wrap; /* Wrap to next line if necessary */
 }
 
-.recent-documents .document {
-  margin: 10px; /* Spacing between documents */
-  padding: 10px;
-  background: rgba(255, 255, 255, 0.8);
-  border: 2px solid var(--color-border); /* Added border for recent documents */
-  border-radius: 5px;
-  width: 220px; /* Fixed width for recent documents */
-  text-align: center;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-.recent-documents img {
-  max-width: 100%;
-  height: 120px;
-  border-radius: 5px;
+.document-list .document {
+  margin: 10px; /* Space between recent document cards */
 }
 </style>
+
