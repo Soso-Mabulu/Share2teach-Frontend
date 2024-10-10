@@ -9,6 +9,7 @@ import ModaratorNavbar from '@/components/ModaratorNavbar.vue';
 const router = useRouter();
 
 // Form state
+const title = ref('');
 const module = ref('');
 const description = ref('');
 const university = ref('');
@@ -102,6 +103,7 @@ const uploadDocuments = async () => {
       formData.append('files', files.value[i]);
     }
   }
+  formData.append('title', title.value);
   formData.append('module', module.value);
   formData.append('description', description.value);
   formData.append('university', university.value);
@@ -123,6 +125,7 @@ const uploadDocuments = async () => {
       toastMessage.value = 'Documents uploaded successfully!';
       toastType.value = 'success';
       // Clear form fields
+      title.value = '';
       module.value = '';
       description.value = '';
       university.value = '';
@@ -139,7 +142,6 @@ const uploadDocuments = async () => {
     toastType.value = 'error';
   }
 };
-
 // Function to select a suggestion
 const selectModuleSuggestion = (suggestion) => {
   module.value = suggestion;
@@ -172,6 +174,17 @@ const selectAcademicYearSuggestion = (suggestion) => {
       <h2 class="text-4xl font-extrabold text-gray-800 mb-8">Upload Documents</h2>
 
       <form @submit.prevent="uploadDocuments" class="space-y-6">
+        <!-- Title -->
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">Title</label>
+          <input
+            v-model="title"
+            type="text"
+            class="mt-2 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 transition duration-300 ease-in-out dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+            placeholder="Enter Document Title"
+            required
+          />
+        </div>
         <!-- Module -->
         <div>
           <label class="block text-sm font-semibold text-gray-700">Module</label>
