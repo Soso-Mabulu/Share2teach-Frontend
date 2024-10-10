@@ -255,5 +255,3 @@ nav ul li .nav-link:hover {
 }
 </style>
 
-git config --global user.email "mxolisiprince87@gmail.com"
-git config --global user.name "Leece"
