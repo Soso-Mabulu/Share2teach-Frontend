@@ -7,6 +7,8 @@ import PublicUserView from '@/views/PublicUserView.vue';
 import ForgotPasswordView from '@/views/ForgotPasswordView.vue';
 import ResetPasswordView from '@/views/ResetPasswordView.vue';
 import SearchResultsView from '@/views/SearchResultsView.vue'; // Import the new view
+import ModeratorDashboardView from '@/views/ModeratorDashboardView.vue'
+import UploadDocuments from '@/components/UploadDocuments.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -50,6 +52,17 @@ const router = createRouter({
       path: '/search-results', // New route for search results
       name: 'search-results',
       component: SearchResultsView,
+    },
+    ,
+    {
+      path: '/moderator-dashboard',
+      name: 'ModeratorDashboardView',
+      component: ModeratorDashboardView
+    },
+    {
+      path: '/upload-documents',
+      name: 'UploadDocuments',
+      component: UploadDocuments,
     },
   ],
 });
