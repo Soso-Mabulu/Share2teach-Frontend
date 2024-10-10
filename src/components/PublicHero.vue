@@ -1,4 +1,3 @@
-<!-- eslint-disable vue/no-unused-vars -->
 <template>
   <div :class="['hero', { 'dark-mode': isDarkMode }]">
     <h1>Welcome to your dashboard!</h1>
@@ -12,38 +11,6 @@
           <i v-if="!isDarkMode" class="sun-icon">☀️</i>
         </span>
       </label>
-    </div>
-
-    <!-- Search Bar -->
-    <div class="search-bar">
-      <div class="search-icon">
-        <img src="https://via.placeholder.com/20" alt="Search" />
-      </div>
-      <input
-        type="text"
-        placeholder="Search documents..."
-        v-model="searchQuery"
-      />
-      <button class="search-button">Search</button>
-    </div>
-
-    <!-- Filters -->
-    <div class="filters">
-      <select v-model="selectedModule">
-        <option value="">Select Module</option>
-        <option value="module1">Module 1</option>
-        <option value="module2">Module 2</option>
-      </select>
-      <select v-model="selectedYear">
-        <option value="">Select Year</option>
-        <option value="2022">2022</option>
-        <option value="2023">2023</option>
-      </select>
-      <select v-model="selectedUniversity">
-        <option value="">Select University</option>
-        <option value="uni1">University 1</option>
-        <option value="uni2">University 2</option>
-      </select>
     </div>
 
     <!-- Carousel for High Rated Documents -->
@@ -122,8 +89,6 @@ async function fetchDocuments() {
       ratingValue: doc.ratingValue || 'No Rating Value',
     }));
 
-    console.log('Fetched approved documents:', approvedDocuments.value);
-
     // Set recent documents
     recentDocuments.value = approvedDocuments.value.slice(0, 5); // Example: first 5 approved documents
 
@@ -133,10 +98,6 @@ async function fetchDocuments() {
 }
 
 // Filtering logic based on search query and selected filters
-const searchQuery = ref('');
-const selectedModule = ref('');
-const selectedYear = ref('');
-const selectedUniversity = ref('');
 const displayCount = 4; // Number of documents to display at a time
 const currentIndex = ref(0); // Current index for the displayed documents
 
@@ -179,7 +140,6 @@ const prevSlide = () => {
   color: var(--color-text-dark);
 }
 
-/* Increased font size for section titles */
 h2 {
   font-size: 24px; /* Increased font size for section titles */
   margin-bottom: 15px; /* Space below titles */
@@ -253,62 +213,6 @@ input:checked + .slider:before {
 
 .sun-icon {
   right: 8px; /* Position for sun icon */
-}
-
-/* Search Bar */
-.search-bar {
-  display: flex;
-  align-items: center;
-  margin-bottom: 20px;
-  border: 1px solid #ccc; /* Grey border */
-  border-radius: 5px;
-  overflow: hidden;
-}
-
-.search-bar input {
-  width: 100%;
-  padding: 10px;
-  border: none; /* Remove default border */
-  outline: none; /* Remove outline on focus */
-  background-color: inherit; /* Match background color */
-  color: inherit; /* Match text color */
-}
-
-.search-icon {
-  display: flex;
-  align-items: center;
-  padding: 10px;
-  background-color: #f1f1f1; /* Light background for icon */
-}
-
-.search-icon img {
-  width: 20px; /* Size of the icon */
-  height: 20px;
-}
-
-.search-button {
-  padding: 10px 20px;
-  background-color: #6200ea; /* Purple button color */
-  border: none;
-  color: white;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.search-button:hover {
-  background-color: #3700b3; /* Darker purple on hover */
-}
-
-/* Filters */
-.filters {
-  margin-bottom: 20px;
-}
-
-.filters select {
-  margin-right: 10px;
-  padding: 10px;
-  border: 1px solid #ccc; /* Grey border */
-  border-radius: 5px;
 }
 
 /* Carousel Styles */
@@ -398,29 +302,13 @@ input:checked + .slider:before {
 
 /* Recent Documents */
 .recent-documents {
-  margin-top: 20px; /* Space above recent documents */
+  margin-top: 30px; /* Space above the section */
 }
 
 .document-list {
   display: flex;
-  flex-wrap: wrap; /* Allow wrapping */
+  flex-wrap: wrap; /* Wrap document cards */
+  gap: 10px; /* Space between cards */
 }
 
-.document-list .document {
-  margin: 10px; /* Space between recent document cards */
-  padding: 10px; /* Consistent padding for recent documents */
-  width: 250px; /* Fixed width for recent documents */
-  height: 180px; /* Fixed height for recent documents */
-  border: 1px solid #ccc; /* Border for recent documents */
-  border-radius: 8px; /* Rounded corners */
-  background: rgba(255, 255, 255, 0.8); /* Light background */
-}
-
-.recent-documents .document img {
-  width: 80px; /* Set consistent width for recent document images */
-  height: 80px; /* Set consistent height for recent document images */
-  object-fit: cover; /* Cover to maintain aspect ratio */
-}
 </style>
-
-
