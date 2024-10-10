@@ -82,67 +82,106 @@
   </main>
 </template>
 
-<script>
+<script setup>
+import { ref } from 'vue'
 import axios from 'axios'
+import { useRouter } from 'vue-router'
 
-export default {
-  name: 'SignupView',
-  data() {
-    return {
-      firstname: '',
-      lastname: '',
-      email: '',
-      password: '',
-      passwordError: '',
-      loading: false,
-      errorMessage: '' // For displaying errors
+// Define reactive variables
+const firstname = ref('')
+const lastname = ref('')
+const email = ref('')
+const password = ref('')
+const passwordError = ref('')
+const loading = ref(false)
+const errorMessage = ref('')
+
+// Use router for navigation
+const router = useRouter()
+
+// Validate password function
+function validatePassword(password) {
+  const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,}$/
+  return regex.test(password)
+}
+
+// Signup function
+async function signup() {
+  loading.value = true // Set loading to true at the beginning
+  passwordError.value = '' // Reset error message
+
+  if (!validatePassword(password.value)) {
+    passwordError.value =
+      'Password must be at least 8 characters long, include at least one uppercase letter, one lowercase letter, and one number.'
+    loading.value = false // Reset loading state after validation
+    return
+  }
+
+  try {
+    const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/v1/auth/signup`, {
+      userName: firstname.value,
+      userLName: lastname.value,
+      email: email.value,
+      password: password.value
+    })
+
+    console.log(response.data)
+    router.push('/login') // Redirecting to login page
+  } catch (error) {
+    console.error('Signup Error:', error)
+    if (error.response && error.response.data) {
+      passwordError.value = error.response.data.message || 'An error occurred. Please try again.'
+    } else {
+      passwordError.value = 'An unexpected error occurred.'
     }
-  },
-  methods: {
-    validatePassword(password) {
-      const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,}$/
-      return regex.test(password)
-    },
-    async signup() {
-      this.loading = true // Set loading to true at the beginning
-      this.passwordError = '' // Reset error message
-      if (!this.validatePassword(this.password)) {
-        this.passwordError =
-          'Password must be at least 8 characters long, include at least one uppercase letter, one lowercase letter, and one number.'
-        this.loading = false // Reset loading state after validation
-        return
-      }
+  } finally {
+    loading.value = false // Reset loading state after try/catch
+  }
+}
 
-      try {
-        const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/v1/auth/signup`, {
-          firstname: this.firstname,
-          lastname: this.lastname,
-          email: this.email,
-          password: this.password
-        })
+// Signup with Google function
+async function signupWithGoogle() {
+  try {
+    // Redirect to your backend authentication route that handles Google OAuth
+    window.location.href = `${import.meta.env.VITE_API_URL}/api/v1/auth/google`
+  } catch (error) {
+    // Handle any errors that occur during the redirect
+    console.error('Google login error:', error) // Log the error for debugging
+  }
+}
 
-        console.log(response.data)
-        this.$router.push('/login') // Redirecting to login page
-      } catch (error) {
-        console.error('Signup Error:', error)
-        if (error.response && error.response.data) {
-          this.passwordError = error.response.data.message || 'An error occurred. Please try again.'
-        } else {
-          this.passwordError = 'An unexpected error occurred.'
-        }
-      } finally {
-        this.loading = false // Reset loading state after try/catch
-      }
-    },
-    signupWithGoogle() {
-      // Logic for Google signup (if applicable)
-      console.log('Google signup initiated')
-      // Implement your Google sign-in logic here.
+// Function to decode base64 URL-encoded token
+// (This function is already declared earlier in the script)
+
+// Use a route guard or mounted hook to handle the token after redirect
+async function handleTokenFromRedirect() {
+  const token = new URLSearchParams(window.location.search).get('token')
+  if (token) {
+    localStorage.setItem('token', token) // Save token to local storage
+    const payload = token.split('.')[1] // Get the payload part of the token
+    const decodedToken = base64UrlDecode(payload) // Decode the token
+
+    const userRole = decodedToken.role // Get user role from the token
+
+    // Redirect based on role
+    if (userRole === 'admin') {
+      router.push({ path: '/admin-dashboard' })
+    } else {
+      router.push({ path: '/user-dashboard' })
     }
   }
 }
-</script>
 
+// Call handleTokenFromRedirect() after your component mounts
+handleTokenFromRedirect()
+
+// Function to decode base64 URL-encoded token
+function base64UrlDecode(str) {
+  const base64 = str.replace(/-/g, '+').replace(/_/g, '/')
+  const padded = base64 + '='.repeat((4 - (base64.length % 4)) % 4)
+  return JSON.parse(window.atob(padded))
+}
+</script>
 <style scoped>
 /* Add any additional styles if needed */
 .loader {

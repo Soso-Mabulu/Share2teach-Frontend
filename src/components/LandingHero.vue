@@ -4,19 +4,18 @@ import { RouterLink } from 'vue-router'
 
 <template>
   <div class="min-h-screen flex flex-col">
-    <!-- Updated Hero Section -->
+    <!-- Updated Hero Section with top-to-bottom gradient -->
     <section
-      class="bg-gradient-to-r from-blue-50 to-blue-200 flex-grow flex items-center justify-center px-4 py-32"
+      class="bg-gradient-to-b from-purple-100 via-white to-white flex-grow flex items-center justify-center px-4 py-32"
     >
       <div
         class="container mx-auto flex flex-col lg:flex-row items-center justify-center space-y-12 lg:space-y-0"
       >
         <!-- Hero Text Section -->
         <div class="max-w-lg text-center lg:text-left lg:w-1/2 lg:ml-4">
-          <!-- Added lg:ml-4 -->
           <h1 class="text-4xl lg:text-6xl font-extrabold text-gray-800 mb-6">
             Learn Efficiently. <br />
-            <span class="text-blue-600">Share Knowledge.</span>
+            <span class="text-purple-600">Share Knowledge.</span>
           </h1>
           <p class="text-lg text-gray-700 mb-8">
             Join our platform and start your journey towards effective learning and teaching, with
@@ -27,14 +26,14 @@ import { RouterLink } from 'vue-router'
           <div class="flex flex-col lg:flex-row gap-4">
             <RouterLink
               to="/login"
-              class="block w-full lg:w-auto bg-blue-600 text-white px-6 py-3 rounded-lg shadow-lg hover:bg-blue-700 transition duration-300"
+              class="block w-full lg:w-auto bg-purple-600 text-white px-6 py-3 rounded-lg shadow-lg hover:bg-purple-700 transition duration-300"
             >
               Get Started
             </RouterLink>
 
             <RouterLink
               to="/learn-more"
-              class="block w-full lg:w-auto border border-blue-600 text-blue-600 px-6 py-3 rounded-lg hover:bg-blue-50 transition duration-300"
+              class="block w-full lg:w-auto border border-purple-600 text-purple-600 px-6 py-3 rounded-lg hover:bg-purple-50 transition duration-300"
             >
               Learn More
             </RouterLink>
@@ -43,7 +42,6 @@ import { RouterLink } from 'vue-router'
 
         <!-- Educational Image Section -->
         <div class="hidden lg:block lg:max-w-2xl lg:max-h-[600px] mt-12 lg:mt-0 lg:ml-16">
-          <!-- Changed lg:max-h-[500px] to lg:max-h-[600px] -->
           <img
             src="@/assets/landinghero.jpg"
             alt="Educational"
@@ -58,7 +56,7 @@ import { RouterLink } from 'vue-router'
 <style scoped>
 /* Additional styling to match navbar flow */
 h1 span {
-  color: #2563eb; /* Blue text to match navbar gradient */
+  color: #9333ea; /* Purple text to match the gradient */
 }
 
 nav button {

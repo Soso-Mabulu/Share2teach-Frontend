@@ -18,7 +18,7 @@
           >
             <h1 class="font-semibold text-gray-800">{{ faq.question }}</h1>
             <span
-              :class="faqOpen[faq.faqId] ? 'text-white bg-blue-500' : 'text-gray-400 bg-gray-200'"
+              :class="faqOpen[faq.faqId] ? 'text-white bg-purple-500' : 'text-gray-400 bg-gray-200'"
               class="rounded-full"
             >
               <svg

@@ -14,7 +14,7 @@
       </div>
       <form @submit.prevent="login" class="space-y-5">
         <div>
-          <label class="font-medium"> Email </label>
+          <label class="font-medium">Email</label>
           <input
             type="email"
             v-model="email"
@@ -23,7 +23,7 @@
           />
         </div>
         <div>
-          <label class="font-medium"> Password </label>
+          <label class="font-medium">Password</label>
           <input
             type="password"
             v-model="password"
@@ -49,7 +49,6 @@
           :disabled="loading"
           class="w-full px-4 py-2 text-white font-medium bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-600 rounded-lg duration-150 flex items-center justify-center gap-2"
         >
-          <!-- Display loading spinner or text based on loading state -->
           <span v-if="loading" class="loader"></span>
           <span v-else>Sign in</span>
         </button>
@@ -76,79 +75,116 @@
   </main>
 </template>
 
-<script>
+<script setup>
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import axios from 'axios'
 
-export default {
-  name: 'LoginView',
-  data() {
-    return {
-      email: '',
-      password: '',
-      loading: false,
-      errorMessage: '' // Added error message state
+// Define reactive state variables
+const email = ref('')
+const password = ref('')
+const loading = ref(false)
+const errorMessage = ref('')
+
+// Use router
+const router = useRouter()
+
+// Function to decode base64 URL
+// Removed duplicate function declaration
+
+// Login function
+async function login() {
+  loading.value = true // Set loading to true at the beginning
+  errorMessage.value = '' // Reset error message
+  try {
+    const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/v1/auth/login`, {
+      email: email.value,
+      password: password.value
+    })
+
+    const token = response.data.token
+    localStorage.setItem('token', token)
+
+    const payload = token.split('.')[1]
+    const decodedToken = base64UrlDecode(payload)
+
+    const userRole = decodedToken.role
+
+    if (userRole === 'admin') {
+      router.push({ path: '/admin-dashboard', query: { token } })
+    } else {
+      router.push({ path: '/user-dashboard', query: { token } })
     }
-  },
-  methods: {
-    base64UrlDecode(str) {
-      const base64 = str.replace(/-/g, '+').replace(/_/g, '/')
-      return JSON.parse(atob(base64))
-    },
+    if (userRole === 'educator') {
+      router.push({ path: '/educator-dashboard', query: { token } })
+    } else {
+      router.push({ path: '/user-dashboard', query: { token } })
+    }
+  } catch (error) {
+    // Handle errors appropriately
+    if (error.response) {
+      errorMessage.value = error.response.data.message || 'Login failed. Please try again.' // Set error message from the server response
+    } else if (error.request) {
+      errorMessage.value = 'Network error. Please check your connection.'
+    } else {
+      errorMessage.value = 'An unexpected error occurred. Please try again.'
+    }
+  } finally {
+    loading.value = false // Reset loading state after try/catch
+  }
+}
 
-    async login() {
-      this.loading = true // Set loading to true at the beginning
-      this.errorMessage = '' // Reset error message
-      try {
-        const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/v1/auth/login`, {
-          email: this.email,
-          password: this.password
-        })
+// Function for forgot password
+function forgotPassword() {
+  router.push('/forgot-password') // Redirect to the forgot password page
+}
 
-        const token = response.data.token
-        localStorage.setItem('token', token)
+// Google login function
+async function loginWithGoogle() {
+  try {
+    // Redirect to your backend authentication route that handles Google OAuth
+    window.location.href = `${import.meta.env.VITE_API_URL}/api/v1/auth/google`
+  } catch (error) {
+    // Handle any errors that occur during the redirect
+    console.error('Google login error:', error) // Log the error for debugging
+  }
+}
 
-        const payload = token.split('.')[1]
-        const decodedToken = this.base64UrlDecode(payload)
+// Function to decode base64 URL-encoded token
+function base64UrlDecode(str) {
+  const base64 = str.replace(/-/g, '+').replace(/_/g, '/')
+  const padded = base64 + '='.repeat((4 - (base64.length % 4)) % 4)
+  return JSON.parse(window.atob(padded))
+}
 
-        const userRole = decodedToken.role
+// Use a route guard or mounted hook to handle the token after redirect
+async function handleTokenFromRedirect() {
+  const token = new URLSearchParams(window.location.search).get('token')
+  if (token) {
+    localStorage.setItem('token', token) // Save token to local storage
+    const payload = token.split('.')[1] // Get the payload part of the token
+    const decodedToken = base64UrlDecode(payload) // Decode the token
 
-        if (userRole === 'admin') {
-          this.$router.push({ path: '/admin-dashboard', query: { token } })
-        } else {
-          this.$router.push({ path: '/user-dashboard', query: { token } })
-        }
-      } catch (error) {
-        // Handle errors appropriately
-        if (error.response) {
-          // Server responded with a status other than 2xx
-          this.errorMessage = error.response.data.message || 'Login failed. Please try again.' // Set error message from the server response
-        } else if (error.request) {
-          // Request was made but no response received
-          this.errorMessage = 'Network error. Please check your connection.'
-        } else {
-          // Something else happened
-          this.errorMessage = 'An unexpected error occurred. Please try again.'
-        }
-      } finally {
-        this.loading = false // Reset loading state after try/catch
-      }
-    },
+    const userRole = decodedToken.role // Get user role from the token
 
-    forgotPassword() {
-      // Logic for forgot password (if applicable)
-      this.$router.push('/forgot-password') // Redirect to the forgot password page
-    },
-
-    loginWithGoogle() {
-      // Logic for Google login (if applicable)
-      // You can implement Google login here
+    // Redirect based on role
+    if (userRole === 'admin') {
+      router.push({ path: '/admin-dashboard' })
+    } 
+    else if (userRole === 'educator') {
+      router.push({ path: '/educator-dashboard' })
+    }
+    else {
+      router.push({ path: '/user-dashboard' })
     }
   }
 }
+
+// Call handleTokenFromRedirect() after your component mounts
+handleTokenFromRedirect()
 </script>
 
 <style scoped>
-/* Add any scoped styles here if necessary */
 .loader {
   border: 2px solid #f3f3f3;
   border-radius: 50%;

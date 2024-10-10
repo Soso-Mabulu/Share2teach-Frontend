@@ -3,6 +3,9 @@ import HomeView from '@/views/HomeView.vue'
 import AboutView from '@/views/AboutView.vue'
 import LoginView from '@/views/LoginView.vue'
 import SignupView from '@/views/SignupView.vue'
+import PublicUserView from '@/views/PublicUserView.vue'
+import ForgotPasswordView from '@/views/ForgotPasswordView.vue'
+import ResetPasswordView from '@/views/ResetPasswordView.vue'
 import AdminDashboardView from '@/views/AdminDashboardView.vue'
 
 const router = createRouter({
@@ -15,18 +18,33 @@ const router = createRouter({
     },
     {
       path: '/about',
-      name: 'AboutView',
+      name: 'about',
       component: AboutView
     },
     {
       path: '/login',
-      name: 'LoginView',
+      name: 'login',
       component: LoginView
     },
     {
       path: '/signup',
-      name: 'SignupView',
+      name: 'signup',
       component: SignupView
+    },
+    {
+      path: '/user-dashboard',
+      name: 'PublicUserView',
+      component: PublicUserView
+    },
+    {
+      path: '/forgot-password',
+      name: 'ForgotPasswordView',
+      component: ForgotPasswordView
+    },
+    {
+      path: '/reset-password',
+      name: 'ResetPasswordView',
+      component: ResetPasswordView
     },
     {
       path: '/admin-dashboard',
