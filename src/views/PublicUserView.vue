@@ -3,7 +3,6 @@ import Sidebar from '@/components/SideBar.vue'; // Adjust the import path as nec
 import PublicHero from '@/components/PublicHero.vue'; // Import the PublicHero component
 import MainFooter from '@/components/MainFooter.vue'; // Import the Footer
 import MainNavbar from '@/components/MainNavbar.vue'; // Import the MainNavbar component
-import PublicDocumentSearch from '@/components/PublicDocumentSearch.vue'; // Import the PublicDocumentSearch component
 </script>
 
 <template>
@@ -11,10 +10,7 @@ import PublicDocumentSearch from '@/components/PublicDocumentSearch.vue'; // Imp
     <MainNavbar />
     <div class="main-content">
       <Sidebar />
-      <div class="hero-search-container">
-        <PublicDocumentSearch class="search-container" />
-        <PublicHero />
-      </div>
+      <PublicHero/>
     </div>
     <MainFooter />
   </div>

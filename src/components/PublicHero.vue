@@ -1,56 +1,68 @@
 <template>
-  <div :class="['hero', { 'dark-mode': isDarkMode }]">
-    <h1>Welcome to your dashboard!</h1>
+  <div :class="['User-dashboard', { 'dark-mode': isDarkMode }]">
+    <h1 class="dashboard-title">User Dashboard</h1>
 
-    <!-- Light/Dark Mode Switch -->
-    <div class="mode-switch">
-      <label class="switch">
-        <input type="checkbox" v-model="isDarkMode" />
-        <span class="slider">
-          <i v-if="isDarkMode" class="moon-icon">🌙</i>
-          <i v-if="!isDarkMode" class="sun-icon">☀️</i>
-        </span>
-      </label>
+    <div class="search-filter-container">
+      <div class="search-bar-wrapper">
+        <input 
+          type="text" 
+          v-model="searchQuery" 
+          placeholder="Search documents..." 
+          class="search-bar"
+          @keyup.enter="handleSearch" 
+        />
+        <i class="fas fa-search search-icon"></i>
+      </div>
+      <div class="filter-options">
+        <label class="dark-mode-switch">
+          <input type="checkbox" v-model="isDarkMode" @change="toggleDarkMode" />
+          <span class="toggle-slider"></span>
+          <span class="toggle-label">Dark Mode</span>
+        </label>
+      </div>
     </div>
 
-    <!-- Carousel for High Rated Documents -->
-    <h2>High Rated Documents</h2>
-    <div class="carousel">
-      <div class="carousel-controls left">
-        <button class="carousel-button" @click="prevSlide" :disabled="currentIndex === 0">&#60;</button>
-      </div>
+    <!-- Only approved documents section -->
+    <div class="document-section">
+      <h2 class="section-title">High Rated Documents</h2>
       <div class="documents-container">
-        <div
-          class="document"
-          v-for="(document, index) in displayedDocuments"
-          :key="document.id"
-        >
-          <img :src="document.preview_image_url" :alt="document.title" />
-          <h3 class="document-title">{{ document.title }}</h3>
-          <p class="document-description">{{ document.description }}</p>
-          <div class="ratings">
-            <span class="stars">★★★★★</span>
-            <span class="rating-value">{{ document.ratingValue }}</span>
+        <div class="documents-grid">
+          <div 
+            v-for="(document, index) in limitedDocuments.approved" 
+            :key="index" 
+            class="document-card"
+            @click="showPreview(document)"
+          >
+            <img :src="document.preview_image_url || defaultImage" alt="Document Preview" class="document-image" />
+            <div class="doc-info">
+              <h3 class="doc-title">{{ document.title }}</h3>
+              <p class="description">{{ document.description }}</p>
+              <p class="author">By: {{ document.author }}</p>
+            </div>
           </div>
         </div>
       </div>
-      <div class="carousel-controls right">
-        <button class="carousel-button" @click="nextSlide" :disabled="currentIndex + displayCount >= approvedDocuments.length">&#62;</button>
-      </div>
+      <button class="view-all-btn">View All Approved Documents</button>
     </div>
 
-    <!-- Recent Documents Section -->
-    <div class="recent-documents">
-      <h2>Recent Documents</h2>
-      <div class="document-list">
-        <div class="document" v-for="document in recentDocuments" :key="document.id">
-          <img :src="document.preview_image_url" :alt="document.title" />
-          <h3 class="document-title">{{ document.title }}</h3>
-          <div class="ratings">
-            <span class="stars">★★★★★</span>
-            <span class="rating-value">{{ document.ratingValue }}</span>
-          </div>
+    <!-- Preview Modal -->
+    <div v-if="showModal" class="modal-overlay" @click="closePreview">
+      <div class="modal-content" @click.stop>
+        <h2>{{ currentDocument.title }}</h2>
+        <div class="preview-images-container">
+          <button @click="prevImage" class="nav-button left">
+            <i class="fas fa-chevron-left"></i>
+          </button>
+          <img :src="currentPreviewImage" alt="Preview" class="preview-image" />
+          <button @click="nextImage" class="nav-button right">
+            <i class="fas fa-chevron-right"></i>
+          </button>
         </div>
+        <p>{{ currentImageIndex + 1 }} / {{ currentDocumentPreviewImages.length }}</p>
+        <p class="description">{{ currentDocument.description }}</p>
+        <p class="author">By: {{ currentDocument.author }}</p>
+        <a :href="currentDocument.download_url" class="download-btn" download>Download Full Document</a>
+        <button class="close-btn" @click="closePreview">Close</button>
       </div>
     </div>
   </div>
@@ -58,257 +70,449 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 import axios from 'axios';
 import defaultImage from '@/assets/documentIcon.png';
 
-const isDarkMode = ref(false); // State for dark mode
-const approvedDocuments = ref([]);
-const recentDocuments = ref([]);
+const documents = ref({
+  approved: [],
+});
 
-// Fetch documents when the component is mounted
+const searchQuery = ref('');
+const isDarkMode = ref(false);
+const showModal = ref(false);
+const currentDocument = ref(null);
+const currentDocumentPreviewImages = ref([]);
+const currentImageIndex = ref(0);
+const router = useRouter();
+
 onMounted(() => {
+  console.log('Component mounted, fetching documents...');
   fetchDocuments();
 });
 
-// Fetch approved documents from the API
+const limitedDocuments = computed(() => {
+  return {
+    approved: documents.value.approved.slice(0, 4),
+  };
+});
+
+const currentPreviewImage = computed(() => {
+  return currentDocumentPreviewImages.value[currentImageIndex.value] || defaultImage;
+});
+
 async function fetchDocuments() {
   try {
     const urlParams = new URLSearchParams(window.location.search);
     const token = urlParams.get('token');
-
     const headers = { Authorization: `Bearer ${token}` };
 
-    // Fetch approved documents
     const approvedResponse = await axios.get(`${import.meta.env.VITE_API_URL}api/v1/documents/approved`, { headers });
-    approvedDocuments.value = approvedResponse.data.documents.map(doc => ({
-      title: doc.title || 'Unknown title',
-      fileName: doc.fileName || 'Unknown Document',
-      preview_image_url: doc.preview_image_url || defaultImage,
-      description: doc.description || 'No description available',
-      rating: doc.rating || 'N/A',
-      ratingValue: doc.ratingValue || 'No Rating Value',
-    }));
-
-    // Set recent documents
-    recentDocuments.value = approvedDocuments.value.slice(0, 5); // Example: first 5 approved documents
+    documents.value.approved = mapDocuments(approvedResponse.data.documents);
 
   } catch (error) {
     console.error('Failed to fetch documents:', error.message);
   }
 }
 
-// Filtering logic based on search query and selected filters
-const displayCount = 4; // Number of documents to display at a time
-const currentIndex = ref(0); // Current index for the displayed documents
+function mapDocuments(docs) {
+  return docs.map(doc => ({
+    title: doc.title || 'Unknown title',
+    preview_image_url: doc.preview_image_url || defaultImage,
+    description: doc.description || 'No description available',
+    author: doc.author || 'Unknown Author',
+    light_preview_url: doc.light_preview_url || '',
+    download_url: doc.download_url || '',
+  }));
+}
 
-const displayedDocuments = computed(() => {
-  return approvedDocuments.value.slice(currentIndex.value, currentIndex.value + displayCount);
-});
+function showPreview(document) {
+  currentDocument.value = document;
+  currentDocumentPreviewImages.value = document.light_preview_url ? document.light_preview_url.split(',') : [];
+  currentImageIndex.value = 0;
+  showModal.value = true;
+}
 
-const nextSlide = () => {
-  if (currentIndex.value + displayCount < approvedDocuments.value.length) {
-    currentIndex.value += displayCount;
+function closePreview() {
+  showModal.value = false;
+}
+
+function toggleDarkMode() {
+  document.body.classList.toggle('dark-mode', isDarkMode.value);
+}
+
+function nextImage() {
+  currentImageIndex.value = (currentImageIndex.value + 1) % currentDocumentPreviewImages.value.length;
+}
+
+function prevImage() {
+  currentImageIndex.value = (currentImageIndex.value - 1 + currentDocumentPreviewImages.value.length) % currentDocumentPreviewImages.value.length;
+}
+
+function handleSearch() {
+  if (searchQuery.value) {
+    // Navigate to the search results page with the search query as a parameter
+    router.push({ name: 'search-results', query: { term: searchQuery.value } });
   }
-};
-
-const prevSlide = () => {
-  if (currentIndex.value > 0) {
-    currentIndex.value -= displayCount;
-  }
-};
+}
 </script>
 
 <style scoped>
-.hero {
-  margin-top: 60px;
+.User-dashboard {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   padding: 20px;
-  background-color: var(--color-bg-light);
-  min-height: calc(100vh - 60px);
-  border-radius: 8px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  transition: background-color 0.3s;
+  color: #333;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #f5f5f5;
 }
 
 .dark-mode {
-  background-color: #121212; /* Dark mode background */
-  color: white; /* Light text color */
+  background-color: #1a1a1a;
+  color: #f5f5f5;
 }
 
-.hero h1 {
-  font-size: 28px;
-  margin-bottom: 20px;
-  color: var(--color-text-dark);
-}
-
-h2 {
-  font-size: 24px; /* Increased font size for section titles */
-  margin-bottom: 15px; /* Space below titles */
-  color: #333; /* Title color */
-}
-
-/* Mode Switch */
-.mode-switch {
-  margin-bottom: 20px;
-  display: flex;
-  align-items: center;
-}
-
-.switch {
+.dashboard-title {
+  text-align: center;
+  margin-bottom: 30px;
+  font-size: 2.5em;
+  color: #2c3e50;
+  text-transform: uppercase;
+  letter-spacing: 2px;
   position: relative;
-  display: inline-block;
-  width: 60px;
-  height: 30px;
+  padding-bottom: 10px;
 }
 
-.switch input {
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
-.slider {
+.dashboard-title::after {
+  content: '';
   position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 4px;
+  background-color: #3498db;
+}
+
+.section-title {
+  text-align: center;
+  margin-bottom: 25px;
+  font-size: 1.8em;
+  color: #34495e;
+  text-transform: capitalize;
+  letter-spacing: 1px;
+}
+
+.search-filter-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 30px;
+  width: 100%;
+  max-width: 600px;
+}
+
+.search-bar-wrapper {
+  position: relative;
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.search-bar {
+  padding: 12px 40px 12px 20px;
+  width: 100%;
+  border-radius: 25px;
+  border: 2px solid #3498db;
+  font-size: 16px;
+  transition: all 0.3s ease;
+}
+
+.search-bar:focus {
+  outline: none;
+  box-shadow: 0 0 10px rgba(52, 152, 219, 0.5);
+}
+
+.search-icon {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #3498db;
+}
+
+.dark-mode-switch {
+  display: inline-flex;
+  align-items: center;
   cursor: pointer;
+}
+
+.dark-mode-switch input {
+  display: none;
+}
+
+.toggle-slider {
+  position: relative;
+  width: 50px;
+  height: 24px;
+  background-color: #ccc;
+  border-radius: 34px;
+  transition: .4s;
+}
+
+.toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 20px;
+  width: 20px;
+  left: 2px;
+  bottom: 2px;
+  background-color: white;
+  border-radius: 50%;
+  transition: .4s;
+}
+
+input:checked + .toggle-slider {
+  background-color: #3498db;
+}
+
+input:checked + .toggle-slider:before {
+  transform: translateX(26px);
+}
+
+.toggle-label {
+  margin-left: 10px;
+  font-weight: 500;
+}
+
+.document-section {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 40px;
+}
+
+.documents-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.documents-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+  max-width: 1200px;
+  width: 100%;
+}
+
+.document-card {
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+  background-color: #ffffff;
+}
+
+.document-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+.document-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.doc-info {
+  padding: 20px;
+}
+
+.doc-title {
+  margin: 0 0 10px;
+  font-size: 1.2em;
+  color: #2c3e50;
+}
+
+.description {
+  font-size: 0.9em;
+  color: #7f8c8d;
+  margin-bottom: 10px;
+}
+
+.author {
+  font-size: 0.8em;
+  color: #95a5a6;
+}
+
+.view-all-btn {
+  display: inline-block;
+  padding: 12px 24px;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 1em;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.view-all-btn:hover {
+  background-color: #2980b9;
+  transform: translateY(-2px);
+  box-shadow: 0 7px 14px rgba(50, 50, 93, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08);
+}
+
+.view-all-btn:active {
+  transform: translateY(1px);
+}
+
+.modal-overlay {
+  position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: #ccc; /* Default switch color */
-  transition: .4s;
-  border-radius: 34px; /* Rounded corners */
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-.slider:before {
-  position: absolute;
-  content: "";
-  height: 26px;
-  width: 26px;
-  left: 2px;
-  bottom: 2px;
-  background-color: white; /* Circle color */
-  transition: .4s;
-  border-radius: 50%; /* Circle shape */
+.modal-content {
+  background: white;
+  padding: 30px;
+  border-radius: 15px;
+  width: 90%;
+  max-width: 800px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
 }
 
-input:checked + .slider {
-  background-color: #6200ea; /* Color when checked */
+.preview-images-container {
+  position: relative;
+  margin: 20px 0;
 }
 
-input:checked + .slider:before {
-  transform: translateX(30px); /* Move circle to the right */
+.preview-image {
+  width: 100%;
+  max-height: 400px;
+  object-fit: contain;
 }
 
-/* Icons */
-.moon-icon,
-.sun-icon {
+.nav-button {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  font-size: 16px; /* Icon size */
-}
-
-.moon-icon {
-  left: 8px; /* Position for moon icon */
-}
-
-.sun-icon {
-  right: 8px; /* Position for sun icon */
-}
-
-/* Carousel Styles */
-.carousel {
-  display: flex;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-.documents-container {
-  display: flex;
-  overflow-x: auto; /* Allow horizontal scrolling */
-}
-
-.document {
-  margin: 0 10px; /* Space between cards */
-  padding: 10px; /* Consistent padding for cards */
-  background-color: white; /* Background for document cards */
-  border-radius: 8px; /* Rounded corners */
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Light shadow for depth */
-  width: 250px; /* Fixed width for rectangular cards */
-  height: 180px; /* Fixed height for rectangular cards */
-  text-align: center; /* Center text */
-}
-
-.document img {
-  width: 80px; /* Set consistent width for images */
-  height: 80px; /* Set consistent height for images */
-  object-fit: cover; /* Cover to maintain aspect ratio */
-  margin-bottom: 10px; /* Space below the image */
-}
-
-.document-title {
-  font-size: 20px; /* Increased font size for document title */
-  margin: 10px 0; /* Space above and below title */
-  color: #333; /* Title color */
-}
-
-.document-description {
-  font-size: 12px; /* Smaller font for description */
-  color: #666; /* Grey color for description text */
-  margin-bottom: 10px; /* Space below the description */
-}
-
-/* Ratings */
-.ratings {
-  display: flex;
-  align-items: center;
-  justify-content: center; /* Center ratings */
-}
-
-.stars {
-  color: gold; /* Color for stars */
-}
-
-.rating-value {
-  margin-left: 5px; /* Space between stars and rating value */
-  color: #666; /* Grey color for rating value */
-}
-
-/* Carousel Controls */
-.carousel-controls {
-  display: flex;
-}
-
-.carousel-button {
-  padding: 10px;
-  background-color: #6200ea; /* Button color */
+  background: rgba(0,0,0,0.5);
   color: white;
   border: none;
+  padding: 10px;
   cursor: pointer;
-  transition: background-color 0.3s;
-  border-radius: 5px; /* Rounded corners */
+  transition: background 0.3s ease;
 }
 
-.carousel-button:hover {
-  background-color: #3700b3; /* Darker color on hover */
+.nav-button:hover {
+  background: rgba(0,0,0,0.8);
 }
 
-.carousel-controls.left {
-  margin-right: 10px; /* Space on the right */
+.nav-button.left {
+  left: 10px;
 }
 
-.carousel-controls.right {
-  margin-left: 10px; /* Space on the left */
+.nav-button.right {
+  right: 10px;
 }
 
-/* Recent Documents */
-.recent-documents {
-  margin-top: 30px; /* Space above the section */
+.download-btn {
+  display: inline-block;
+  padding: 10px 20px;
+  background: #2ecc71;
+  color: white;
+  text-decoration: none;
+  border-radius: 5px;
+  margin-top: 20px;
+  transition: background-color 0.3s ease;
 }
 
-.document-list {
-  display: flex;
-  flex-wrap: wrap; /* Wrap document cards */
-  gap: 10px; /* Space between cards */
+.download-btn:hover {
+  background: #27ae60;
 }
 
+.close-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #333;
+}
+
+.close-btn:hover {
+  color: #e74c3c;
+}
+
+/* Dark mode styles */
+.dark-mode .dashboard-title {
+  color: #ecf0f1;
+}
+
+.dark-mode .dashboard-title::after {
+  background-color: #3498db;
+}
+
+.dark-mode .section-title {
+  color: #bdc3c7;
+}
+
+.dark-mode .search-bar {
+  background-color: #2c3e50;
+  color: #ecf0f1;
+  border-color: #3498db;
+}
+
+.dark-mode .search-icon {
+  color: #3498db;
+}
+
+.dark-mode .document-card {
+  background-color: #34495e;
+  border-color: #2c3e50;
+}
+
+.dark-mode .doc-title {
+  color: #ecf0f1;
+}
+
+.dark-mode .description {
+  color: #bdc3c7;
+}
+
+.dark-mode .author {
+  color: #95a5a6;
+}
+
+.dark-mode .modal-content {
+  background-color: #2c3e50;
+  color: #ecf0f1;
+}
+
+.dark-mode .close-btn {
+  color: #ecf0f1;
+}
+
+.dark-mode .close-btn:hover {
+  color: #e74c3c;
+}
 </style>
