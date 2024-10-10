@@ -15,22 +15,22 @@
           type="text" 
           v-model="searchTerm" 
           placeholder="Enter search term..." 
-          class="search-bar"
           @keyup.enter="handleSearch"
+          class="search-bar"
         />
         <i class="fas fa-search search-icon" @click="handleSearch"></i>
       </div>
 
       <div class="filters">
-        <select v-model="selectedModule" class="filter-select" @change="applyFilters">
+        <select v-model="selectedModule" class="filter-select">
           <option value="">All Modules</option>
           <option v-for="module in modules" :key="module">{{ module }}</option>
         </select>
-        <select v-model="selectedYear" class="filter-select" @change="applyFilters">
+        <select v-model="selectedYear" class="filter-select">
           <option value="">All Years</option>
           <option v-for="year in years" :key="year">{{ year }}</option>
         </select>
-        <select v-model="selectedUniversity" class="filter-select" @change="applyFilters">
+        <select v-model="selectedUniversity" class="filter-select">
           <option value="">All Universities</option>
           <option v-for="uni in universities" :key="uni">{{ uni }}</option>
         </select>
@@ -38,143 +38,132 @@
 
       <h2 v-if="searchTerm" class="results-title">Results for "{{ searchTerm }}"</h2>
 
-      <!-- Loading indicator moved to the top -->
-      <div v-if="isLoading" class="loading">
-        <div class="spinner"></div>
-        <p>Searching for documents...</p>
-      </div>
-
       <div v-if="filteredResults.length" class="results-container">
-        <div v-for="document in filteredResults" :key="document.id" class="document-card">
-          <img 
-            :src="document.preview_image_url || defaultImage" 
-            alt="Preview" 
-            class="preview-image"
-          />
-          <div class="document-info">
-            <h3 class="doc-title">{{ document.title }}</h3>
-            <p class="description">{{ document.description }}</p>
-            <p class="author">By: {{ document.author }}</p>
-            <p class="module">Module: {{ document.module }}</p>
-            <p class="year">Year: {{ document.year }}</p>
-            <p class="university">University: {{ document.university }}</p>
-            <a :href="document.download_url" class="download-btn" download>Download</a>
-          </div>
-        </div>
+  <div v-for="document in filteredResults" :key="document.fileName" class="document-card">
+    <img 
+      :src="document.preview_image_url" 
+      alt="Preview" 
+      class="preview-image"
+    />
+    <div class="document-info">
+      <h3 class="doc-title">{{ document.title }}</h3>
+      <p class="description">{{ document.description }}</p>
+      
+      <div class="document-details">
+        <p><strong>Author:</strong> {{ document.author || 'N/A' }}</p>
+        <p><strong>Year:</strong> {{ document.year || 'N/A' }}</p>
+        <p><strong>Publication Date:</strong> {{ document.publication_date || 'N/A' }}</p>
+        <p><strong>Size:</strong> {{ document.size ? document.size + ' MB' : 'N/A' }}</p>
+        <p><strong>University:</strong> {{ document.university || 'N/A' }}</p>
       </div>
+      
+      <a :href="document.location" target="_blank" class="download-btn">Download</a>
+    </div>
+  </div>
+</div>
 
       <div v-else-if="!filteredResults.length && !isLoading" class="no-results">
         <p>No documents found.</p>
       </div>
 
+      <div v-if="isLoading" class="loading">
+        <div class="spinner"></div>
+        <p>Searching for documents...</p>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
-import { ref, computed, onMounted, watch } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
-import axios from 'axios';
-
 export default {
-  setup() {
-    const route = useRoute();
-    const router = useRouter();
-    const searchTerm = ref(route.query.term || '');
-    const results = ref([]);
-    const isLoading = ref(false);
-    const isDarkMode = ref(false);
-
-    const selectedModule = ref('');
-    const selectedYear = ref('');
-    const selectedUniversity = ref('');
-
-    const modules = ref([]);
-    const years = ref([]);
-    const universities = ref([]);
-
-    const filteredResults = computed(() => {
-      return results.value.filter(doc => 
-        (!selectedModule.value || doc.module === selectedModule.value) &&
-        (!selectedYear.value || doc.year === selectedYear.value) &&
-        (!selectedUniversity.value || doc.university === selectedUniversity.value)
+  data() {
+    return {
+      results: [],
+      searchTerm: this.$route.query.term || '',
+      isLoading: false,
+      isDarkMode: false,
+      selectedModule: '',
+      selectedYear: '',
+      selectedUniversity: '',
+      modules: [],
+      years: [],
+      universities: [],
+    };
+  },
+  created() {
+    this.isDarkMode = localStorage.getItem('isDarkMode') === 'true';
+    if (this.searchTerm) {
+      this.fetchDocuments(this.searchTerm);
+    }
+  },
+  computed: {
+    filteredResults() {
+      return this.results.filter(doc => 
+        (!this.selectedModule || doc.module === this.selectedModule) &&
+        (!this.selectedYear || (doc.year === this.selectedYear && doc.approved)) && // Filter by year only if the document is approved
+        (!this.selectedUniversity || doc.university === this.selectedUniversity) &&
+        (!this.searchTerm || doc.title.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+         doc.description.toLowerCase().includes(this.searchTerm.toLowerCase())) // Filter by search term
       );
-    });
-
-    onMounted(() => {
-      if (searchTerm.value) {
-        fetchDocuments(searchTerm.value);
-      }
-      fetchApprovedDocuments();
-    });
-
-    watch(() => route.query.term, (newTerm) => {
-      if (newTerm) {
-        searchTerm.value = newTerm;
-        fetchDocuments(newTerm);
-      }
-    });
-
-    const fetchDocuments = async (term) => {
-      isLoading.value = true;
+    }
+  },
+  watch: {
+    '$route.query.term': {
+      handler(newTerm) {
+        this.searchTerm = newTerm;
+        if (newTerm) {
+          this.fetchDocuments(newTerm);
+        }
+      },
+      immediate: true,
+    },
+    isDarkMode(newValue) {
+      localStorage.setItem('isDarkMode', newValue);
+    },
+  },
+  methods: {
+    async fetchDocuments(searchQuery) {
+      this.isLoading = true;
+      this.results = [];
+      
       try {
-        const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/v1/documents/search?search=${term}`, {
+        const url = `${import.meta.env.VITE_API_URL}/api/v1/documents/search?search=${searchQuery}`;
+        const response = await fetch(url, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
           },
         });
-        results.value = response.data.documents || [];
+        
+        if (response.ok) {
+          const data = await response.json();
+          this.results = data.documents || [];
+          this.extractFilters(this.results); // Extract modules, years, and universities
+        } else {
+          console.error('Failed to fetch documents');
+        }
       } catch (error) {
         console.error('Error fetching documents:', error);
       } finally {
-        isLoading.value = false;
+        this.isLoading = false;
       }
-    };
-
-    const fetchApprovedDocuments = async () => {
-      try {
-        const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/v1/documents/approved`, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
-          },
-        });
-        const approvedDocs = response.data.documents || [];
-        modules.value = [...new Set(approvedDocs.map(doc => doc.module))];
-        years.value = [...new Set(approvedDocs.map(doc => doc.year))];
-        universities.value = [...new Set(approvedDocs.map(doc => doc.university))];
-      } catch (error) {
-        console.error('Error fetching approved documents:', error);
+    },
+    extractFilters(documents) {
+      this.modules = [...new Set(documents.map(doc => doc.module))].filter(Boolean);
+      // Extract years from approved documents
+      this.years = [...new Set(documents.filter(doc => doc.approved).map(doc => doc.year))].filter(Boolean);
+      this.universities = [...new Set(documents.map(doc => doc.university))].filter(Boolean);
+    },
+    handleSearch() {
+      if (this.searchTerm) {
+        this.$router.push({ name: 'search-results', query: { term: this.searchTerm } });
       }
-    };
-
-    const handleSearch = () => {
-      if (searchTerm.value) {
-        router.push({ name: 'search-results', query: { term: searchTerm.value } });
-      }
-    };
-
-    const applyFilters = () => {
-      // Access the computed property to update filtered results
-      filteredResults.value; // Just read to trigger reactivity
-    };
-
-    return {
-      searchTerm,
-      filteredResults,
-      isLoading,
-      isDarkMode,
-      handleSearch,
-      selectedModule,
-      selectedYear,
-      selectedUniversity,
-      modules,
-      years,
-      universities,
-      applyFilters,
-    };
-  }
+    },
+  },
 };
 </script>
+
+
+
 
 
 <style scoped>
@@ -299,12 +288,13 @@ input:checked + .slider:before {
 .search-bar:focus {
   outline: none;
   border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
 }
 
 .search-icon {
   position: absolute;
+  right: 1rem;
   top: 50%;
-  left: 10px;
   transform: translateY(-50%);
   color: var(--primary-color);
   cursor: pointer;
@@ -317,91 +307,67 @@ input:checked + .slider:before {
 }
 
 .filter-select {
+  flex: 1;
   padding: 0.5rem;
-  border: 2px solid var(--border-color);
+  border: 1px solid var(--border-color);
   border-radius: 5px;
   background-color: var(--card-background);
   color: var(--text-color);
-  transition: all 0.3s ease;
-}
-
-.filter-select:focus {
-  outline: none;
-  border-color: var(--primary-color);
 }
 
 .results-title {
   font-size: 1.5rem;
-  margin-bottom: 1rem;
-}
-
-.loading {
-  display: flex;
-  align-items: center;
-  margin-bottom: 1rem;
-}
-
-.spinner {
-  border: 4px solid var(--border-color);
-  border-top: 4px solid var(--primary-color);
-  border-radius: 50%;
-  width: 30px;
-  height: 30px;
-  animation: spin 1s linear infinite;
-  margin-right: 10px;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  margin-bottom: 1.5rem;
+  color: var(--secondary-color);
 }
 
 .results-container {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 1.5rem;
+  gap: 2rem;
 }
 
 .document-card {
   background-color: var(--card-background);
-  box-shadow: var(--card-shadow);
-  border-radius: 8px;
+  border-radius: 10px;
   overflow: hidden;
-  padding: 1rem;
+  box-shadow: var(--card-shadow);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.document-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
 }
 
 .preview-image {
   width: 100%;
-  height: auto;
-  border-radius: 5px;
+  height: 150px;
+  object-fit: cover;
 }
 
 .document-info {
-  padding: 0.5rem 0;
+  padding: 1.5rem;
 }
 
 .doc-title {
   font-size: 1.2rem;
-  font-weight: bold;
+  margin-bottom: 0.5rem;
   color: var(--primary-color);
 }
 
 .description {
   font-size: 0.9rem;
-  color: #666;
-}
-
-.author, .module, .year, .university {
-  font-size: 0.8rem;
-  color: #999;
+  color: var(--text-color);
+  opacity: 0.8;
+  margin-bottom: 1rem;
 }
 
 .download-btn {
   display: inline-block;
-  margin-top: 10px;
   padding: 0.5rem 1rem;
   background-color: var(--primary-color);
-  color: white;
+  color: #fff;
   text-decoration: none;
   border-radius: 5px;
   transition: background-color 0.3s ease;
@@ -414,6 +380,55 @@ input:checked + .slider:before {
 .no-results {
   text-align: center;
   font-size: 1.2rem;
-  color: #999;
+  color: var(--text-color);
+}
+
+.loading {
+  text-align: center;
+  font-size: 1.2rem;
+  color: var(--text-color);
+}
+
+.spinner {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  border-top: 4px solid var(--primary-color);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 1rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .main-title {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+  }
+
+  .filters {
+    flex-direction: column;
+  }
+
+  .filter-select {
+    width: 100%;
+  }
+
+  .results-container {
+    grid-template-columns: 1fr;
+  }
 }
 </style>

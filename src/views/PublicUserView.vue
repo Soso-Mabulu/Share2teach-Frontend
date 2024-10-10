@@ -6,20 +6,20 @@ import MainNavbar from '@/components/MainNavbar.vue'; // Import the MainNavbar c
 </script>
 
 <template>
-  <div class="layout">
+  <div class="public-user-view">
     <MainNavbar />
     <div class="main-content">
       <Sidebar />
-      <PublicHero/>
+      <PublicHero />
     </div>
     <MainFooter />
   </div>
 </template>
 
 <style scoped>
-.layout {
+.public-user-view {
   display: flex;
-  flex-direction: column;
+  flex-direction: column; /* Stack navbar and footer vertically */
   height: 100vh; /* Full viewport height */
 }
 
@@ -31,44 +31,22 @@ import MainNavbar from '@/components/MainNavbar.vue'; // Import the MainNavbar c
 .sidebar {
   width: 30%; /* Sidebar takes 30% of the width */
   flex-shrink: 0; /* Prevent sidebar from shrinking */
-}
-
-.hero-search-container {
-  width: 70%; /* Hero and search container take 70% of the width */
-  display: flex;
-  flex-direction: column;
-  height: 100%; /* Fill available height */
-  justify-content: space-between; /* Distribute space evenly */
-  padding: 20px; /* Add padding to create equal space around components */
-}
-
-.search-container {
-  margin-top: 0; /* No additional margin */
-}
-
-.public-document-search {
-  flex: 0 0 auto; /* Keep the document search to its content size */
+  background-color: var(--card-background); /* Optional: Sidebar background color */
+  box-shadow: var(--card-shadow); /* Optional: Add shadow for depth */
 }
 
 .public-hero {
-  flex: 1; /* Fill the remaining space */
+  width: 70%; /* Adjust width as necessary */
+  padding: 20px; /* Add padding for spacing */
 }
 
 @media (max-width: 1024px) {
-  .layout {
+  .main-content {
     flex-direction: column; /* Stack on smaller screens */
   }
 
-  .main-content {
-    flex-direction: column; /* Stack sidebar and content */
-  }
-
-  .sidebar {
-    width: 100%; /* Full width on mobile */
-    order: -1; /* Move sidebar above main content */
-  }
-
-  .hero-search-container {
+  .sidebar,
+  .public-hero {
     width: 100%; /* Full width on mobile */
   }
 }
