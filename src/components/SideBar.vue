@@ -5,6 +5,21 @@
       <i class="icon">{{ isExpanded ? '◀️' : '▶️' }}</i>
     </div>
 
+    <!-- User Profile Section -->
+    <div class="user-profile" @click="openEditModal">
+      <a href="#" class="flex items-center gap-2 p-4 hover:bg-gray-50">
+        <img :src="userAvatar || defaultAvatar" alt="User Avatar" class="w-10 h-10 rounded-full object-cover" />
+        <div v-if="isExpanded">
+          <p class="text-xs">
+            <strong class="block font-medium">
+              {{ user.userName || 'Fetching first name...' }} {{ user.userLName || 'Fetching last name...' }}
+            </strong>
+            <span>{{ user.email || 'Fetching email...' }}</span>
+          </p>
+        </div>
+      </a>
+    </div>
+
     <!-- Navigation -->
     <nav>
       <ul>
@@ -23,23 +38,6 @@
         </li>
       </ul>
     </nav>
-
-    <!-- User Profile Section -->
-    <div class="user-profile" @click="openEditModal">
-      <a href="#" class="flex items-center gap-2 p-4 hover:bg-gray-50">
-        <img :src="userAvatar || defaultAvatar" alt="User Avatar" class="w-10 h-10 rounded-full object-cover" />
-        <div v-if="isExpanded">
-          <p class="text-xs">
-            <strong class="block font-medium">
-              {{ user.userName || 'Fetching first name...' }} {{ user.userLName || 'Fetching last name...' }}
-            </strong>
-            <span>{{ user.email || 'Fetching email...' }}</span>
-          </p>
-        </div>
-      </a>
-    </div>
-
-  
   </div>
 </template>
 
@@ -139,7 +137,6 @@ onMounted(() => {
 });
 </script>
 
-
 <style scoped>
 :root {
   --color-teal-light: #81e6d9;
@@ -219,21 +216,28 @@ nav ul li .nav-link:hover {
 }
 
 .user-profile {
-  position: absolute;
-  bottom: 0;
   width: 100%;
+  background-color: white; /* Optional: You can add a background color for better visibility */
 }
 
 .user-profile a {
   display: flex;
   align-items: center;
   padding: 10px;
-  background-color: white;
-  border-top: 1px solid #ddd;
+  transition: background-color 0.3s ease; /* Add transition for background color */
+}
+
+.user-profile a:hover {
+  background-color: rgba(200, 200, 200, 0.3); /* Change background color on hover */
 }
 
 .user-profile img {
   margin-right: 10px;
+  transition: transform 0.3s ease; /* Add transition for scaling effect */
+}
+
+.user-profile a:hover img {
+  transform: scale(1.1); /* Scale up the image on hover */
 }
 
 @media (max-width: 1023px) { 
