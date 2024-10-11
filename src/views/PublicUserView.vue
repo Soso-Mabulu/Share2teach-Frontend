@@ -38,7 +38,7 @@ import MainNavbar from '@/components/MainNavbar.vue'; // Import the MainNavbar c
 }
 
 .hero-container {
-  width: 70%; /* Adjust width as necessary */
+  width: 100%; /* Adjust width as necessary */
   padding: 20px; /* Add padding for spacing */
   display: flex; /* Use flexbox for centering */
   justify-content: center; /* Center horizontally */

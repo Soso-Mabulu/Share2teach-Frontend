@@ -1,6 +1,6 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 dark:from-gray-900 dark:via-purple-900 dark:to-indigo-900 transition-all duration-500 ease-in-out">
-    <div class="container mx-auto px-4 py-8">
+<div class="min-h-screen w-full max-w-none bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 dark:from-gray-900 dark:via-purple-900 dark:to-indigo-900 transition-all duration-500 ease-in-out">
+  <div class="container mx-auto px-4 py-8">
       <!-- Cosmic Toggle -->
       <div class="flex justify-center mb-8">
         <button @click="toggleDarkMode" class="relative w-24 h-24 rounded-full overflow-hidden group">
@@ -14,7 +14,7 @@
       </div>
 
       <h1 class="text-4xl md:text-6xl font-extrabold text-center text-white mb-12 transform hover:scale-110 transition-transform duration-300 ease-in-out">
-        Cosmic Dashboard
+        User Dashboard
       </h1>
 
       <!-- Search Bar -->
@@ -33,10 +33,26 @@
 
       <!-- High Rated Documents -->
       <div class="mb-12">
-        <h2 class="text-3xl font-bold text-center text-white mb-8">Stellar Documents</h2>
+        <h2 class="text-3xl font-bold text-center text-white mb-8">High Rated Documents</h2>
+        <div class="flex justify-between mb-4">
+          <button 
+            class="px-4 py-2 bg-white bg-opacity-20 rounded-full text-white hover:bg-opacity-30 transition-all duration-300 ease-in-out"
+            @click="prevPage"
+            :disabled="currentPage === 0"
+          >
+            Previous
+          </button>
+          <button 
+            class="px-4 py-2 bg-white bg-opacity-20 rounded-full text-white hover:bg-opacity-30 transition-all duration-300 ease-in-out"
+            @click="nextPage"
+            :disabled="currentPage >= totalPages - 1"
+          >
+            Next
+          </button>
+        </div>
         <div class="flex overflow-x-auto space-x-6 pb-4">
           <div 
-            v-for="(document, index) in highRatedDocuments" 
+            v-for="(document, index) in paginatedDocuments" 
             :key="index" 
             @click="showPreview(document)"
             class="flex-shrink-0 w-64 bg-white bg-opacity-10 backdrop-filter backdrop-blur-lg rounded-lg overflow-hidden transform hover:scale-105 transition-all duration-300 ease-in-out cursor-pointer"
@@ -94,10 +110,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
 import axios from 'axios';
-
-const router = useRouter();
 
 const documents = ref([]);
 const ratings = ref([]);
@@ -109,9 +122,16 @@ const currentDocument = ref(null);
 const currentDocumentPreviewImages = ref([]);
 const currentImageIndex = ref(0);
 const defaultImage = '/api/placeholder/400/320'; // Placeholder image
+const currentPage = ref(0);
+const itemsPerPage = 4; // Show only 4 documents at a time
 
-const currentPreviewImage = computed(() => {
-  return currentDocumentPreviewImages.value[currentImageIndex.value] || defaultImage;
+const paginatedDocuments = computed(() => {
+  const start = currentPage.value * itemsPerPage;
+  return highRatedDocuments.value.slice(start, start + itemsPerPage);
+});
+
+const totalPages = computed(() => {
+  return Math.ceil(highRatedDocuments.value.length / itemsPerPage);
 });
 
 onMounted(() => {
@@ -207,6 +227,18 @@ function prevImage() {
 function handleSearch() {
   if (searchQuery.value) {
     router.push({ name: 'search-results', query: { term: searchQuery.value } });
+  }
+}
+
+function nextPage() {
+  if (currentPage.value < totalPages.value - 1) {
+    currentPage.value++;
+  }
+}
+
+function prevPage() {
+  if (currentPage.value > 0) {
+    currentPage.value--;
   }
 }
 </script>
