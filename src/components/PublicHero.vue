@@ -1,71 +1,92 @@
 <template>
-  <div :class="['User-dashboard', { 'dark-mode': isDarkMode }]">
-    <h1 class="dashboard-title">User Dashboard</h1>
+  <div class="min-h-screen bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 dark:from-gray-900 dark:via-purple-900 dark:to-indigo-900 transition-all duration-500 ease-in-out">
+    <div class="container mx-auto px-4 py-8">
+      <!-- Cosmic Toggle -->
+      <div class="flex justify-center mb-8">
+        <button @click="toggleDarkMode" class="relative w-24 h-24 rounded-full overflow-hidden group">
+          <div class="absolute inset-0 bg-yellow-300 dark:bg-indigo-900 transition-all duration-500 ease-in-out transform group-hover:rotate-180">
+            <div class="absolute inset-2 bg-yellow-500 dark:bg-indigo-700 rounded-full transform transition-all duration-500 ease-in-out group-hover:scale-75"></div>
+          </div>
+          <span class="absolute inset-0 flex items-center justify-center text-4xl">
+            {{ isDarkMode ? '🌙' : '☀️' }}
+          </span>
+        </button>
+      </div>
 
-    <div class="search-filter-container">
-      <div class="search-bar-wrapper">
+      <h1 class="text-4xl md:text-6xl font-extrabold text-center text-white mb-12 transform hover:scale-110 transition-transform duration-300 ease-in-out">
+        Cosmic Dashboard
+      </h1>
+
+      <!-- Search Bar -->
+      <div class="relative mb-12 max-w-2xl mx-auto">
         <input 
           type="text" 
           v-model="searchQuery" 
-          placeholder="Search documents..." 
-          class="search-bar"
-          @keyup.enter="handleSearch" 
+          @keyup.enter="handleSearch"
+          placeholder="Search the cosmos..." 
+          class="w-full py-4 px-6 rounded-full bg-white bg-opacity-20 backdrop-filter backdrop-blur-lg text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-white"
         />
-        <i class="fas fa-search search-icon"></i>
+        <button @click="handleSearch" class="absolute right-2 top-2 bg-white bg-opacity-30 rounded-full p-2 hover:bg-opacity-50 transition-all duration-300 ease-in-out">
+          🔍
+        </button>
       </div>
-      <div class="filter-options">
-        <label class="dark-mode-switch">
-          <input type="checkbox" v-model="isDarkMode" @change="toggleDarkMode" />
-          <span class="toggle-slider"></span>
-          <span class="toggle-label">Dark Mode</span>
-        </label>
-      </div>
-    </div>
 
-    <!-- High Rated Documents Section -->
-    <div class="document-section">
-      <h2 class="section-title">High Rated Documents</h2>
-      <div class="documents-container">
-        <div class="documents-grid">
+      <!-- High Rated Documents -->
+      <div class="mb-12">
+        <h2 class="text-3xl font-bold text-center text-white mb-8">Stellar Documents</h2>
+        <div class="flex overflow-x-auto space-x-6 pb-4">
           <div 
             v-for="(document, index) in highRatedDocuments" 
             :key="index" 
-            class="document-card"
             @click="showPreview(document)"
+            class="flex-shrink-0 w-64 bg-white bg-opacity-10 backdrop-filter backdrop-blur-lg rounded-lg overflow-hidden transform hover:scale-105 transition-all duration-300 ease-in-out cursor-pointer"
           >
-            <img :src="document.preview_image_url || defaultImage" alt="Document Preview" class="document-image" />
-            <div class="doc-info">
-              <h3 class="doc-title">{{ document.title }}</h3>
-              <p class="description">{{ document.description }}</p>
-              <p class="author">By: {{ document.author }}</p>
-              <div class="rating">
-                <span v-for="star in 5" :key="star" class="star" :class="{ filled: star <= document.rating }">&#9733;</span>
+            <img :src="document.preview_image_url || defaultImage" alt="Document Preview" class="w-full h-40 object-cover" />
+            <div class="p-4">
+              <h3 class="text-lg font-semibold text-white mb-2">{{ document.title }}</h3>
+              <p class="text-sm text-gray-300 mb-2">{{ document.description }}</p>
+              <p class="text-xs text-gray-400">By: {{ document.author }}</p>
+              <div class="flex mt-2">
+                <span v-for="star in 5" :key="star" class="text-2xl" :class="{ 'text-yellow-400': star <= document.rating, 'text-gray-600': star > document.rating }">
+                  {{ star <= document.rating ? '★' : '☆' }}
+                </span>
               </div>
             </div>
           </div>
         </div>
       </div>
-      <button class="view-all-btn">View All Approved Documents</button>
+
+      <button class="block mx-auto py-3 px-6 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-full text-white font-semibold transform hover:scale-105 transition-all duration-300 ease-in-out">
+        Explore All Cosmic Documents
+      </button>
     </div>
 
     <!-- Preview Modal -->
-    <div v-if="showModal" class="modal-overlay" @click="closePreview">
-      <div class="modal-content" @click.stop>
-        <h2>{{ currentDocument.title }}</h2>
-        <div class="preview-images-container">
-          <button @click="prevImage" class="nav-button left">
-            <i class="fas fa-chevron-left"></i>
-          </button>
-          <img :src="currentPreviewImage" alt="Preview" class="preview-image" />
-          <button @click="nextImage" class="nav-button right">
-            <i class="fas fa-chevron-right"></i>
+    <div v-if="showModal" class="fixed inset-0 bg-black bg-opacity-50 backdrop-filter backdrop-blur-sm flex items-center justify-center z-50" @click="closePreview">
+      <div class="bg-white dark:bg-gray-800 rounded-lg p-8 max-w-2xl w-full m-4 transform transition-all duration-300 ease-in-out" @click.stop>
+        <h2 class="text-2xl font-bold mb-4 text-gray-800 dark:text-white">{{ currentDocument.title }}</h2>
+        <div class="relative mb-4">
+          <img :src="currentPreviewImage" alt="Preview" class="w-full h-64 object-cover rounded-lg" />
+          <div class="absolute inset-0 flex items-center justify-between">
+            <button @click="prevImage" class="bg-black bg-opacity-50 hover:bg-opacity-75 text-white rounded-full p-2 transform transition-all duration-300 ease-in-out hover:scale-110">
+              ◀
+            </button>
+            <button @click="nextImage" class="bg-black bg-opacity-50 hover:bg-opacity-75 text-white rounded-full p-2 transform transition-all duration-300 ease-in-out hover:scale-110">
+              ▶
+            </button>
+          </div>
+        </div>
+        <p class="text-sm text-gray-600 dark:text-gray-300 mb-2">{{ currentImageIndex + 1 }} / {{ currentDocumentPreviewImages.length }}</p>
+        <p class="text-gray-700 dark:text-gray-300 mb-4">{{ currentDocument.description }}</p>
+        <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">By: {{ currentDocument.author }}</p>
+        <div class="flex justify-between">
+          <a :href="currentDocument.download_url" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded transition-colors duration-300 ease-in-out" download>
+            Download Full Document
+          </a>
+          <button @click="closePreview" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded transition-colors duration-300 ease-in-out">
+            Close
           </button>
         </div>
-        <p>{{ currentImageIndex + 1 }} / {{ currentDocumentPreviewImages.length }}</p>
-        <p class="description">{{ currentDocument.description }}</p>
-        <p class="author">By: {{ currentDocument.author }}</p>
-        <a :href="currentDocument.download_url" class="download-btn" download>Download Full Document</a>
-        <button class="close-btn" @click="closePreview">Close</button>
       </div>
     </div>
   </div>
@@ -75,7 +96,8 @@
 import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import axios from 'axios';
-import defaultImage from '@/assets/documentIcon.png';
+
+const router = useRouter();
 
 const documents = ref([]);
 const ratings = ref([]);
@@ -86,30 +108,30 @@ const showModal = ref(false);
 const currentDocument = ref(null);
 const currentDocumentPreviewImages = ref([]);
 const currentImageIndex = ref(0);
-const router = useRouter();
-
-onMounted(() => {
-  fetchRatings();
-});
+const defaultImage = '/api/placeholder/400/320'; // Placeholder image
 
 const currentPreviewImage = computed(() => {
   return currentDocumentPreviewImages.value[currentImageIndex.value] || defaultImage;
 });
 
+onMounted(() => {
+  fetchRatings();
+  initializeDarkMode();
+});
+
 async function fetchRatings() {
   try {
-    const urlParams = new URLSearchParams(window.location.search);
-    const token = urlParams.get('token');
+    const token = localStorage.getItem('token');
     const headers = { Authorization: `Bearer ${token}` };
 
-    const ratingsResponse = await axios.get(`${import.meta.env.VITE_API_URL}api/v1/ratings`, { headers });
+    const ratingsResponse = await axios.get(`${import.meta.env.VITE_API_URL}/api/v1/ratings`, { headers });
     ratings.value = ratingsResponse.data;
 
     const highRatedIds = ratings.value
       .filter(rating => rating.rating > 3)
       .map(rating => rating.docId);
 
-    fetchHighRatedDocuments(highRatedIds, headers);
+    await fetchHighRatedDocuments(highRatedIds, headers);
   } catch (error) {
     console.error('Failed to fetch ratings:', error.message);
   }
@@ -118,7 +140,7 @@ async function fetchRatings() {
 async function fetchHighRatedDocuments(ids, headers) {
   try {
     const documentPromises = ids.map(async (id) => {
-      const response = await axios.get(`${import.meta.env.VITE_API_URL}api/v1/documents/${id}`, { headers });
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/v1/documents/${id}`, { headers });
 
       if (response.data && response.data.status === 'success') {
         return mapDocument(response.data.document);
@@ -163,7 +185,15 @@ function closePreview() {
 }
 
 function toggleDarkMode() {
-  document.body.classList.toggle('dark-mode', isDarkMode.value);
+  isDarkMode.value = !isDarkMode.value;
+  localStorage.setItem('darkMode', isDarkMode.value);
+  document.documentElement.classList.toggle('dark', isDarkMode.value);
+}
+
+function initializeDarkMode() {
+  const darkModePreference = localStorage.getItem('darkMode');
+  isDarkMode.value = darkModePreference === 'true';
+  document.documentElement.classList.toggle('dark', isDarkMode.value);
 }
 
 function nextImage() {
@@ -181,226 +211,27 @@ function handleSearch() {
 }
 </script>
 
-<style scoped>
-.User-dashboard {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  padding: 20px;
-  color: #333;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background-color: #f5f5f5;
+<style>
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+/* Custom scrollbar styles */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
 }
 
-.dark-mode {
-  background-color: #1a1a1a;
-  color: #f5f5f5;
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
 }
 
-.dashboard-title {
-  text-align: center;
-  margin-bottom: 30px;
-  font-size: 2.5em;
-  color: #2c3e50;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-}
-
-.section-title {
-  text-align: center;
-  margin-bottom: 25px;
-  font-size: 1.8em;
-  color: #34495e;
-  text-transform: capitalize;
-}
-
-.document-section {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.documents-grid {
-  display: flex;
-  overflow-x: auto; /* Allow horizontal scrolling if needed */
-  gap: 20px; /* Space between documents */
-  padding: 10px; /* Optional padding */
-}
-
-.document-card {
-  background: #fff;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 10px;
-  cursor: pointer;
-  transition: transform 0.2s;
-  min-width: 250px; /* Ensure a minimum width for each card */
-}
-
-.document-card:hover {
-  transform: scale(1.05);
-}
-
-.document-image {
-  width: 100%;
-  height: auto;
-  border-radius: 8px;
-}
-
-.doc-info {
-  padding: 10px 0;
-}
-
-.rating {
-  display: flex;
-}
-
-.star {
-  color: #d3d3d3; /* Default star color */
-  font-size: 1.2em; /* Star size */
-}
-
-.star.filled {
-  color: #f39c12; /* Filled star color */
-}
-
-.view-all-btn {
-  padding: 10px 15px;
-  background-color: #4a90e2;
-  color: #fff;
-  border: none;
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
   border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.2s;
 }
 
-.view-all-btn:hover {
-  background-color: #357ab7;
-}
-
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.7);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
-
-.modal-content {
-  background: #fff;
-  padding: 20px;
-  border-radius: 8px;
-  width: 80%;
-  max-width: 600px;
-  text-align: center;
-}
-
-.preview-images-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: 15px 0;
-}
-
-.preview-image {
-  width: 100%;
-  height: auto;
-  border-radius: 8px;
-  max-width: 400px;
-}
-
-.nav-button {
-  background-color: transparent;
-  border: none;
-  cursor: pointer;
-  padding: 0 15px;
-}
-
-.close-btn {
-  padding: 10px 20px;
-  background-color: #e74c3c;
-  color: #fff;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.close-btn:hover {
-  background-color: #c0392b;
-}
-
-.search-filter-container {
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
-  margin-bottom: 20px;
-}
-
-.search-bar-wrapper {
-  position: relative;
-  flex: 1;
-  margin-right: 10px;
-}
-
-.search-bar {
-  width: 100%;
-  padding: 10px 40px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  font-size: 1em;
-}
-
-.search-icon {
-  position: absolute;
-  left: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #999;
-}
-
-.filter-options {
-  display: flex;
-  align-items: center;
-}
-
-.dark-mode-switch {
-  display: flex;
-  align-items: center;
-}
-
-.toggle-slider {
-  width: 40px;
-  height: 20px;
-  background-color: #ddd;
-  border-radius: 20px;
-  position: relative;
-  margin-right: 10px;
-}
-
-.toggle-slider::before {
-  content: '';
-  width: 16px;
-  height: 16px;
-  background-color: white;
-  border-radius: 50%;
-  position: absolute;
-  top: 2px;
-  left: 2px;
-  transition: transform 0.2s;
-}
-
-input[type="checkbox"]:checked + .toggle-slider::before {
-  transform: translateX(20px);
-}
-
-.toggle-label {
-  font-size: 1em;
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5);
 }
 </style>

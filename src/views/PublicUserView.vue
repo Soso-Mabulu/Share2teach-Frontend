@@ -10,7 +10,9 @@ import MainNavbar from '@/components/MainNavbar.vue'; // Import the MainNavbar c
     <MainNavbar />
     <div class="main-content">
       <Sidebar />
-      <PublicHero />
+      <div class="hero-container">
+        <PublicHero />
+      </div>
     </div>
     <MainFooter />
   </div>
@@ -35,9 +37,12 @@ import MainNavbar from '@/components/MainNavbar.vue'; // Import the MainNavbar c
   box-shadow: var(--card-shadow); /* Optional: Add shadow for depth */
 }
 
-.public-hero {
+.hero-container {
   width: 70%; /* Adjust width as necessary */
   padding: 20px; /* Add padding for spacing */
+  display: flex; /* Use flexbox for centering */
+  justify-content: center; /* Center horizontally */
+  align-items: center; /* Center vertically */
 }
 
 @media (max-width: 1024px) {
@@ -46,7 +51,7 @@ import MainNavbar from '@/components/MainNavbar.vue'; // Import the MainNavbar c
   }
 
   .sidebar,
-  .public-hero {
+  .hero-container {
     width: 100%; /* Full width on mobile */
   }
 }
