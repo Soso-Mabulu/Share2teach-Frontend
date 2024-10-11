@@ -3,74 +3,67 @@
                   isDarkMode ? 'bg-gradient-to-br from-gray-900 via-purple-900 to-indigo-900' : 
                   'bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500']">
       <div class="container mx-auto px-4 py-8">
-        <h1 class="text-3xl md:text-4xl lg:text-6xl font-extrabold text-center text-white mb-8 md:mb-12">
+        <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold text-center text-white mb-12 tracking-tight">
           All Approved Documents
         </h1>
   
         <!-- Filter Section -->
-        <div class="flex flex-wrap mb-8">
+        <div class="flex flex-wrap justify-center mb-12 gap-4">
           <input 
             type="text" 
             v-model="searchQuery" 
             placeholder="Search documents..." 
-            class="w-full sm:w-1/4 py-3 md:py-4 px-4 md:px-6 rounded-full bg-white bg-opacity-20 backdrop-filter backdrop-blur-lg text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-white mb-4 sm:mr-4"
+            class="w-full sm:w-64 py-3 px-6 rounded-full bg-white bg-opacity-20 backdrop-filter backdrop-blur-lg text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-white transition-all duration-300"
           />
-          <select v-model="selectedModule" class="w-full sm:w-1/4 py-3 md:py-4 px-4 md:px-6 rounded-full bg-white bg-opacity-20 backdrop-filter backdrop-blur-lg text-white">
-            <option value="">Select Module</option>
+          <select v-model="selectedModule" class="w-full sm:w-48 py-3 px-6 rounded-full bg-white bg-opacity-20 backdrop-filter backdrop-blur-lg text-white transition-all duration-300">
+            <option value="">All Modules</option>
             <option v-for="module in uniqueModules" :key="module" :value="module">{{ module }}</option>
           </select>
-          <select v-model="selectedUniversity" class="w-full sm:w-1/4 py-3 md:py-4 px-4 md:px-6 rounded-full bg-white bg-opacity-20 backdrop-filter backdrop-blur-lg text-white mb-4 sm:mr-4">
-            <option value="">Select University</option>
+          <select v-model="selectedUniversity" class="w-full sm:w-48 py-3 px-6 rounded-full bg-white bg-opacity-20 backdrop-filter backdrop-blur-lg text-white transition-all duration-300">
+            <option value="">All Universities</option>
             <option v-for="university in uniqueUniversities" :key="university" :value="university">{{ university }}</option>
           </select>
-          <select v-model="selectedYear" class="w-full sm:w-1/4 py-3 md:py-4 px-4 md:px-6 rounded-full bg-white bg-opacity-20 backdrop-filter backdrop-blur-lg text-white mb-4 sm:mr-4">
-            <option value="">Select Year</option>
+          <select v-model="selectedYear" class="w-full sm:w-48 py-3 px-6 rounded-full bg-white bg-opacity-20 backdrop-filter backdrop-blur-lg text-white transition-all duration-300">
+            <option value="">All Years</option>
             <option v-for="year in uniqueYears" :key="year" :value="year">{{ year }}</option>
           </select>
-          <select v-model="selectedRating" class="w-full sm:w-1/4 py-3 md:py-4 px-4 md:px-6 rounded-full bg-white bg-opacity-20 backdrop-filter backdrop-blur-lg text-white mb-4 sm:mr-4">
-            <option value="">Select Rating</option>
-            <option v-for="n in 5" :key="n" :value="n">{{ n }} Stars & Above</option>
-          </select>
-          <button @click="applySearch" class="ml-4 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 rounded-full text-white transition-all duration-300 ease-in-out">
+          <button @click="applySearch" class="px-8 py-3 bg-indigo-600 hover:bg-indigo-700 rounded-full text-white font-semibold transition-all duration-300 ease-in-out transform hover:scale-105">
             Filter
           </button>
         </div>
   
         <!-- Approved Documents Section (Grid Layout) -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
           <div 
-            v-for="(document, index) in filteredDocuments" 
+            v-for="document in filteredDocuments" 
             :key="document.id" 
             @click="showPreview(document)"
-            class="flex flex-col bg-white bg-opacity-10 backdrop-filter backdrop-blur-lg rounded-lg overflow-hidden transform hover:scale-105 transition-all duration-300 ease-in-out cursor-pointer"
+            class="flex flex-col bg-white bg-opacity-10 backdrop-filter backdrop-blur-lg rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transform hover:scale-105 transition-all duration-300 ease-in-out cursor-pointer"
           >
-            <img :src="document.preview_image_url || defaultImage" alt="Document Preview" class="w-full h-40 object-cover" />
-            <div class="p-4 flex-grow">
-              <h3 class="text-lg font-semibold text-white mb-2">{{ document.title }}</h3>
-              <p class="text-sm text-gray-300 mb-2">{{ document.description }}</p>
+            <img :src="document.preview_image_url || defaultImage" alt="Document Preview" class="w-full h-48 object-cover" />
+            <div class="p-6 flex-grow">
+              <h3 class="text-xl font-bold text-white mb-2 line-clamp-2">{{ document.title }}</h3>
+              <p class="text-sm text-gray-300 mb-4 line-clamp-3">{{ document.description }}</p>
               <p class="text-xs text-gray-400">By: {{ document.author }}</p>
-              <div class="flex mt-2">
-                <span v-for="star in 5" :key="star" class="text-2xl" :class="{ 'text-yellow-400': star <= document.rating, 'text-gray-600': star > document.rating }">
-                  {{ star <= document.rating ? '★' : '☆' }}
-                </span>
-              </div>
             </div>
           </div>
         </div>
   
         <!-- Preview Modal -->
         <div v-if="showModal" class="fixed inset-0 bg-black bg-opacity-50 backdrop-filter backdrop-blur-sm flex items-center justify-center z-50" @click="closePreview">
-          <div class="bg-white dark:bg-gray-800 rounded-lg p-4 md:p-8 max-w-2xl w-full m-4 transform transition-all duration-300 ease-in-out" @click.stop>
-            <h2 class="text-xl md:text-2xl font-bold mb-4 text-gray-800 dark:text-white">{{ currentDocument.title }}</h2>
-            <img :src="currentDocument.preview_image_url || defaultImage" :alt="currentDocument.title" class="w-full h-48 md:h-64 object-cover rounded-lg" />
-            <p class="text-gray-700 dark:text-gray-300 mb-4">{{ currentDocument.description }}</p>
-            <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">By: {{ currentDocument.author }}</p>
-            <a :href="currentDocument.download_url" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded transition-colors duration-300 ease-in-out mb-2">
-              Download Full Document
-            </a>
-            <button @click="closePreview" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded transition-colors duration-300 ease-in-out">
-              Close
-            </button>
+          <div class="bg-white dark:bg-gray-800 rounded-2xl p-8 max-w-2xl w-full m-4 transform transition-all duration-300 ease-in-out" @click.stop>
+            <h2 class="text-2xl font-bold mb-4 text-gray-800 dark:text-white">{{ currentDocument.title }}</h2>
+            <img :src="currentDocument.preview_image_url || defaultImage" :alt="currentDocument.title" class="w-full h-64 object-cover rounded-lg mb-6" />
+            <p class="text-gray-700 dark:text-gray-300 mb-6">{{ currentDocument.description }}</p>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mb-6">By: {{ currentDocument.author }}</p>
+            <div class="flex justify-between">
+              <a :href="currentDocument.download_url" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-full transition-colors duration-300 ease-in-out">
+                Download Full Document
+              </a>
+              <button @click="closePreview" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-3 px-6 rounded-full transition-colors duration-300 ease-in-out">
+                Close
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -80,22 +73,19 @@
   <script setup>
   import { ref, computed, onMounted } from 'vue';
   import axios from 'axios';
-  import { useRouter } from 'vue-router';
   
-  const router = useRouter();
   const documents = ref([]);
   const approvedDocuments = ref([]);
   const searchQuery = ref('');
   const showModal = ref(false);
   const currentDocument = ref(null);
-  const defaultImage = '/api/placeholder/400/320'; // Placeholder image
-  const isDarkMode = ref(false); // Define isDarkMode here or import it from your store/context
+  const defaultImage = '/api/placeholder/400/320';
+  const isDarkMode = ref(false);
   
-  // Additional Filters
+  // Filters
   const selectedModule = ref('');
   const selectedUniversity = ref('');
   const selectedYear = ref('');
-  const selectedRating = ref('');
   
   // Arrays to hold unique filter options
   const uniqueModules = ref([]);
@@ -111,13 +101,13 @@
       const token = localStorage.getItem('token');
       const headers = { Authorization: `Bearer ${token}` };
   
-      const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/v1/documents/approved`, { headers });
+      const documentsResponse = await axios.get(`${import.meta.env.VITE_API_URL}/api/v1/documents/approved`, { headers });
   
-      if (response.data && response.data.status === 'success') {
-        approvedDocuments.value = response.data.documents.map(mapDocument);
-        extractUniqueFilters(approvedDocuments.value); // Extract unique values for filters
+      if (documentsResponse.data && documentsResponse.data.status === 'success') {
+        approvedDocuments.value = documentsResponse.data.documents.map(mapDocument);
+        extractUniqueFilters(approvedDocuments.value);
       } else {
-        console.error('Failed to fetch approved documents:', response.data);
+        console.error('Failed to fetch approved documents:', documentsResponse.data);
       }
     } catch (error) {
       console.error('Failed to fetch approved documents:', error.message);
@@ -132,10 +122,9 @@
       description: doc.description || 'No description available',
       author: doc.author || 'Unknown Author',
       download_url: doc.download_url || '',
-      rating: doc.rating || 0, // Assuming document has a rating
-      module: doc.module || 'Unknown Module', // Assuming document has a module field
-      university: doc.university || 'Unknown University', // Assuming document has a university field
-      year: doc.academicYear || 'Unknown Year', // Assuming document has a year field
+      module: doc.module || 'Unknown Module',
+      university: doc.university || 'Unknown University',
+      year: doc.academicYear || 'Unknown Year',
     };
   }
   
@@ -170,10 +159,7 @@
       const matchesYear = selectedYear.value ? 
         doc.year === selectedYear.value : true;
   
-      const matchesRating = selectedRating.value ? 
-        doc.rating >= selectedRating.value : true;
-  
-      return matchesSearchQuery && matchesModule && matchesUniversity && matchesYear && matchesRating;
+      return matchesSearchQuery && matchesModule && matchesUniversity && matchesYear;
     });
   });
   
@@ -216,4 +202,3 @@
     background: rgba(255, 255, 255, 0.5);
   }
   </style>
-  
