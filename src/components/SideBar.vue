@@ -55,9 +55,9 @@ const router = useRouter();
 
 // Navigation links
 const links = ref([
-  { text: "Dashboard", icon: "🏠", route: "/dashboard" },
+  { text: "Dashboard", icon: "🏠", route: "/user-dashboard" },
   { text: "Subject", icon: "📚", route: "/subject" },
-  { text: "Search", icon: "🔍", route: "/search" },
+  { text: "Search", icon: "🔍", route: "/search-results" }, // Ensure no trailing space here
   { text: "Contributors", icon: "👥", route: "/contributors" },
   { text: "FAQ", icon: "❓", route: "/faq" },
   { text: "Self Directed Learning", icon: "💡", route: "/self-learning" },
