@@ -77,30 +77,30 @@
         </div>
       </div>
 
-      <!-- Approved Documents Section -->
-<div class="mb-8 md:mb-12">
-  <h2 class="text-2xl md:text-3xl font-bold text-center text-white mb-6 md:mb-8">Browse for Documents</h2>
-  <div class="flex overflow-x-auto space-x-6 pb-4">
-    <div 
-      v-for="(document, index) in approvedDocuments" 
-      :key="index" 
-      @click="showPreview(document)"
-      class="flex-shrink-0 w-64 bg-white bg-opacity-10 backdrop-filter backdrop-blur-lg rounded-lg overflow-hidden transform hover:scale-105 transition-all duration-300 ease-in-out cursor-pointer"
-    >
-      <img :src="document.preview_image_url || defaultImage" alt="Document Preview" class="w-full h-40 object-cover" />
-      <div class="p-4">
-        <h3 class="text-lg font-semibold text-white mb-2">{{ document.title }}</h3>
-        <p class="text-sm text-gray-300 mb-2">{{ document.description }}</p>
-        <p class="text-xs text-gray-400">By: {{ document.author }}</p>
-        <div class="flex mt-2">
-          <span v-for="star in 5" :key="star" class="text-2xl" :class="{ 'text-yellow-400': star <= document.rating, 'text-gray-600': star > document.rating }">
-            {{ star <= document.rating ? '★' : '☆' }}
-          </span>
+  <!-- Approved Documents Section -->
+  <div class="mb-8 md:mb-12">
+    <h2 class="text-2xl md:text-3xl font-bold text-center text-white mb-6 md:mb-8">Browse for Documents</h2>
+    <div class="flex overflow-x-auto space-x-6 pb-4">
+      <div 
+        v-for="(document, index) in approvedDocuments" 
+        :key="index" 
+        @click="showPreview(document)"
+        class="flex-shrink-0 w-64 bg-white bg-opacity-10 backdrop-filter backdrop-blur-lg rounded-lg overflow-hidden transform hover:scale-105 transition-all duration-300 ease-in-out cursor-pointer"
+      >
+        <img :src="document.preview_image_url || defaultImage" alt="Document Preview" class="w-full h-40 object-cover" />
+        <div class="p-4">
+          <h3 class="text-lg font-semibold text-white mb-2">{{ document.title }}</h3>
+          <p class="text-sm text-gray-300 mb-2">{{ document.description }}</p>
+          <p class="text-xs text-gray-400">By: {{ document.author }}</p>
+          <div class="flex mt-2">
+            <span v-for="star in 5" :key="star" class="text-2xl" :class="{ 'text-yellow-400': star <= document.rating, 'text-gray-600': star > document.rating }">
+              {{ star <= document.rating ? '★' : '☆' }}
+            </span>
+          </div>
         </div>
       </div>
     </div>
   </div>
-</div>
 
 
 
@@ -228,16 +228,33 @@ onMounted(() => {
   initializeDarkMode();
 });
 
+// Modified fetchApprovedDocuments function
 async function fetchApprovedDocuments() {
   try {
     const token = localStorage.getItem('token');
     const headers = { Authorization: `Bearer ${token}` };
-    
+
     const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/v1/documents/approved`, { headers });
-    
+
     if (response.data && response.data.status === 'success') {
-      // Take only the first 5 approved documents
-      approvedDocuments.value = response.data.documents.slice(0, 5).map(mapDocument);
+      // Map the approved documents and add the ratings if they exist
+      approvedDocuments.value = response.data.documents.map((doc) => {
+        const documentId = doc.id || doc.docId;
+        const documentRating = ratings.value.find(rating => rating.docId === documentId);
+
+        // Log each document's rating to the console
+        console.log(`Document ID: ${documentId}, Rating: ${documentRating ? documentRating.rating : 'No Rating'}`);
+
+        return {
+          docId: documentId,
+          title: doc.title || 'Unknown title',
+          preview_image_url: doc.preview_image_url || defaultImage,
+          description: doc.description || 'No description available',
+          author: doc.author || 'Unknown Author',
+          download_url: doc.download_url || '',
+          rating: documentRating ? documentRating.rating : 0 // Set the rating or default to 0 if not rated
+        };
+      });
     } else {
       console.error('Failed to fetch approved documents:', response.data);
     }
@@ -245,6 +262,7 @@ async function fetchApprovedDocuments() {
     console.error('Failed to fetch approved documents:', error.message);
   }
 }
+
 
 
 function mapDocument(doc) {
