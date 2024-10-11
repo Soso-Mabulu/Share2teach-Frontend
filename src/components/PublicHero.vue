@@ -22,13 +22,13 @@
       </div>
     </div>
 
-    <!-- Only approved documents section -->
+    <!-- High Rated Documents Section -->
     <div class="document-section">
       <h2 class="section-title">High Rated Documents</h2>
       <div class="documents-container">
         <div class="documents-grid">
           <div 
-            v-for="(document, index) in limitedDocuments.approved" 
+            v-for="(document, index) in highRatedDocuments" 
             :key="index" 
             class="document-card"
             @click="showPreview(document)"
@@ -38,6 +38,9 @@
               <h3 class="doc-title">{{ document.title }}</h3>
               <p class="description">{{ document.description }}</p>
               <p class="author">By: {{ document.author }}</p>
+              <div class="rating">
+                <span v-for="star in 5" :key="star" class="star" :class="{ filled: star <= document.rating }">&#9733;</span>
+              </div>
             </div>
           </div>
         </div>
@@ -74,10 +77,9 @@ import { useRouter } from 'vue-router';
 import axios from 'axios';
 import defaultImage from '@/assets/documentIcon.png';
 
-const documents = ref({
-  approved: [],
-});
-
+const documents = ref([]);
+const ratings = ref([]);
+const highRatedDocuments = ref([]);
 const searchQuery = ref('');
 const isDarkMode = ref(false);
 const showModal = ref(false);
@@ -87,41 +89,66 @@ const currentImageIndex = ref(0);
 const router = useRouter();
 
 onMounted(() => {
-  fetchDocuments();
-});
-
-const limitedDocuments = computed(() => {
-  return {
-    approved: documents.value.approved.slice(0, 4),
-  };
+  fetchRatings();
 });
 
 const currentPreviewImage = computed(() => {
   return currentDocumentPreviewImages.value[currentImageIndex.value] || defaultImage;
 });
 
-async function fetchDocuments() {
+async function fetchRatings() {
   try {
     const urlParams = new URLSearchParams(window.location.search);
     const token = urlParams.get('token');
     const headers = { Authorization: `Bearer ${token}` };
 
-    const approvedResponse = await axios.get(`${import.meta.env.VITE_API_URL}api/v1/documents/approved`, { headers });
-    documents.value.approved = mapDocuments(approvedResponse.data.documents);
+    const ratingsResponse = await axios.get(`${import.meta.env.VITE_API_URL}api/v1/ratings`, { headers });
+    ratings.value = ratingsResponse.data;
+
+    const highRatedIds = ratings.value
+      .filter(rating => rating.rating > 3)
+      .map(rating => rating.docId);
+
+    fetchHighRatedDocuments(highRatedIds, headers);
   } catch (error) {
-    console.error('Failed to fetch documents:', error.message);
+    console.error('Failed to fetch ratings:', error.message);
   }
 }
 
-function mapDocuments(docs) {
-  return docs.map(doc => ({
+async function fetchHighRatedDocuments(ids, headers) {
+  try {
+    const documentPromises = ids.map(async (id) => {
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}api/v1/documents/${id}`, { headers });
+
+      if (response.data && response.data.status === 'success') {
+        return mapDocument(response.data.document);
+      } else {
+        console.error(`Failed to fetch document for ID ${id}:`, response.data);
+        return null;
+      }
+    });
+
+    const documentsArray = (await Promise.all(documentPromises)).filter(doc => doc !== null);
+    highRatedDocuments.value = documentsArray;
+  } catch (error) {
+    console.error('Failed to fetch documents for high ratings:', error.message);
+  }
+}
+
+function mapDocument(doc) {
+  const documentId = doc.id || doc.docId;
+  const documentRating = ratings.value.find(rating => rating.docId === documentId);
+
+  return {
+    id: documentId,
     title: doc.title || 'Unknown title',
     preview_image_url: doc.preview_image_url || defaultImage,
     description: doc.description || 'No description available',
     author: doc.author || 'Unknown Author',
     light_preview_url: doc.light_preview_url || '',
     download_url: doc.download_url || '',
-  }));
+    rating: documentRating ? documentRating.rating : 0 
+  };
 }
 
 function showPreview(document) {
@@ -177,19 +204,6 @@ function handleSearch() {
   color: #2c3e50;
   text-transform: uppercase;
   letter-spacing: 2px;
-  position: relative;
-  padding-bottom: 10px;
-}
-
-.dashboard-title::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 60px;
-  height: 4px;
-  background-color: #3498db;
 }
 
 .section-title {
@@ -198,88 +212,6 @@ function handleSearch() {
   font-size: 1.8em;
   color: #34495e;
   text-transform: capitalize;
-  letter-spacing: 1px;
-}
-
-.search-filter-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 30px;
-  width: 100%;
-  max-width: 600px;
-}
-
-.search-bar-wrapper {
-  position: relative;
-  width: 100%;
-  margin-bottom: 20px;
-}
-
-.search-bar {
-  padding: 12px 40px 12px 20px;
-  width: 100%;
-  border-radius: 25px;
-  border: 2px solid #3498db;
-  font-size: 16px;
-  transition: all 0.3s ease;
-}
-
-.search-bar:focus {
-  outline: none;
-  box-shadow: 0 0 10px rgba(52, 152, 219, 0.5);
-}
-
-.search-icon {
-  position: absolute;
-  right: 15px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #3498db;
-}
-
-.dark-mode-switch {
-  display: inline-flex;
-  align-items: center;
-  cursor: pointer;
-}
-
-.dark-mode-switch input {
-  display: none;
-}
-
-.toggle-slider {
-  position: relative;
-  width: 50px;
-  height: 24px;
-  background-color: #ccc;
-  border-radius: 34px;
-  transition: .4s;
-}
-
-.toggle-slider:before {
-  position: absolute;
-  content: "";
-  height: 20px;
-  width: 20px;
-  left: 2px;
-  bottom: 2px;
-  background-color: white;
-  border-radius: 50%;
-  transition: .4s;
-}
-
-input:checked + .toggle-slider {
-  background-color: #3498db;
-}
-
-input:checked + .toggle-slider:before {
-  transform: translateX(26px);
-}
-
-.toggle-label {
-  margin-left: 10px;
-  font-weight: 500;
 }
 
 .document-section {
@@ -287,89 +219,64 @@ input:checked + .toggle-slider:before {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-bottom: 40px;
-}
-
-.documents-container {
-  width: 100%;
-  display: flex;
-  justify-content: center;
 }
 
 .documents-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 20px;
-  margin-bottom: 30px;
-  max-width: 1200px;
-  width: 100%;
+  display: flex;
+  overflow-x: auto; /* Allow horizontal scrolling if needed */
+  gap: 20px; /* Space between documents */
+  padding: 10px; /* Optional padding */
 }
 
 .document-card {
-  border: 1px solid #e0e0e0;
-  border-radius: 10px;
-  overflow: hidden;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 10px;
   cursor: pointer;
-  background-color: #ffffff;
+  transition: transform 0.2s;
+  min-width: 250px; /* Ensure a minimum width for each card */
 }
 
 .document-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+  transform: scale(1.05);
 }
 
 .document-image {
   width: 100%;
-  height: 200px;
-  object-fit: cover;
+  height: auto;
+  border-radius: 8px;
 }
 
 .doc-info {
-  padding: 20px;
+  padding: 10px 0;
 }
 
-.doc-title {
-  margin: 0 0 10px;
-  font-size: 1.2em;
-  color: #2c3e50;
+.rating {
+  display: flex;
 }
 
-.description {
-  font-size: 0.9em;
-  color: #7f8c8d;
-  margin-bottom: 10px;
+.star {
+  color: #d3d3d3; /* Default star color */
+  font-size: 1.2em; /* Star size */
 }
 
-.author {
-  font-size: 0.8em;
-  color: #95a5a6;
+.star.filled {
+  color: #f39c12; /* Filled star color */
 }
 
 .view-all-btn {
-  display: inline-block;
-  padding: 12px 24px;
-  background-color: #3498db;
-  color: white;
+  padding: 10px 15px;
+  background-color: #4a90e2;
+  color: #fff;
   border: none;
-  border-radius: 25px;
+  border-radius: 5px;
   cursor: pointer;
-  transition: all 0.3s ease;
-  font-size: 1em;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08);
+  transition: background-color 0.2s;
 }
 
 .view-all-btn:hover {
-  background-color: #2980b9;
-  transform: translateY(-2px);
-  box-shadow: 0 7px 14px rgba(50, 50, 93, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08);
-}
-
-.view-all-btn:active {
-  transform: translateY(1px);
+  background-color: #357ab7;
 }
 
 .modal-overlay {
@@ -378,138 +285,122 @@ input:checked + .toggle-slider:before {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.8);
+  background: rgba(0, 0, 0, 0.7);
   display: flex;
   justify-content: center;
   align-items: center;
+  z-index: 1000;
 }
 
 .modal-content {
-  background: white;
-  padding: 30px;
-  border-radius: 15px;
-  width: 90%;
-  max-width: 800px;
-  max-height: 90vh;
-  overflow-y: auto;
-  position: relative;
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  width: 80%;
+  max-width: 600px;
+  text-align: center;
 }
 
 .preview-images-container {
-  position: relative;
-  margin: 20px 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 15px 0;
 }
 
 .preview-image {
   width: 100%;
-  max-height: 400px;
-  object-fit: contain;
+  height: auto;
+  border-radius: 8px;
+  max-width: 400px;
 }
 
 .nav-button {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  background: rgba(0,0,0,0.5);
-  color: white;
+  background-color: transparent;
   border: none;
-  padding: 10px;
   cursor: pointer;
-  transition: background 0.3s ease;
-}
-
-.nav-button:hover {
-  background: rgba(0,0,0,0.8);
-}
-
-.nav-button.left {
-  left: 10px;
-}
-
-.nav-button.right {
-  right: 10px;
-}
-
-.download-btn {
-  display: inline-block;
-  padding: 10px 20px;
-  background: #2ecc71;
-  color: white;
-  text-decoration: none;
-  border-radius: 5px;
-  margin-top: 20px;
-  transition: background-color 0.3s ease;
-}
-
-.download-btn:hover {
-  background: #27ae60;
+  padding: 0 15px;
 }
 
 .close-btn {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background: none;
+  padding: 10px 20px;
+  background-color: #e74c3c;
+  color: #fff;
   border: none;
-  font-size: 24px;
+  border-radius: 5px;
   cursor: pointer;
-  color: #333;
+  transition: background-color 0.2s;
 }
 
 .close-btn:hover {
-  color: #e74c3c;
+  background-color: #c0392b;
 }
 
-/* Dark mode styles */
-.dark-mode .dashboard-title {
-  color: #ecf0f1;
+.search-filter-container {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 20px;
 }
 
-.dark-mode .dashboard-title::after {
-  background-color: #3498db;
+.search-bar-wrapper {
+  position: relative;
+  flex: 1;
+  margin-right: 10px;
 }
 
-.dark-mode .section-title {
-  color: #bdc3c7;
+.search-bar {
+  width: 100%;
+  padding: 10px 40px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 1em;
 }
 
-.dark-mode .search-bar {
-  background-color: #2c3e50;
-  color: #ecf0f1;
-  border-color: #3498db;
+.search-icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #999;
 }
 
-.dark-mode .search-icon {
-  color: #3498db;
+.filter-options {
+  display: flex;
+  align-items: center;
 }
 
-.dark-mode .document-card {
-  background-color: #34495e;
-  border-color: #2c3e50;
+.dark-mode-switch {
+  display: flex;
+  align-items: center;
 }
 
-.dark-mode .doc-title {
-  color: #ecf0f1;
+.toggle-slider {
+  width: 40px;
+  height: 20px;
+  background-color: #ddd;
+  border-radius: 20px;
+  position: relative;
+  margin-right: 10px;
 }
 
-.dark-mode .description {
-  color: #bdc3c7;
+.toggle-slider::before {
+  content: '';
+  width: 16px;
+  height: 16px;
+  background-color: white;
+  border-radius: 50%;
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  transition: transform 0.2s;
 }
 
-.dark-mode .author {
-  color: #95a5a6;
+input[type="checkbox"]:checked + .toggle-slider::before {
+  transform: translateX(20px);
 }
 
-.dark-mode .modal-content {
-  background-color: #2c3e50;
-  color: #ecf0f1;
-}
-
-.dark-mode .close-btn {
-  color: #ecf0f1;
-}
-
-.dark-mode .close-btn:hover {
-  color: #e74c3c;
+.toggle-label {
+  font-size: 1em;
 }
 </style>
