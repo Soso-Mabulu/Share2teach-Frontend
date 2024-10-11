@@ -12,6 +12,7 @@ import UploadDocuments from '@/components/UploadDocuments.vue';
 import ViewAllDocumentsView from '@/views/ViewAllDocumentsView.vue';
 import ModerateDocumentsView from '@/views/ModerateDocumentsView.vue'
 import SubjectView from '@/views/SubjectView.vue'
+import SelfDirectedlearningView from '@/views/SelfDirectedlearningView.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -90,7 +91,12 @@ const router = createRouter({
       path: '/subject',
       name: 'SubjectView',
       component: SubjectView
-    }
+    },
+    {
+      path: '/self-learning',
+      name: 'SelfDirectedlearningView',
+      component: SelfDirectedlearningView
+    },
 
   ],
 });

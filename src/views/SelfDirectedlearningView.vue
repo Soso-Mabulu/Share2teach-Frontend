@@ -1,9 +1,8 @@
 <script setup>
-import ModaratorSidebar from '@/components/ModaratorSidebar.vue'; // Adjust the import path as necessary
-import MainFooter from '@/components/MainFooter.vue'; // Import the Footer
+import ModaratorSidebar from '@/components/ModaratorSidebar.vue';
+import MainFooter from '@/components/MainFooter.vue';
 import ModaratorNavbar from '@/components/ModaratorNavbar.vue';
-import ModerateDocuments from '@/components/ModerateDocuments.vue';
-
+import SelfDirectedLeaning from '@/components/SelfDirectedLearning.vue';
 </script>
 
 <template>
@@ -12,7 +11,7 @@ import ModerateDocuments from '@/components/ModerateDocuments.vue';
     <div class="flex-grow flex">
       <ModaratorSidebar class="hidden lg:block flex-shrink-0" />
       <main class="flex-grow overflow-auto">
-        <ModerateDocuments />
+        <SelfDirectedLeaning />
       </main>
     </div>
     <MainFooter />
@@ -20,5 +19,5 @@ import ModerateDocuments from '@/components/ModerateDocuments.vue';
 </template>
 
 <style scoped>
-/* No changes to styles or colors; focus only on layout */
+/* You can add any additional styles here if needed */
 </style>
