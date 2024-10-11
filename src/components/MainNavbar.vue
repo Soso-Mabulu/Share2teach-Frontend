@@ -40,10 +40,12 @@ function toggleMenu() {
       </button>
     </div>
 
-    <!-- Profile Button (visible on larger screens) -->
-    <a class="hidden lg:inline-block py-2 px-6 bg-purple-600 hover:bg-purple-800 text-sm text-white font-bold rounded-xl transition duration-200" href="#">
-      Profile
-    </a>
+   <!-- Profile Button (visible on larger screens) -->
+<router-link 
+  to="/update-profile" 
+  class="hidden lg:inline-block py-2 px-6 bg-purple-600 hover:bg-purple-800 text-sm text-white font-bold rounded-xl transition duration-200">
+  Profile
+</router-link>
 
     <!-- Navbar Links (visible when isMenuOpen is true on small screens) -->
     <ul v-if="isMenuOpen" class="lg:hidden bg-white shadow-lg absolute top-full left-0 w-full">

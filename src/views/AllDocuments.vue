@@ -1,8 +1,8 @@
 <script setup>
 import Sidebar from '@/components/SideBar.vue'; // Adjust the import path as necessary
-import PublicHero from '@/components/PublicHero.vue'; // Import the PublicHero component
 import MainFooter from '@/components/MainFooter.vue'; // Import the Footer
 import MainNavbar from '@/components/MainNavbar.vue'; // Import the MainNavbar component
+import AllDocuments from '@/components/AllDocuments.vue';
 </script>
 
 <template>
@@ -11,7 +11,7 @@ import MainNavbar from '@/components/MainNavbar.vue'; // Import the MainNavbar c
     <div class="main-content">
       <Sidebar />
       <div class="hero-container">
-        <PublicHero />
+        <AllDocuments />
       </div>
     </div>
     <MainFooter />
