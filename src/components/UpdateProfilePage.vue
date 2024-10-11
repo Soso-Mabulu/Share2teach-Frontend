@@ -38,7 +38,7 @@
         </button>
         <button
           type="button"
-          @click="$router.go(-1)"
+          @click="$router.push('/user-dashboard')"
           class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
         >
           Cancel
@@ -89,7 +89,7 @@ const updateProfile = async () => {
     const response = await axios.put(`${import.meta.env.VITE_API_URL}/api/v1/users/update`, requestData, {
       headers: {
         'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json', // Content type for JSON
+        'Content-Type': 'application/json',
       }
     });
 
@@ -97,7 +97,7 @@ const updateProfile = async () => {
     if (response.data) {
       alert('Profile updated successfully!');
       localStorage.setItem('user', JSON.stringify(response.data)); // Save updated user data
-      router.push('/dashboard'); // Redirect to dashboard or reload current page
+      router.push('/user-dashboard'); // Redirect to dashboard
     }
   } catch (error) {
     // Enhanced error handling
@@ -116,18 +116,17 @@ const parseToken = (token) => {
   if (!token) {
     return { userId: null };
   }
-  
+
   try {
     const decoded = JSON.parse(atob(token.split('.')[1]));
     return {
-      userId: decoded.user_id || decoded.sub || decoded.id, // Adjust based on your token structure
+      userId: decoded.user_id || decoded.sub || decoded.id,
     };
   } catch (error) {
     console.error('Error parsing token:', error);
     return { userId: null };
   }
 };
-
 
 onMounted(() => {
   const userData = JSON.parse(localStorage.getItem('user'));
@@ -138,3 +137,4 @@ onMounted(() => {
   }
 });
 </script>
+
