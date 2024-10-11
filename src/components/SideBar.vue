@@ -6,9 +6,12 @@
     </div>
 
     <!-- User Profile Section -->
-    <div class="user-profile" @click="openEditModal">
-      <a href="#" class="flex items-center gap-2 p-4 hover:bg-gray-50">
-        <img :src="userAvatar || defaultAvatar" alt="User Avatar" class="w-10 h-10 rounded-full object-cover" />
+    <div class="user-profile">
+      <div class="flex items-center gap-2 p-4 hover:bg-gray-50">
+        <!-- Make the profile icon clickable to navigate to the update profile page -->
+        <a href="#" @click.prevent="goToProfileUpdate" class="flex items-center">
+          <img :src="userAvatar || defaultAvatar" alt="User Avatar" class="w-10 h-10 rounded-full object-cover" />
+        </a>
         <div v-if="isExpanded">
           <p class="text-xs">
             <strong class="block font-medium">
@@ -17,7 +20,7 @@
             <span>{{ user.email || 'Fetching email...' }}</span>
           </p>
         </div>
-      </a>
+      </div>
     </div>
 
     <!-- Navigation -->
@@ -57,7 +60,7 @@ const router = useRouter();
 const links = ref([
   { text: "Dashboard", icon: "🏠", route: "/user-dashboard" },
   { text: "Subject", icon: "📚", route: "/subject" },
-  { text: "Search", icon: "🔍", route: "/search-results" }, // Ensure no trailing space here
+  { text: "Search", icon: "🔍", route: "/search-results" },
   { text: "Contributors", icon: "👥", route: "/contributors" },
   { text: "FAQ", icon: "❓", route: "/faq" },
   { text: "Self Directed Learning", icon: "💡", route: "/self-learning" },
@@ -66,6 +69,11 @@ const links = ref([
 // Method to toggle sidebar
 const toggleSidebar = () => {
   isExpanded.value = !isExpanded.value;
+};
+
+// Navigate to the profile update page
+const goToProfileUpdate = () => {
+  router.push('/update-profile');
 };
 
 // Logout function
@@ -126,12 +134,7 @@ const parseToken = (token) => {
   }
 };
 
-// Function to open edit modal
-const openEditModal = () => {
-  router.push('/update-profile');
-};
-
-
+// Lifecycle hook to fetch user data
 onMounted(() => {
   fetchUserFromAPI(); // Fetch user data when component is mounted
 });

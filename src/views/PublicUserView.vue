@@ -33,8 +33,8 @@ import MainNavbar from '@/components/MainNavbar.vue'; // Import the MainNavbar c
 .sidebar {
   width: 30%; /* Sidebar takes 30% of the width */
   flex-shrink: 0; /* Prevent sidebar from shrinking */
-  background-color: var(--card-background); /* Optional: Sidebar background color */
-  box-shadow: var(--card-shadow); /* Optional: Add shadow for depth */
+  /* Removed background color */
+  /* Removed shadow */
 }
 
 .hero-container {
