@@ -4,8 +4,9 @@
     <div class="analytics">
       <!-- Loop over cardDataOptions to dynamically generate cards -->
       <div class="card" v-for="(cardData, index) in cardDataOptions" :key="index">
+        <img :src="cardData.icon" class="card-icon" alt="Icon" />
         <h2 class="counts-title">{{ cardData.title }}</h2>
-        <p><i class="fas" :class="cardData.icon"></i> {{ cardData.value }}</p>
+        <p>{{ cardData.value }}</p>
 
         <!-- AnalyticsButton integrated here -->
         <AnalyticsButton
@@ -13,11 +14,6 @@
           :buttonLabel="cardData.buttonLabel"
           class="results-button"
         />
-
-        <!-- Display results below each card -->
-        <div v-if="showResults[index]" class="results-layout">
-          <pre>{{ results[index] }}</pre>
-        </div>
       </div>
     </div>
   </div>
@@ -37,51 +33,45 @@ export default {
       cardDataOptions: [
         {
           title: 'DOCUMENTS',
-          icon: 'fa-file-alt',
+          icon: new URL('@/assets/documentIcon.png', import.meta.url).href, // Custom icon with dynamic import
           value: 0, // Placeholder, will be updated
           endpoint: '/api/admin/all-documents',
           buttonLabel: 'View All Documents',
         },
         {
           title: 'USERS',
-          icon: 'fa-users',
+          icon: new URL('@/assets/UserIcon.png', import.meta.url).href, // Custom icon with dynamic import
           value: 0, // Placeholder, will be updated
           endpoint: '/api/admin/all-users',
           buttonLabel: 'View All Users',
         },
         {
           title: 'USER SIGNUPS',
-          icon: 'fa-user-plus',
+          icon: new URL('@/assets/SignUpIcon.png', import.meta.url).href, // Custom icon with dynamic import
           value: 0, // Placeholder, will be updated
           endpoint: '/api/admin/all-signups',
           buttonLabel: 'View All Signups',
         },
         {
           title: 'UPLOADED DOCUMENTS',
-          icon: 'fa-upload',
+          icon: new URL('@/assets/uploadIcon.png', import.meta.url).href, // Custom icon with dynamic import
           value: 0, // Placeholder, will be updated
           endpoint: '/api/admin/all-uploaded-docs',
           buttonLabel: 'View All Uploaded Docs',
         },
         {
           title: 'AVERAGE RATINGS',
-          icon: 'fa-star',
+          icon: new URL('@/assets/RatingsIcon.png', import.meta.url).href, // Custom icon with dynamic import
           value: 0, // Placeholder, will be updated
           endpoint: '/api/admin/all-ratings',
           buttonLabel: 'View All Ratings',
         },
       ],
-      // Track which card results are being displayed
-      showResults: [],
-      // Store the fetched results for each card
-      results: [],
     };
   },
   mounted() {
     // Initialize the dashboard by fetching data for each card
     this.fetchData();
-    // Initialize showResults to be false for each card
-    this.showResults = new Array(this.cardDataOptions.length).fill(false);
   },
   methods: {
     // Fetch data for each card from the corresponding API endpoints
@@ -97,25 +87,9 @@ export default {
         for (let i = 0; i < allResults.length; i++) {
           const data = allResults[i].data;
           this.cardDataOptions[i].value = data.count || data.some_value; // Adjust as needed
-          this.results[i] = JSON.stringify(data, null, 2); // Format the JSON results
         }
       } catch (error) {
         console.error('Error fetching data:', error);
-      }
-    },
-    // Toggle the display of results for a particular card
-    toggleResults(index) {
-      this.showResults[index] = !this.showResults[index];
-      if (this.showResults[index] && !this.results[index]) {
-        axios
-          .get(this.cardDataOptions[index].endpoint)
-          .then((response) => {
-            this.results[index] = JSON.stringify(response.data, null, 2);
-          })
-          .catch((error) => {
-            console.error('Error fetching data:', error);
-            this.results[index] = 'Error fetching data.';
-          });
       }
     },
   },
@@ -124,76 +98,68 @@ export default {
 
 <style scoped>
 .dashboard {
-  background: linear-gradient(to right, #8E2DE2, #4A00E0); /* Gradient background */
+  background: #f7f7f7; 
   padding: 20px;
-  color: #fff;
+  color: #333;
+  font-weight: bold;
 }
 
 .admin-title {
   text-align: center;
-  font-size: 2.5rem;
-  color: #fff;
+  font-size: 2.2rem;
+  color: #333;
 }
 
 .analytics {
   display: flex;
-  flex-wrap: wrap; /* Wrap cards on smaller screens */
-  gap: 20px;
-  justify-content: space-between;
+  justify-content: space-between; 
+  gap: 10px; /* Reduce gap to fit more cards in a row */
+  flex-wrap: wrap; /* Still allows wrapping for smaller screens */
 }
 
 .card {
   background-color: #fff; /* White background for cards */
-  border-radius: 10px; /* Rounded corners */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  padding: 20px;
-  text-align: center; /* Center align content */
-  flex: 1; /* Cards take equal width */
-  min-width: 250px; /* Ensure a reasonable minimum width */
+  border-radius: 8px; /* Slightly smaller rounded corners */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  padding: 15px; /* Reduced padding */
+  text-align: center;
+  flex: 1 1 calc(20% - 10px); /* Make cards narrower and responsive */
+  min-width: 200px; /* Smaller minimum width */
+  position: relative;
 }
 
 .card h2 {
-  color: #4A00E0; /* Match gradient color */
+  color: #290429; /* Purple text to match the theme */
 }
 
 .card p {
-  margin-bottom: 10px;
-  font-size: 18px;
-  color: #333; /* Text color */
-}
-
-.card i {
-  margin-right: 10px; /* Increased space between icon and text */
+  margin-bottom: 8px;
   font-size: 20px;
-  color: #4A00E0; /* Match card title color */
+  font-weight: bold;
+  color: #444; /* Slightly darker text color */
 }
 
-.results-layout {
-  margin-top: 10px;
-  background-color: #f3f3f3; /* Light gray background for readability */
-  padding: 15px;
-  border-radius: 5px;
-  max-width: 80%;
-  max-height: 300px;
-  overflow-y: auto;
-  white-space: pre-wrap;
-  color: #333;
-  font-family: 'Courier New', Courier, monospace;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+.card-icon {
+  width: 35px; /* Adjust the icon size */
+  height: 35px;
+  position: absolute;
+  top: 10px;
+  right: 10px;
 }
 
-.view-all {
-  background: #4A00E0; /* Button color */
-  color: #fff; /* White text */
+.results-button {
+  background: #f9f9f9; /* Button color */
+  color: #fff;
   border: none;
   border-radius: 5px;
-  padding: 10px 15px;
+  padding: 8px 12px; /* Adjust padding for smaller size */
   cursor: pointer;
   font-weight: bold;
   transition: background 0.3s ease;
+  margin-top: 10px;
 }
 
-.view-all:hover {
-  background: #3A00C0; /* Darker shade on hover */
+.results-button:hover {
+  background: #f1f0f3; /* Darker shade on hover */
 }
 </style>

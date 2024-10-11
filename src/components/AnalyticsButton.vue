@@ -58,19 +58,20 @@
   }
   
   .view-all {
-    background-color: #f8ecfb;
+    background: linear-gradient(to right, #739ea9, #f7f5f8, #2c4475); /* Similar gradient */
     border: none;
-    border-radius: 2px;
-    padding: 7px;
+    border-radius: 9999px; /* Rounded full to match 'View' button */
+    padding: 7px 20px;
     cursor: pointer;
     font-weight: bold;
-    color: rgb(4, 0, 5);
+    color: rgb(44, 25, 46); /* Adjusted for better contrast */
     width: 150px;
-    transition: background 0.3s ease;
+    transition: transform 0.3s ease-in-out, background 0.3s ease-in-out;
   }
   
   .view-all:hover {
-    background-color: rgba(80, 77, 126, 0.438);
+    transform: scale(1.05); /* Slight scale on hover */
+    background: linear-gradient(to right, #c2b2c7, #f8f1fa, #e4e3e4); /* Darker gradient on hover */
   }
   
   /* Style for the results layout */
