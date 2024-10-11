@@ -53,7 +53,6 @@ const router = createRouter({
       name: 'search-results',
       component: SearchResultsView,
     },
-    ,
     {
       path: '/moderator-dashboard',
       name: 'ModeratorDashboardView',
@@ -63,6 +62,11 @@ const router = createRouter({
       path: '/upload-documents',
       name: 'UploadDocuments',
       component: UploadDocuments,
+    },
+    {
+      path: '/update-profile',
+      name: 'UpdateProfile',
+      component: () => import('@/components/UpdateProfilePage.vue')
     },
   ],
 });

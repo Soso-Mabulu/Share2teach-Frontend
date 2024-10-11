@@ -25,7 +25,7 @@
     </nav>
 
     <!-- User Profile Section -->
-    <div class="user-profile">
+    <div class="user-profile" @click="openEditModal">
       <a href="#" class="flex items-center gap-2 p-4 hover:bg-gray-50">
         <img :src="userAvatar || defaultAvatar" alt="User Avatar" class="w-10 h-10 rounded-full object-cover" />
         <div v-if="isExpanded">
@@ -38,6 +38,8 @@
         </div>
       </a>
     </div>
+
+  
   </div>
 </template>
 
@@ -126,10 +128,17 @@ const parseToken = (token) => {
   }
 };
 
+// Function to open edit modal
+const openEditModal = () => {
+  router.push('/update-profile');
+};
+
+
 onMounted(() => {
   fetchUserFromAPI(); // Fetch user data when component is mounted
 });
 </script>
+
 
 <style scoped>
 :root {
