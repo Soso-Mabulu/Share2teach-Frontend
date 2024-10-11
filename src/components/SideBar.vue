@@ -5,6 +5,21 @@
       <i class="icon">{{ isExpanded ? '◀️' : '▶️' }}</i>
     </div>
 
+    <!-- User Profile Section -->
+    <div class="user-profile" @click="openEditModal">
+      <a href="#" class="flex items-center gap-2 p-4 hover:bg-gray-50">
+        <img :src="userAvatar || defaultAvatar" alt="User Avatar" class="w-10 h-10 rounded-full object-cover" />
+        <div v-if="isExpanded">
+          <p class="text-xs">
+            <strong class="block font-medium">
+              {{ user.userName || 'Fetching first name...' }} {{ user.userLName || 'Fetching last name...' }}
+            </strong>
+            <span>{{ user.email || 'Fetching email...' }}</span>
+          </p>
+        </div>
+      </a>
+    </div>
+
     <!-- Navigation -->
     <nav>
       <ul>
@@ -23,47 +38,22 @@
         </li>
       </ul>
     </nav>
-
-    <!-- User Profile Section -->
-    <div class="user-profile">
-      <a href="#" class="flex items-center gap-2 p-4 hover:bg-gray-50">
-        <img :src="userAvatar || defaultAvatar" alt="User Avatar" class="w-10 h-10 rounded-full object-cover" />
-        <div v-if="isExpanded">
-          <p class="text-xs">
-            <strong class="block font-medium">{{ user.name || 'Guest User' }}</strong>
-            <span>{{ user.email || 'guest@example.com' }}</span>
-          </p>
-        </div>
-      </a>
-    </div>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
-import { useRouter } from 'vue-router'; // Import Vue Router
-
-// Default avatar image
+import { useRouter } from 'vue-router';
 import defaultAvatar from '@/assets/images/profile.webp';
 
-// Reactive reference for user data
-const user = ref({
-  firstName: "Firstname",
-  lastName: "Lastname",
-  email: ''
-});
-
-// Avatar reference (random avatar generation)
+// Reactive references for user data, sidebar state, and avatar
+const user = ref({ userName: '', userLName: '', email: '' });
 const userAvatar = ref('');
-
-// Reactive reference for sidebar state
 const isExpanded = ref(true);
-
-// Use Vue Router for navigation
 const router = useRouter();
 
-// Navigation links (without logout)
+// Navigation links
 const links = ref([
   { text: "Dashboard", icon: "🏠", route: "/dashboard" },
   { text: "Subject", icon: "📚", route: "/subject" },
@@ -80,71 +70,70 @@ const toggleSidebar = () => {
 
 // Logout function
 const logout = () => {
-  localStorage.removeItem('token'); // Clear the token
+  localStorage.removeItem('token'); // Clear token
   localStorage.removeItem('user'); // Clear user data
   router.push('/login'); // Redirect to login page
 };
 
-// Function to fetch user info from API based on token
-const fetchUserFromToken = async () => {
-  const token = new URLSearchParams(window.location.search).get('token');
+// Function to fetch user info from API
+const fetchUserFromAPI = async () => {
+  const token = localStorage.getItem('token'); // Get token from local storage
 
   if (token) {
     try {
-      const userId = parseToken(token); // Decode token and extract user ID
-      const apiUrl = `${import.meta.env.VITE_API_URL}/api/auth/user/${userId}`; // Updated endpoint
+      const { userId } = parseToken(token); // Decode token to get user ID
 
-      // Fetch user data from the API
-      const response = await axios.get(apiUrl, {
-        headers: {
-          Authorization: `Bearer ${token}` // Include token in the request headers
+      if (userId) {
+        const apiUrl = `${import.meta.env.VITE_API_URL}/api/v1/users/${userId}`; // Include user ID in the API URL
+
+        // Fetch user data from API
+        const response = await axios.get(apiUrl, {
+          headers: { Authorization: `Bearer ${token}` } // Include token in headers
+        });
+
+        // Update user object with fetched data
+        if (response.data) {
+          user.value.userName = response.data.userName;
+          user.value.userLName = response.data.userLName;
+          user.value.email = response.data.email;
+          getRandomAvatar(user.value.userName, user.value.userLName);
         }
-      });
-
-      user.value.name = `${response.data.firstname} ${response.data.lastname}`; 
-      user.value.email = response.data.email; // Store email
-      localStorage.setItem('user', JSON.stringify(response.data));
-      getRandomAvatar(user.value.name); 
-    } catch (error) {
-      const storedUser = JSON.parse(localStorage.getItem('user'));
-      if (storedUser) {
-        user.value.name = `${storedUser.firstname} ${storedUser.lastname}`;
-        user.value.email = storedUser.email;
-        getRandomAvatar(user.value.name);
+        localStorage.setItem('user', JSON.stringify(response.data)); // Store user data
       }
-    }
-  } else {
-    const storedUser = JSON.parse(localStorage.getItem('user'));
-    if (storedUser) {
-      user.value.name = `${storedUser.firstname} ${storedUser.lastname}`;
-      user.value.email = storedUser.email;
-      getRandomAvatar(user.value.name);
+    } catch (error) {
+      console.error('Error fetching user:', error);
     }
   }
 };
 
-// Function to get a random avatar based on user's initials
-const getRandomAvatar = (name) => {
-  const initials = name
-    .split(' ')
-    .map((word) => word.charAt(0).toUpperCase())
-    .join('');
-
+// Function to get a random avatar
+const getRandomAvatar = (userName, userLName) => {
+  const initials = `${userName.charAt(0).toUpperCase()}${userLName.charAt(0).toUpperCase()}`;
   userAvatar.value = `https://ui-avatars.com/api/?name=${initials}&size=285&background=random`;
 };
 
-// Function to decode token and extract user_id
+// Function to decode token and extract user info
 const parseToken = (token) => {
   try {
     const decoded = JSON.parse(atob(token.split('.')[1]));
-    return decoded.user_id; 
-  } catch (error) {
-    return null;
+
+    // Return userId
+    return {
+      userId: decoded.user_id || decoded.sub || decoded.id, // Adjust this based on your token's structure
+    };
+  } catch {
+    return { userId: null }; // Return null if there's an error
   }
 };
 
+// Function to open edit modal
+const openEditModal = () => {
+  router.push('/update-profile');
+};
+
+
 onMounted(() => {
-  fetchUserFromToken(); 
+  fetchUserFromAPI(); // Fetch user data when component is mounted
 });
 </script>
 
@@ -227,33 +216,33 @@ nav ul li .nav-link:hover {
 }
 
 .user-profile {
-  position: absolute;
-  bottom: 0;
   width: 100%;
+  background-color: white; /* Optional: You can add a background color for better visibility */
 }
 
 .user-profile a {
   display: flex;
   align-items: center;
   padding: 10px;
-  background-color: white;
-  border-top: 1px solid #ddd;
+  transition: background-color 0.3s ease; /* Add transition for background color */
+}
+
+.user-profile a:hover {
+  background-color: rgba(200, 200, 200, 0.3); /* Change background color on hover */
 }
 
 .user-profile img {
   margin-right: 10px;
+  transition: transform 0.3s ease; /* Add transition for scaling effect */
 }
 
-.sticky {
-  position: sticky;
+.user-profile a:hover img {
+  transform: scale(1.1); /* Scale up the image on hover */
 }
 
-@media (max-width: 1023px) { /* Hide sidebar on mobile */
+@media (max-width: 1023px) { 
   .sidebar {
     display: none;
   }
 }
 </style>
-
-git config --global user.email "mxolisiprince87@gmail.com"
-git config --global user.name "Leece"
