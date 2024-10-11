@@ -1,28 +1,23 @@
 <script setup>
-import ModaratorSidebar from '@/components/ModaratorSidebar.vue'; // Adjust the import path as necessary
-import MainFooter from '@/components/MainFooter.vue'; // Import the Footer
+import ModaratorSidebar from '@/components/ModaratorSidebar.vue';
+import MainFooter from '@/components/MainFooter.vue';
 import ModaratorNavbar from '@/components/ModaratorNavbar.vue';
-import Subject from '@/components/Subject.vue';
-
+import Subject from '@/components/SubjectComponent.vue';
 </script>
 
 <template>
-  <ModaratorNavbar />
-  <div>
-    <div class="min-h-screen flex flex-col lg:flex-row">
-      <!-- Sidebar -->
-      <ModaratorSidebar />
-      
-      <!-- Main Content (PublicHero) -->
-      <div class="flex-grow flex flex-col">
+  <div class="flex flex-col min-h-screen">
+    <ModaratorNavbar class="z-10" />
+    <div class="flex-grow flex">
+      <ModaratorSidebar class="hidden lg:block flex-shrink-0" />
+      <main class="flex-grow overflow-auto">
         <Subject />
-      </div>
+      </main>
     </div>
+    <MainFooter />
   </div>
-  
-  <MainFooter />
 </template>
 
 <style scoped>
-/* No changes to styles or colors; focus only on layout */
+/* You can add any additional styles here if needed */
 </style>

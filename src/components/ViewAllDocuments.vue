@@ -126,23 +126,42 @@
   });
   
   async function fetchDocuments() {
-    try {
-      const urlParams = new URLSearchParams(window.location.search);
-      const token = urlParams.get('token');
-      const headers = { Authorization: `Bearer ${token}` };
-  
-      const endpoint = route.name === 'PendingDocuments' 
-        ? `${import.meta.env.VITE_API_URL}api/v1/documents/pending`
-        : `${import.meta.env.VITE_API_URL}api/v1/documents/approved`;
-  
-      const response = await axios.get(endpoint, { headers });
-      documents.value = mapDocuments(response.data.documents);
-      totalItems.value = documents.value.length;
-      categories.value = [...new Set(documents.value.map(doc => doc.category))];
-    } catch (error) {
+  try {
+    // Try to get the token from the URL
+    const urlParams = new URLSearchParams(window.location.search);
+    let token = urlParams.get('token');
+    
+    // If the token is not in the URL, get it from local storage
+    if (!token) {
+      token = localStorage.getItem('token'); // Assume token is stored under 'token' key in local storage
+    }
+    
+    if (!token) {
+      throw new Error('Token not found in URL parameters or local storage');
+    }
+    
+    const headers = { Authorization: `Bearer ${token}` };
+    console.log('Token:', token); // Debug: Log token
+    console.log('Headers:', headers); // Debug: Log headers
+    
+    const endpoint = route.name === 'PendingDocuments' 
+      ? `${import.meta.env.VITE_API_URL}api/v1/documents/pending`
+      : `${import.meta.env.VITE_API_URL}api/v1/documents/approved`;
+    
+    const response = await axios.get(endpoint, { headers });
+    documents.value = mapDocuments(response.data.documents);
+    totalItems.value = documents.value.length;
+    categories.value = [...new Set(documents.value.map(doc => doc.category))];
+    
+  } catch (error) {
+    if (error.response) {
+      console.error('Failed to fetch documents:', error.response.data);
+    } else {
       console.error('Failed to fetch documents:', error.message);
     }
   }
+}
+
   
   function mapDocuments(docs) {
     return docs.map(doc => ({

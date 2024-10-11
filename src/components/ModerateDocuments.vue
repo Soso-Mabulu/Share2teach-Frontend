@@ -160,7 +160,7 @@
       category: doc.category || 'Uncategorized',
       status: 'Pending',
       light_preview_url: doc.light_preview_url || '',
-      download_url: doc.download_url || '',
+      download_url: doc.location || '',
     }));
   }
   

@@ -136,7 +136,7 @@ function mapDocuments(docs) {
     description: doc.description || 'No description available',
     author: doc.author || 'Unknown Author',
     light_preview_url: doc.light_preview_url || '',
-    download_url: doc.download_url || '',
+    download_url: doc.location || '',
   }));
 }
 
@@ -146,7 +146,9 @@ function showPreview(document) {
   currentImageIndex.value = 0;
   showModal.value = true;
 }
-
+const currentPreviewImage = computed(() => {
+    return currentDocumentPreviewImages.value[currentImageIndex.value] || defaultImage;
+  });
 function closePreview() {
   showModal.value = false;
 }
