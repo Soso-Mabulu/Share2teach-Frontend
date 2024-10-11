@@ -8,6 +8,8 @@ import ForgotPasswordView from '@/views/ForgotPasswordView.vue'
 import ResetPasswordView from '@/views/ResetPasswordView.vue'
 import ModeratorDashboardView from '@/views/ModeratorDashboardView.vue'
 import UploadDocuments from '@/components/UploadDocuments.vue';
+import EducatorDashboardView from '@/views/EducatorDashboardView.vue'
+import AllApprovedDocumentsView from '@/views/AllApprovedDocumentsView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -58,6 +60,17 @@ const router = createRouter({
       name: 'UploadDocuments',
       component: UploadDocuments,
     },
+    {
+      path: '/educator-dashboard',
+      name: 'EducatorDashboardView',
+      component: EducatorDashboardView,
+    },
+    {
+      path: '/approved-documents',
+      name: 'AllApprovedDocumentsView',
+      component: AllApprovedDocumentsView
+    }
+
   ]
 })
 
