@@ -73,23 +73,34 @@ const filterAcademicYearSuggestions = computed(() => {
 const handleDrop = (event) => {
   event.preventDefault();
   isDragging.value = false;
-  files.value = event.dataTransfer.files;
+
+  // Handle the dropped files
+  if (event.dataTransfer.files.length > 0) {
+    files.value = event.dataTransfer.files;
+  } else {
+    console.error('No files dropped');
+  }
 };
 
 
 // Function to handle clicking the drop zone
 const handleDropZoneClick = () => {
   const fileInput = document.getElementById('file-input');
-  fileInput.click();
+  if (fileInput) {
+    fileInput.click();
+  } else {
+    console.error('File input element not found');
+  }
 };
+
 
 // Function to validate the academic year
 const isValidAcademicYear = (year) => {
   return /^\d{4}$/.test(year) && year >= startYear && year <= endYear;
 };
 
-// Function to handle form submission
 const uploadDocuments = async () => {
+  // Validate academic year
   if (!isValidAcademicYear(academicYear.value)) {
     showToast.value = true;
     toastMessage.value = 'Please enter a valid academic year (YYYY).';
@@ -97,12 +108,20 @@ const uploadDocuments = async () => {
     return;
   }
 
+  // Prepare form data
   const formData = new FormData();
-  if (files.value) {
+  
+  if (files.value && files.value.length > 0) {
     for (let i = 0; i < files.value.length; i++) {
       formData.append('files', files.value[i]);
     }
+  } else {
+    showToast.value = true;
+    toastMessage.value = 'Please select files to upload.';
+    toastType.value = 'error';
+    return;
   }
+  
   formData.append('title', title.value);
   formData.append('module', module.value);
   formData.append('description', description.value);
@@ -111,37 +130,46 @@ const uploadDocuments = async () => {
   formData.append('academicYear', academicYear.value);
 
   try {
-    const token = localStorage.getItem('token'); // Retrieve the JWT token
-
+    const token = localStorage.getItem('token');
     const headers = {
       'Content-Type': 'multipart/form-data',
       'Authorization': `Bearer ${token}`,
     };
 
-    const response = await axios.post(`${import.meta.env.VITE_API_URL}api/v1/upload`, formData, { headers });
+    const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/v1/upload`, formData, { headers });
 
     if (response.status === 200) {
       showToast.value = true;
       toastMessage.value = 'Documents uploaded successfully!';
       toastType.value = 'success';
-      // Clear form fields
-      title.value = '';
-      module.value = '';
-      description.value = '';
-      university.value = '';
-      category.value = '';
-      academicYear.value = '';
-      files.value = null;
-      // Optionally, navigate to another route or perform other actions
+      // Clear the form
+      resetForm();
+      // Optionally navigate to another route
       router.push('/dashboard');
+    } else {
+      showToast.value = true;
+      toastMessage.value = 'Failed to upload documents. Please try again.';
+      toastType.value = 'error';
     }
   } catch (error) {
-    console.error(error);
+    console.error('Upload failed:', error);
     showToast.value = true;
-    toastMessage.value = 'Failed to upload documents';
+    toastMessage.value = 'Failed to upload documents. Check the server or file size.';
     toastType.value = 'error';
   }
 };
+
+// Function to reset form fields after successful upload
+const resetForm = () => {
+  title.value = '';
+  module.value = '';
+  description.value = '';
+  university.value = '';
+  category.value = '';
+  academicYear.value = '';
+  files.value = null;
+};
+
 // Function to select a suggestion
 const selectModuleSuggestion = (suggestion) => {
   module.value = suggestion;
@@ -180,7 +208,7 @@ const selectAcademicYearSuggestion = (suggestion) => {
           <input
             v-model="title"
             type="text"
-            class="mt-2 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 transition duration-300 ease-in-out dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+            class="mt-2 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 transition duration-300 ease-in-out"
             placeholder="Enter Document Title"
             required
           />
@@ -307,12 +335,13 @@ const selectAcademicYearSuggestion = (suggestion) => {
             >
                 <p class="text-gray-600">Drag and drop files here, or click to select files</p>
                 <input 
-                id="file-input" 
-                type="file" 
-                multiple 
-                @change="files.value = $event.target.files" 
-                class="hidden"
+                  id="file-input" 
+                  type="file" 
+                  multiple 
+                  @change="files.value = $event.target.files" 
+                  class="hidden"
                 />
+
             </div>
             <p class="mt-2 text-sm text-gray-500">Supported file types: PDF, DOCX, XLSX, PPTX, and more.</p>
         </div>

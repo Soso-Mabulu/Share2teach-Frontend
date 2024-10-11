@@ -10,6 +10,7 @@ import ModeratorDashboardView from '@/views/ModeratorDashboardView.vue'
 import UploadDocuments from '@/components/UploadDocuments.vue';
 import ViewAllDocumentsView from '@/views/ViewAllDocumentsView.vue';
 import ModerateDocumentsView from '@/views/ModerateDocumentsView.vue'
+import SubjectView from '@/views/SubjectView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -74,6 +75,11 @@ const router = createRouter({
       path: '/moderate-documents',
       name: 'ModerateDocumentsView',
       component: ModerateDocumentsView
+    },
+    {
+      path: '/subject',
+      name: 'SubjectView',
+      component: SubjectView
     }
 
   ]
