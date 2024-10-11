@@ -8,6 +8,13 @@ import ForgotPasswordView from '@/views/ForgotPasswordView.vue';
 import ResetPasswordView from '@/views/ResetPasswordView.vue';
 import AdminDashboardView from '@/views/AdminDashboardView.vue';
 import DetailedView from '@/views/DetailedView.vue';
+import SearchResultsView from '@/views/SearchResultsView.vue'; // Import the new view
+import ModeratorDashboardView from '@/views/ModeratorDashboardView.vue'
+import UploadDocuments from '@/components/UploadDocuments.vue';
+import ViewAllDocumentsView from '@/views/ViewAllDocumentsView.vue';
+import ModerateDocumentsView from '@/views/ModerateDocumentsView.vue'
+import SubjectView from '@/views/SubjectView.vue'
+import SelfDirectedlearningView from '@/views/SelfDirectedlearningView.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -58,6 +65,52 @@ const router = createRouter({
       component: DetailedView,
       props: route => ({ activeEndpoint: route.params.endpoint }),
     },
+    {
+      path: '/search-results', // New route for search results
+      name: 'search-results',
+      component: SearchResultsView,
+    },
+    {
+      path: '/moderator-dashboard',
+      name: 'ModeratorDashboardView',
+      component: ModeratorDashboardView
+    },
+    {
+      path: '/upload-documents',
+      name: 'UploadDocuments',
+      component: UploadDocuments,
+    },
+    {
+      path: '/update-profile',
+      name: 'UpdateProfile',
+      component: () => import('@/components/UpdateProfilePage.vue')
+    },
+    { 
+      path: '/pending-documents', 
+      name: 'PendingDocuments', 
+      component: ViewAllDocumentsView 
+    },
+    { 
+      path: '/approved-documents', 
+      name: 'ApprovedDocuments', 
+      component: ViewAllDocumentsView 
+    },
+    {
+      path: '/moderate-documents',
+      name: 'ModerateDocumentsView',
+      component: ModerateDocumentsView
+    },
+    {
+      path: '/subject',
+      name: 'SubjectView',
+      component: SubjectView
+    },
+    {
+      path: '/self-learning',
+      name: 'SelfDirectedlearningView',
+      component: SelfDirectedlearningView
+    },
+
   ],
 });
 
