@@ -226,7 +226,7 @@ function mapDocuments(docs) {
     description: doc.description || 'No description available',
     author: doc.author || 'Unknown Author',
     light_preview_url: doc.light_preview_url || '',
-    download_url: doc.download_url || '',
+    download_url: doc.location || '',
     category: doc.category ||'',
     university: doc.university ||'',
     module: doc.module ||'',

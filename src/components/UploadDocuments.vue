@@ -1,3 +1,5 @@
+Improved Document Upload Component
+
 <script setup>
 import { ref, computed } from 'vue';
 import axios from 'axios';
@@ -20,6 +22,8 @@ const isDragging = ref(false);
 const showToast = ref(false);
 const toastMessage = ref('');
 const toastType = ref(''); // 'success' or 'error'
+const isUploading = ref(false);
+
 
 // Suggestions data
 const allModules = ['Module A', 'Module B', 'Module C', 'Module D'];
@@ -74,14 +78,12 @@ const handleDrop = (event) => {
   event.preventDefault();
   isDragging.value = false;
 
-  // Handle the dropped files
   if (event.dataTransfer.files.length > 0) {
     files.value = event.dataTransfer.files;
   } else {
     console.error('No files dropped');
   }
 };
-
 
 // Function to handle clicking the drop zone
 const handleDropZoneClick = () => {
@@ -93,14 +95,12 @@ const handleDropZoneClick = () => {
   }
 };
 
-
 // Function to validate the academic year
 const isValidAcademicYear = (year) => {
   return /^\d{4}$/.test(year) && year >= startYear && year <= endYear;
 };
 
 const uploadDocuments = async () => {
-  // Validate academic year
   if (!isValidAcademicYear(academicYear.value)) {
     showToast.value = true;
     toastMessage.value = 'Please enter a valid academic year (YYYY).';
@@ -108,7 +108,6 @@ const uploadDocuments = async () => {
     return;
   }
 
-  // Prepare form data
   const formData = new FormData();
   
   if (files.value && files.value.length > 0) {
@@ -130,32 +129,29 @@ const uploadDocuments = async () => {
   formData.append('academicYear', academicYear.value);
 
   try {
-    const token = localStorage.getItem('token');
-    const headers = {
-      'Content-Type': 'multipart/form-data',
-      'Authorization': `Bearer ${token}`,
-    };
+    isUploading.value = true;    
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('token');
+    const headers = { Authorization: `Bearer ${token}` };
 
-    const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/v1/upload`, formData, { headers });
+    const response = await axios.post(`${import.meta.env.VITE_API_URL}api/v1/upload`, formData, { headers });
 
     if (response.status === 200) {
       showToast.value = true;
       toastMessage.value = 'Documents uploaded successfully!';
       toastType.value = 'success';
-      // Clear the form
       resetForm();
-      // Optionally navigate to another route
       router.push('/dashboard');
     } else {
-      showToast.value = true;
-      toastMessage.value = 'Failed to upload documents. Please try again.';
-      toastType.value = 'error';
+      throw new Error('Upload failed');
     }
   } catch (error) {
     console.error('Upload failed:', error);
     showToast.value = true;
-    toastMessage.value = 'Failed to upload documents. Check the server or file size.';
+    toastMessage.value = 'Failed to upload documents. Please try again.';
     toastType.value = 'error';
+  } finally {
+    isUploading.value = false;
   }
 };
 
@@ -321,37 +317,46 @@ const selectAcademicYearSuggestion = (suggestion) => {
           </ul>
         </div>
 
+
         <!-- File Upload -->
         <div>
-            <label class="block text-sm font-semibold text-gray-700">Upload Files</label>
-            <div 
-                @drop="handleDrop" 
-                @dragover.prevent 
-                @dragenter="isDragging = true" 
-                @dragleave="isDragging = false" 
-                @click="handleDropZoneClick"
-                class="mt-2 border-dashed border-2 border-gray-300 rounded-lg p-8 text-center cursor-pointer transition duration-300 ease-in-out hover:border-indigo-400"
-                :class="{ 'bg-indigo-100': isDragging }"
-            >
-                <p class="text-gray-600">Drag and drop files here, or click to select files</p>
-                <input 
-                  id="file-input" 
-                  type="file" 
-                  multiple 
-                  @change="files.value = $event.target.files" 
-                  class="hidden"
-                />
-
-            </div>
-            <p class="mt-2 text-sm text-gray-500">Supported file types: PDF, DOCX, XLSX, PPTX, and more.</p>
+          <label class="block text-sm font-semibold text-gray-700">Upload Files</label>
+          <div 
+            @drop="handleDrop" 
+            @dragover.prevent 
+            @dragenter="isDragging = true" 
+            @dragleave="isDragging = false" 
+            @click="handleDropZoneClick"
+            class="mt-2 border-dashed border-2 border-gray-300 rounded-lg p-8 text-center cursor-pointer transition duration-300 ease-in-out hover:border-indigo-400"
+            :class="{ 'bg-indigo-100': isDragging }"
+          >
+            <p class="text-gray-600">
+              {{ files && files.length > 0 ? `${files.length} file(s) selected` : 'Drag and drop files here, or click to select files' }}
+            </p>
+            <input 
+              id="file-input" 
+              type="file" 
+              multiple 
+              @change="files = $event.target.files" 
+              class="hidden"
+            />
+          </div>
+          <p class="mt-2 text-sm text-gray-500">Supported file types: PDF, DOCX, XLSX, PPTX, and more.</p>
         </div>
 
-  
         <button 
           type="submit" 
-          class="w-full bg-indigo-600 text-white font-semibold py-3 rounded-lg shadow-lg transition duration-300 ease-in-out hover:bg-indigo-500"
+          class="w-full bg-indigo-600 text-white font-semibold py-3 rounded-lg shadow-lg transition duration-300 ease-in-out hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+          :disabled="isUploading"
         >
-          Upload Documents
+          <span v-if="!isUploading">Upload Documents</span>
+          <span v-else class="flex items-center justify-center">
+            <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Uploading...
+          </span>
         </button>
       </form>
 
@@ -362,7 +367,7 @@ const selectAcademicYearSuggestion = (suggestion) => {
           :class="`fixed top-4 right-4 bg-white border rounded-lg shadow-lg p-4 transition-all duration-300 ${toastType === 'success' ? 'border-green-400 bg-green-100 text-green-800' : 'border-red-400 bg-red-100 text-red-800'}`"
         >
           <p>{{ toastMessage }}</p>
-          <button @click="showToast = false" class="text-sm text-gray-500">✖</button>
+          <button @click="showToast = false" class="absolute top-1 right-1 text-sm text-gray-500 hover:text-gray-700">✖</button>
         </div>
       </transition>
     </div>

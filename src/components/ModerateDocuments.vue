@@ -1,264 +1,306 @@
 <template>
-    <div :class="['moderate-documents', { 'dark-mode': isDarkMode }]">
-      <h1 class="page-title">Moderate Documents</h1>
-  
-      <div class="search-filter-container">
-        <div class="search-bar-wrapper">
-          <input type="text" v-model="searchQuery" placeholder="Search documents..." class="search-bar" />
-          <i class="fas fa-search search-icon"></i>
-        </div>
-        <div class="filter-options">
-          <select v-model="selectedCategory" class="category-filter">
-            <option value="">All Categories</option>
-            <option v-for="category in categories" :key="category" :value="category">
-              {{ category }}
-            </option>
-          </select>
-          <label class="dark-mode-switch">
-            <input type="checkbox" v-model="isDarkMode" @change="toggleDarkMode" />
-            <span class="toggle-slider"></span>
-            <span class="toggle-label">Dark Mode</span>
-          </label>
-        </div>
+  <div :class="['moderate-documents', { 'dark-mode': isDarkMode }]">
+    <h1 class="page-title">Moderate Documents</h1>
+
+    <div class="search-filter-container">
+      <div class="search-bar-wrapper">
+        <input type="text" v-model="searchQuery" placeholder="Search documents..." class="search-bar" />
+        <i class="fas fa-search search-icon"></i>
       </div>
-  
-      <div class="documents-container">
-        <div class="documents-grid">
-          <div 
-            v-for="document in filteredDocuments" 
-            :key="document.id" 
-            class="document-card"
-            @click="showPreview(document)"
-          >
-            <img :src="document.preview_image_url || defaultImage" alt="Document Preview" class="document-image" />
-            <div class="doc-info">
-              <h3 class="doc-title">{{ document.title }}</h3>
-              <p class="description">{{ document.description }}</p>
-              <p class="author">By: {{ document.author }}</p>
-              <p class="category">Category: {{ document.category }}</p>
-              <p class="status">Status: {{ document.status }}</p>
-            </div>
-          </div>
-        </div>
+      <div class="filter-options">
+        <select v-model="selectedCategory" class="category-filter">
+          <option value="">All Categories</option>
+          <option v-for="category in categories" :key="category" :value="category">
+            {{ category }}
+          </option>
+        </select>
+        <label class="dark-mode-switch">
+          <input type="checkbox" v-model="isDarkMode" @change="toggleDarkMode" />
+          <span class="toggle-slider"></span>
+          <span class="toggle-label">Dark Mode</span>
+        </label>
       </div>
-  
-      <div v-if="totalPages > 1" class="pagination">
-        <button @click="prevPage" :disabled="currentPage === 1">Previous</button>
-        <span>Page {{ currentPage }} of {{ totalPages }}</span>
-        <button @click="nextPage" :disabled="currentPage === totalPages">Next</button>
-      </div>
-  
-      <!-- Preview Modal -->
-      <div v-if="showModal" class="modal-overlay" @click="closePreview">
-        <div class="modal-content" @click.stop>
-          <h2>{{ currentDocument.title }}</h2>
-          <div class="preview-images-container">
-            <button @click="prevImage" class="nav-button left">
-              <i class="fas fa-chevron-left"></i>
-            </button>
-            <img :src="currentPreviewImage" alt="Preview" class="preview-image" />
-            <button @click="nextImage" class="nav-button right">
-              <i class="fas fa-chevron-right"></i>
-            </button>
-          </div>
-          <p>{{ currentImageIndex + 1 }} / {{ currentDocumentPreviewImages.length }}</p>
-          <p class="description">{{ currentDocument.description }}</p>
-          <p class="author">By: {{ currentDocument.author }}</p>
-          <p class="category">Category: {{ currentDocument.category }}</p>
-          <p class="status">Status: {{ currentDocument.status }}</p>
-          <a :href="currentDocument.download_url" class="download-btn" download>Download Full Document</a>
-          <div class="moderation-actions">
-            <button @click="approveDocument" class="approve-btn">Approve</button>
-            <button @click="openDisapproveModal" class="disapprove-btn">Disapprove</button>
-          </div>
-          <button class="close-btn" @click="closePreview">&times;</button>
-        </div>
-      </div>
-  
-      <!-- Disapprove Modal -->
-      <div v-if="showDisapproveModal" class="modal-overlay" @click="closeDisapproveModal">
-        <div class="modal-content disapprove-modal" @click.stop>
-          <h3>Disapprove Document</h3>
-          <textarea v-model="disapproveReason" placeholder="Please provide a reason for disapproval..." rows="4"></textarea>
-          <div class="disapprove-actions">
-            <button @click="submitDisapproval" class="submit-disapprove-btn">Submit</button>
-            <button @click="closeDisapproveModal" class="cancel-btn">Cancel</button>
+    </div>
+
+    <div class="documents-container">
+      <div class="documents-grid">
+        <div 
+          v-for="document in filteredDocuments" 
+          :key="document.id" 
+          class="document-card"
+          @click="showPreview(document)"
+        >
+          <img :src="document.preview_image_url || defaultImage" alt="Document Preview" class="document-image" />
+          <div class="doc-info">
+            <h3 class="doc-title">{{ document.title }}</h3>
+            <p class="description">{{ truncateText(document.description, 100) }}</p>
+            <p class="author">By: {{ document.author }}</p>
+            <p class="category">Category: {{ document.category }}</p>
+            <p class="status">Status: {{ document.status }}</p>
           </div>
         </div>
       </div>
     </div>
-  </template>
+
+    <div v-if="totalPages > 1" class="pagination">
+      <button @click="prevPage" :disabled="currentPage === 1">Previous</button>
+      <span>Page {{ currentPage }} of {{ totalPages }}</span>
+      <button @click="nextPage" :disabled="currentPage === totalPages">Next</button>
+    </div>
+
+    <!-- Preview Modal -->
+    <div v-if="showModal" class="modal-overlay" @click="closePreview">
+      <div class="modal-content" @click.stop>
+        <h2>{{ currentDocument.title }}</h2>
+        <div class="preview-images-container">
+          <button @click="prevImage" class="nav-button left" :disabled="currentImageIndex === 0">
+            <i class="fas fa-chevron-left"></i>
+          </button>
+          <img :src="currentPreviewImage" alt="Preview" class="preview-image" />
+          <button @click="nextImage" class="nav-button right" :disabled="currentImageIndex === currentDocumentPreviewImages.length - 1">
+            <i class="fas fa-chevron-right"></i>
+          </button>
+        </div>
+        <p>{{ currentImageIndex + 1 }} / {{ currentDocumentPreviewImages.length }}</p>
+        <p class="description">{{ currentDocument.description }}</p>
+        <p class="author">By: {{ currentDocument.author }}</p>
+        <p class="category">Category: {{ currentDocument.category }}</p>
+        <p class="status">Status: {{ currentDocument.status }}</p>
+        <a :href="currentDocument.download_url" class="download-btn" download>Download Full Document</a>
+        <div class="moderation-actions">
+          <button @click="approveDocument" class="approve-btn">Approve</button>
+          <button @click="openDisapproveModal" class="disapprove-btn">Disapprove</button>
+        </div>
+        <button class="close-btn" @click="closePreview">&times;</button>
+      </div>
+    </div>
+
+    <!-- Disapprove Modal -->
+    <div v-if="showDisapproveModal" class="modal-overlay" @click="closeDisapproveModal">
+      <div class="modal-content disapprove-modal" @click.stop>
+        <h3>Disapprove Document</h3>
+        <textarea v-model="disapproveReason" placeholder="Please provide a reason for disapproval..." rows="4"></textarea>
+        <div class="disapprove-actions">
+          <button @click="submitDisapproval" class="submit-disapprove-btn">Submit</button>
+          <button @click="closeDisapproveModal" class="cancel-btn">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Response Message -->
+    <div v-if="responseMessage" :class="['response-message', responseMessage.type]">
+      {{ responseMessage.text }}
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { ref, computed, onMounted, watch } from 'vue';
+import axios from 'axios';
+import defaultImage from '@/assets/documentIcon.png';
+
+const documents = ref([]);
+const searchQuery = ref('');
+const isDarkMode = ref(false);
+const showModal = ref(false);
+const showDisapproveModal = ref(false);
+const currentDocument = ref(null);
+const currentDocumentPreviewImages = ref([]);
+const currentImageIndex = ref(0);
+const selectedCategory = ref('');
+const categories = ref([]);
+const currentPage = ref(1);
+const itemsPerPage = 12;
+const totalItems = ref(0);
+const disapproveReason = ref('');
+const responseMessage = ref(null);
+
+const filteredDocuments = computed(() => {
+  let filtered = documents.value.filter(document => 
+    (document.title.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+    document.description.toLowerCase().includes(searchQuery.value.toLowerCase())) &&
+    (selectedCategory.value === '' || document.category === selectedCategory.value)
+  );
   
-  <script setup>
-  import { ref, computed, onMounted } from 'vue';
-  import axios from 'axios';
-  import defaultImage from '@/assets/documentIcon.png';
-  
-  const documents = ref([]);
-  const searchQuery = ref('');
-  const isDarkMode = ref(false);
-  const showModal = ref(false);
-  const showDisapproveModal = ref(false);
-  const currentDocument = ref(null);
-  const currentDocumentPreviewImages = ref([]);
-  const currentImageIndex = ref(0);
-  const selectedCategory = ref('');
-  const categories = ref([]);
-  const currentPage = ref(1);
-  const itemsPerPage = 12;
-  const totalItems = ref(0);
-  const disapproveReason = ref('');
-  
-  const filteredDocuments = computed(() => {
-    let filtered = documents.value.filter(document => 
-      (document.title.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-      document.description.toLowerCase().includes(searchQuery.value.toLowerCase())) &&
-      (selectedCategory.value === '' || document.category === selectedCategory.value)
-    );
-    
-    const startIndex = (currentPage.value - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    return filtered.slice(startIndex, endIndex);
-  });
-  
-  const totalPages = computed(() => {
-    return Math.ceil(totalItems.value / itemsPerPage);
-  });
-  
-  const currentPreviewImage = computed(() => {
-    return currentDocumentPreviewImages.value[currentImageIndex.value] || defaultImage;
-  });
-  
-  onMounted(() => {
-    fetchDocuments();
-  });
-  
-  async function fetchDocuments() {
-    try {
-      const urlParams = new URLSearchParams(window.location.search);
-      const token = urlParams.get('token');
-      const headers = { Authorization: `Bearer ${token}` };
-  
-      const endpoint = `${import.meta.env.VITE_API_URL}api/v1/documents/pending`;
-  
-      const response = await axios.get(endpoint, { headers });
-      documents.value = mapDocuments(response.data.documents);
-      totalItems.value = documents.value.length;
-      categories.value = [...new Set(documents.value.map(doc => doc.category))];
-    } catch (error) {
-      console.error('Failed to fetch documents:', error.message);
-    }
+  const startIndex = (currentPage.value - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  return filtered.slice(startIndex, endIndex);
+});
+
+watch(filteredDocuments, (newFilteredDocuments) => {
+  totalItems.value = newFilteredDocuments.length;
+});
+
+const totalPages = computed(() => {
+  return Math.ceil(totalItems.value / itemsPerPage);
+});
+
+const currentPreviewImage = computed(() => {
+  return currentDocumentPreviewImages.value[currentImageIndex.value] || defaultImage;
+});
+
+onMounted(() => {
+  fetchDocuments();
+  loadDarkModePreference();
+});
+
+async function fetchDocuments() {
+  try {
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('token');
+    const headers = { Authorization: `Bearer ${token}` };
+
+    const endpoint = `${import.meta.env.VITE_API_URL}api/v1/documents/pending`;
+
+    const response = await axios.get(endpoint, { headers });
+    documents.value = mapDocuments(response.data.documents);
+    totalItems.value = documents.value.length;
+    categories.value = [...new Set(documents.value.map(doc => doc.category))];
+  } catch (error) {
+    console.error('Failed to fetch documents:', error.message);
+    showResponseMessage('Error fetching documents. Please try again.', 'error');
   }
-  
-  function mapDocuments(docs) {
-    return docs.map(doc => ({
-      id: doc.id,
-      title: doc.title || 'Unknown title',
-      preview_image_url: doc.preview_image_url || defaultImage,
-      description: doc.description || 'No description available',
-      author: doc.author || 'Unknown Author',
-      category: doc.category || 'Uncategorized',
-      status: 'Pending',
-      light_preview_url: doc.light_preview_url || '',
-      download_url: doc.location || '',
-    }));
-  }
-  
-  function showPreview(document) {
-    currentDocument.value = document;
-    currentDocumentPreviewImages.value = document.light_preview_url ? document.light_preview_url.split(',') : [];
-    currentImageIndex.value = 0;
-    showModal.value = true;
-  }
-  
-  function closePreview() {
-    showModal.value = false;
-  }
-  
-  function toggleDarkMode() {
+}
+
+function mapDocuments(docs) {
+  return docs.map(doc => ({
+    id: doc.docId,
+    title: doc.title || 'Unknown title',
+    preview_image_url: doc.preview_image_url || defaultImage,
+    description: doc.description || 'No description available',
+    author: doc.author || 'Unknown Author',
+    category: doc.category || 'Uncategorized',
+    status: 'Pending',
+    light_preview_url: doc.light_preview_url || '',
+    download_url: doc.location || '',
+  }));
+}
+
+function showPreview(document) {
+  currentDocument.value = document;
+  currentDocumentPreviewImages.value = document.light_preview_url ? document.light_preview_url.split(',') : [];
+  currentImageIndex.value = 0;
+  showModal.value = true;
+}
+
+function closePreview() {
+  showModal.value = false;
+}
+
+function toggleDarkMode() {
+  document.body.classList.toggle('dark-mode', isDarkMode.value);
+  localStorage.setItem('darkMode', isDarkMode.value);
+}
+
+function loadDarkModePreference() {
+  const savedDarkMode = localStorage.getItem('darkMode');
+  if (savedDarkMode !== null) {
+    isDarkMode.value = savedDarkMode === 'true';
     document.body.classList.toggle('dark-mode', isDarkMode.value);
   }
-  
-  function nextImage() {
-    currentImageIndex.value = (currentImageIndex.value + 1) % currentDocumentPreviewImages.value.length;
+}
+
+function nextImage() {
+  if (currentImageIndex.value < currentDocumentPreviewImages.value.length - 1) {
+    currentImageIndex.value++;
   }
-  
-  function prevImage() {
-    currentImageIndex.value = (currentImageIndex.value - 1 + currentDocumentPreviewImages.value.length) % currentDocumentPreviewImages.value.length;
+}
+
+function prevImage() {
+  if (currentImageIndex.value > 0) {
+    currentImageIndex.value--;
   }
-  
-  function nextPage() {
-    if (currentPage.value < totalPages.value) {
-      currentPage.value++;
-    }
+}
+
+function nextPage() {
+  if (currentPage.value < totalPages.value) {
+    currentPage.value++;
   }
-  
-  function prevPage() {
-    if (currentPage.value > 1) {
-      currentPage.value--;
-    }
+}
+
+function prevPage() {
+  if (currentPage.value > 1) {
+    currentPage.value--;
   }
-  
-  async function approveDocument() {
-    try {
-      const urlParams = new URLSearchParams(window.location.search);
-      const token = urlParams.get('token');
-      const headers = { Authorization: `Bearer ${token}` };
-  
-      const endpoint = `${import.meta.env.VITE_API_URL}api/v1/moderation`;
-  
-      const payload = {
-        docid: currentDocument.value.id,
-        action: "approve",
-        comments: "Document meets the required standards."
-      };
-  
-      await axios.post(endpoint, payload, { headers });
-  
-      // Remove the approved document from the list
-      documents.value = documents.value.filter(doc => doc.id !== currentDocument.value.id);
-      closePreview();
-    } catch (error) {
-      console.error('Failed to approve document:', error.message);
-      // Handle error (e.g., show an error message to the user)
-    }
+}
+
+async function approveDocument() {
+  try {
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('token');
+    const headers = { Authorization: `Bearer ${token}` };
+
+    const endpoint = `${import.meta.env.VITE_API_URL}api/v1/moderation`;
+
+    const payload = {
+      docid: currentDocument.value.id,
+      action: "approve",
+      comments: "Document meets the required standards."
+    };
+    console.log("docid:", currentDocument.value.id,)
+
+    // Make sure headers are passed as the third argument
+    await axios.post(endpoint, payload, { headers });
+
+    // Remove the approved document from the list
+    documents.value = documents.value.filter(doc => doc.id !== currentDocument.value.id);
+    closePreview();
+    showResponseMessage('Document approved successfully.', 'success');
+  } catch (error) {
+    console.error('Failed to approve document:', error.message);
+    showResponseMessage('Failed to approve document. Please try again.', 'error');
   }
-  
-  function openDisapproveModal() {
-    showDisapproveModal.value = true;
+}
+
+
+function openDisapproveModal() {
+  showDisapproveModal.value = true;
+}
+
+function closeDisapproveModal() {
+  showDisapproveModal.value = false;
+  disapproveReason.value = '';
+}
+
+async function submitDisapproval() {
+  try {
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('token');
+    const headers = { Authorization: `Bearer ${token}` };
+
+    const endpoint = `${import.meta.env.VITE_API_URL}api/v1/moderation`;
+
+    const payload = {
+      docid: currentDocument.value.id,
+      action: "disapprove",
+      comments: disapproveReason.value
+    };
+
+    await axios.post(endpoint, payload, { headers });
+
+    // Remove the disapproved document from the list
+    documents.value = documents.value.filter(doc => doc.id !== currentDocument.value.id);
+    closeDisapproveModal();
+    closePreview();
+    showResponseMessage('Document disapproved successfully.', 'success');
+  } catch (error) {
+    console.error('Failed to disapprove document:', error.message);
+    showResponseMessage('Failed to disapprove document. Please try again.', 'error');
   }
-  
-  function closeDisapproveModal() {
-    showDisapproveModal.value = false;
-    disapproveReason.value = '';
-  }
-  
-  async function submitDisapproval() {
-    try {
-      const urlParams = new URLSearchParams(window.location.search);
-      const token = urlParams.get('token');
-      const headers = { Authorization: `Bearer ${token}` };
-  
-      const endpoint = `${import.meta.env.VITE_API_URL}api/v1/moderation`;
-  
-      const payload = {
-        docid: currentDocument.value.id,
-        action: "disapprove",
-        comments: disapproveReason.value
-      };
-  
-      await axios.post(endpoint, payload, { headers });
-  
-      // Remove the disapproved document from the list
-      documents.value = documents.value.filter(doc => doc.id !== currentDocument.value.id);
-      closeDisapproveModal();
-      closePreview();
-    } catch (error) {
-      console.error('Failed to disapprove document:', error.message);
-      // Handle error (e.g., show an error message to the user)
-    }
-  }
-  </script>
+}
+
+function showResponseMessage(text, type) {
+  responseMessage.value = { text, type };
+  setTimeout(() => {
+    responseMessage.value = null;
+  }, 5000);
+}
+
+function truncateText(text, maxLength) {
+  if (text.length <= maxLength) return text;
+  return text.substr(0, maxLength) + '...';
+}
+</script>
   
   <style scoped>
   .moderate-documents {
@@ -658,4 +700,42 @@
     color: #ecf0f1;
     border-color: #3498db;
   }
+  .response-message {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  padding: 15px 20px;
+  border-radius: 5px;
+  color: white;
+  font-weight: bold;
+  z-index: 1000;
+  animation: fadeIn 0.3s, fadeOut 0.3s 4.7s;
+}
+
+.response-message.success {
+  background-color: #2ecc71;
+}
+
+.response-message.error {
+  background-color: #e74c3c;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+/* Dark mode styles */
+.dark-mode .response-message.success {
+  background-color: #27ae60;
+}
+
+.dark-mode .response-message.error {
+  background-color: #c0392b;
+}
   </style>
