@@ -77,10 +77,37 @@
         </div>
       </div>
 
+      <!-- Approved Documents Section -->
+<div class="mb-8 md:mb-12">
+  <h2 class="text-2xl md:text-3xl font-bold text-center text-white mb-6 md:mb-8">Browse for Documents</h2>
+  <div class="flex overflow-x-auto space-x-6 pb-4">
+    <div 
+      v-for="(document, index) in approvedDocuments" 
+      :key="index" 
+      @click="showPreview(document)"
+      class="flex-shrink-0 w-64 bg-white bg-opacity-10 backdrop-filter backdrop-blur-lg rounded-lg overflow-hidden transform hover:scale-105 transition-all duration-300 ease-in-out cursor-pointer"
+    >
+      <img :src="document.preview_image_url || defaultImage" alt="Document Preview" class="w-full h-40 object-cover" />
+      <div class="p-4">
+        <h3 class="text-lg font-semibold text-white mb-2">{{ document.title }}</h3>
+        <p class="text-sm text-gray-300 mb-2">{{ document.description }}</p>
+        <p class="text-xs text-gray-400">By: {{ document.author }}</p>
+        <div class="flex mt-2">
+          <span v-for="star in 5" :key="star" class="text-2xl" :class="{ 'text-yellow-400': star <= document.rating, 'text-gray-600': star > document.rating }">
+            {{ star <= document.rating ? '★' : '☆' }}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
-      <button class="block mx-auto py-2 md:py-3 px-4 md:px-6 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-full text-white font-semibold transform hover:scale-105 transition-all duration-300 ease-in-out">
-        Explore All Cosmic Documents
-      </button>
+
+
+<button @click="router.push({ name: 'AllDocuments' })" class="block mx-auto py-2 md:py-3 px-4 md:px-6 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-full text-white font-semibold transform hover:scale-105 transition-all duration-300 ease-in-out">
+  Explore All Cosmic Documents
+</button>
+
     </div>
 
     <!-- Preview Modal -->
@@ -192,6 +219,33 @@ async function fetchHighRatedDocuments(ids, headers) {
     console.error('Failed to fetch documents for high ratings:', error.message);
   }
 }
+
+const approvedDocuments = ref([]);
+
+onMounted(() => {
+  fetchRatings();
+  fetchApprovedDocuments(); // Fetch approved documents on mount
+  initializeDarkMode();
+});
+
+async function fetchApprovedDocuments() {
+  try {
+    const token = localStorage.getItem('token');
+    const headers = { Authorization: `Bearer ${token}` };
+    
+    const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/v1/documents/approved`, { headers });
+    
+    if (response.data && response.data.status === 'success') {
+      // Take only the first 5 approved documents
+      approvedDocuments.value = response.data.documents.slice(0, 5).map(mapDocument);
+    } else {
+      console.error('Failed to fetch approved documents:', response.data);
+    }
+  } catch (error) {
+    console.error('Failed to fetch approved documents:', error.message);
+  }
+}
+
 
 function mapDocument(doc) {
   const documentId = doc.id || doc.docId;

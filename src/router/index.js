@@ -9,6 +9,8 @@ import ResetPasswordView from '@/views/ResetPasswordView.vue';
 import SearchResultsView from '@/views/SearchResultsView.vue'; // Import the new view
 import ModeratorDashboardView from '@/views/ModeratorDashboardView.vue'
 import UploadDocuments from '@/components/UploadDocuments.vue';
+import AllDocuments from '@/views/AllDocuments.vue'; // Adjust the path as necessary
+
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -68,6 +70,11 @@ const router = createRouter({
       name: 'UpdateProfile',
       component: () => import('@/components/UpdateProfilePage.vue')
     },
+    {
+      path: '/all-documents',
+      name: 'AllDocuments',
+      component: AllDocuments,
+    },    
   ],
 });
 
