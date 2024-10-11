@@ -1,14 +1,21 @@
 <template>
-    <div class="faq-page">
-      <div class="container mx-auto p-6 lg:p-8">
-        <div class="header flex justify-between items-center mb-8">
-          <h1 class="main-title text-3xl font-semibold text-gray-800 dark:text-gray-200">
+  <div class="faq-page">
+    <MainNavbar />
+
+    <div class="flex">
+      <div :class="['faq-sidebar', { 'hidden': !isSidebarOpen }]">
+        <FAQSideBar />
+      </div>
+
+      <div class="container mx-auto p-6 lg:p-8 flex-1">
+        <div class="header flex justify-center items-center mb-8">
+          <h1 class="main-title text-3xl font-semibold text-center text-gray-800 dark:text-gray-200">
             Frequently Asked Questions
           </h1>
         </div>
-  
-        <div class="search-bar-wrapper mb-6">
-          <div class="relative">
+
+        <div class="search-bar-wrapper mb-6 flex justify-center">
+          <div class="relative w-full max-w-md">
             <input
               type="text"
               v-model="searchTerm"
@@ -19,225 +26,233 @@
             <i class="fas fa-search search-icon absolute right-4 top-2 text-gray-400 cursor-pointer" @click="handleSearch"></i>
           </div>
         </div>
-  
+
         <transition-group name="fade" tag="div" class="faq-container space-y-4">
           <div 
             v-for="faq in filteredFAQs" 
-            :key="faq.id" 
-            class="faq-card bg-white border border-gray-300 rounded-lg shadow-md transition duration-300 ease-in-out hover:shadow-lg relative overflow-hidden"
+            :key="faq.faqId" 
+            class="faq-card border border-gray-200 rounded-lg shadow-md transition duration-300 ease-in-out hover:shadow-lg relative overflow-hidden"
           >
-            <h3 
-              class="faq-question cursor-pointer p-4 text-lg font-semibold text-gray-800 hover:bg-gray-100 transition flex items-center justify-between"
-              @click="faq.open = !faq.open"
+            <button
+              @click="toggleFAQ(faq.faqId)"
+              class="flex items-center justify-between w-full p-8 transition-colors duration-300"
             >
-              {{ faq.question }}
-              <span :class="{'rotate-180': faq.open}" class="transition-transform transform">
-                <i class="fas fa-chevron-down"></i>
+              <h1 class="font-semibold text-gray-800">{{ faq.question }}</h1>
+              <span
+                :class="faqOpen[faq.faqId] ? 'text-white bg-purple-500' : 'text-gray-400 bg-gray-200'"
+                class="rounded-full p-2"  
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="w-6 h-6 transition-transform duration-300"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    :d="faqOpen[faq.faqId] ? 'M12 6v6m0 0v6m0-6h6m-6 0H6' : 'M18 12H6'"
+                  />
+                </svg>
               </span>
-            </h3>
-            <transition name="slide-fade">
-              <p v-if="faq.open" class="faq-answer p-4 text-gray-600 bg-gray-50 border-t border-gray-300">{{ faq.answer }}</p>
-            </transition>
+            </button>
+            <hr class="border-gray-300" />
+            <p v-if="faqOpen[faq.faqId]" class="p-8 text-sm text-gray-600">
+              {{ faq.answer }}
+            </p>
           </div>
         </transition-group>
-  
+
         <div v-if="!isLoading && !filteredFAQs.length" class="no-results text-center text-gray-500 text-lg">
           <p>No FAQs found.</p>
         </div>
-  
+
         <div v-if="isLoading" class="loading text-center text-gray-500 text-lg">
           <div class="spinner mx-auto mb-2"></div>
           <p>Loading FAQs...</p>
         </div>
       </div>
     </div>
-  </template>
-  
-  <script>
-  export default {
-    data() {
-      return {
-        faqs: [],
-        searchTerm: '',
-        isLoading: true,
-        isDarkMode: false,
-      };
+  </div>
+</template>
+
+<script>
+import FAQSideBar from '@/components/FAQSideBar.vue';
+import MainNavbar from '@/components/MainNavbar.vue';
+
+export default {
+  components: {
+    MainNavbar,
+    FAQSideBar,
+  },
+  data() {
+    return {
+      faqs: [],
+      searchTerm: '',
+      isLoading: true,
+      isDarkMode: false,
+      isSidebarOpen: true,
+      faqOpen: {}, // Track which FAQs are open
+    };
+  },
+  created() {
+    this.isDarkMode = localStorage.getItem('isDarkMode') === 'true';
+    this.fetchFAQs();
+  },
+  computed: {
+    filteredFAQs() {
+      return this.faqs.filter(faq =>
+        faq.question.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+        faq.answer.toLowerCase().includes(this.searchTerm.toLowerCase())
+      );
+    }
+  },
+  watch: {
+    isDarkMode(newValue) {
+      localStorage.setItem('isDarkMode', newValue);
     },
-    created() {
-      this.isDarkMode = localStorage.getItem('isDarkMode') === 'true';
-      this.fetchFAQs();
-    },
-    computed: {
-      filteredFAQs() {
-        return this.faqs.filter(faq =>
-          faq.question.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-          faq.answer.toLowerCase().includes(this.searchTerm.toLowerCase())
-        );
+  },
+  methods: {
+    async fetchFAQs() {
+      this.isLoading = true;
+      try {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/faq`);
+        if (response.ok) {
+          this.faqs = await response.json();
+          // Initialize faqOpen state for each FAQ
+          this.faqs.forEach(faq => {
+            this.$set(this.faqOpen, faq.faqId, false);
+          });
+        } else {
+          console.error('Failed to fetch FAQs');
+        }
+      } catch (error) {
+        console.error('Error fetching FAQs:', error);
+      } finally {
+        this.isLoading = false;
       }
     },
-    watch: {
-      isDarkMode(newValue) {
-        localStorage.setItem('isDarkMode', newValue);
-      },
+    handleSearch() {
+      // Add any search handling logic here if needed
     },
-    methods: {
-      async fetchFAQs() {
-        this.isLoading = true;
-        try {
-          const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/faq`);
-          if (response.ok) {
-            this.faqs = await response.json();
-          } else {
-            console.error('Failed to fetch FAQs');
-          }
-        } catch (error) {
-          console.error('Error fetching FAQs:', error);
-        } finally {
-          this.isLoading = false;
-        }
-      },
-      handleSearch() {
-        // Search handling logic here
-      },
+    toggleFAQ(faqId) {
+      this.$set(this.faqOpen, faqId, !this.faqOpen[faqId]); // Toggle FAQ open/close state
     },
-  };
-  </script>
-  
-  <style scoped>
-  .faq-page {
-    font-family: 'Roboto', Arial, sans-serif;
-    background-color: var(--background-color);
-    color: var(--text-color);
-    min-height: 100vh;
-    transition: all 0.3s ease;
-  }
-  
-  .container {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 2rem;
-  }
-  
-  .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 2rem;
-  }
-  
-  .main-title {
-    font-size: 2rem;
-    color: var(--primary-color);
-  }
-  
-  .search-bar-wrapper {
-    position: relative;
-    margin-bottom: 1.5rem;
-  }
-  
-  .search-bar {
-    width: 100%;
-    padding: 1rem 3rem 1rem 1rem;
-    font-size: 1rem;
-    border: 2px solid var(--border-color);
-    border-radius: 30px;
-    background-color: var(--card-background);
-    color: var(--text-color);
-    transition: all 0.3s ease;
-  }
-  
-  .search-bar:focus {
-    outline: none;
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
-  }
-  
-  .search-icon {
-    position: absolute;
-    right: 1rem;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--primary-color);
-    cursor: pointer;
-  }
-  
-  .faq-container {
-    margin-top: 1.5rem;
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .faq-card {
-    background-color: var(--card-background);
-    border: 1px solid var(--border-color);
-    border-radius: 5px;
-    padding: 1rem;
-    margin-bottom: 1rem;
-    transition: background-color 0.3s ease;
-    cursor: pointer;
-  }
-  
-  .faq-card:hover {
-    background-color: rgba(74, 144, 226, 0.1);
-  }
-  
-  .faq-question {
-    font-size: 1.2rem;
-    color: var(--primary-color);
-  }
-  
-  .faq-answer {
-    margin-top: 0.5rem;
-    font-size: 0.9rem;
-    transition: max-height 0.3s ease, opacity 0.3s ease;
-  }
-  
-  .no-results {
-    text-align: center;
-    font-size: 1.2rem;
-    color: var(--text-color);
-  }
-  
-  .loading {
-    text-align: center;
-    font-size: 1.2rem;
-    color: var(--text-color);
-  }
-  
-  .spinner {
-    border: 4px solid rgba(0, 0, 0, 0.1);
-    border-top: 4px solid var(--primary-color);
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    animation: spin 1s linear infinite;
-    margin: 0 auto 1rem;
-  }
-  
-  @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-  }
-  
-  /* Animation styles */
-  .fade-enter-active, .fade-leave-active {
-    transition: opacity 0.5s;
-  }
-  .fade-enter, .fade-leave-to /* .fade-leave-active in <2.1.8 */ {
-    opacity: 0;
-  }
-  
-  .slide-fade-enter-active, .slide-fade-leave-active {
-    transition: max-height 0.3s ease, opacity 0.3s ease;
-  }
-  .slide-fade-enter, .slide-fade-leave-to {
-    max-height: 0;
-    opacity: 0;
-  }
-  .slide-fade-enter-to, .slide-fade-leave-active {
-    max-height: 100px; /* Adjust this based on expected content height */
-    opacity: 1;
-  }
-  </style>
-  
-  
+  },
+};
+</script>
+
+<style scoped>
+.faq-page {
+  min-height: 100vh; /* Ensure the container takes full height */
+}
+
+.flex {
+  display: flex; /* Use flexbox to position sidebar and main content */
+}
+
+/* Sidebar styles */
+.faq-sidebar {
+  width: 250px; /* Set your desired width for the sidebar */
+  height: 100vh; /* Ensures it takes the full height of the viewport */
+  overflow-y: auto; /* Allows scrolling if content is too tall */
+  transition: transform 0.3s ease; /* Smooth transition */
+}
+
+.faq-sidebar.hidden {
+  transform: translateX(-100%); /* Move sidebar out of view when hidden */
+}
+
+/* Main container styles */
+.container {
+  flex: 1; /* Allow the container to take up remaining space */
+  padding: 2rem;
+  display: flex;
+  flex-direction: column; /* Allow elements to stack vertically */
+  align-items: center; /* Center align items horizontally */
+}
+
+/* Centered and Smaller Search Bar */
+.search-bar-wrapper {
+  position: relative;
+  margin-bottom: 2rem; /* Adjusted margin-bottom for spacing */
+  display: flex;
+  justify-content: center;
+}
+
+.search-bar-wrapper input {
+  width: 100%;
+  max-width: 400px; /* Make the input smaller */
+}
+
+.search-icon {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--primary-color);
+  cursor: pointer;
+}
+
+/* Modern FAQ Card Styles */
+.faq-container {
+  margin-top: 1.5rem;
+  max-width: 600px; /* Set a maximum width for the FAQ container */
+}
+
+/* FAQ Card Styles */
+.faq-card {
+  border: 1px solid var(--border-color);
+  border-radius: 13px;
+  padding: 1rem; /* Increased padding for better spacing */
+  display: flex;
+  flex-direction: column; /* Stack children vertically */
+  justify-content: space-between; /* Space out the contents */
+  background-color: white; /* Default background */
+  transition: background-color 0.5s ease;
+  min-height: 150px; /* Set minimum height for FAQ cards to make them longer */
+}
+
+/* Gradient Hover Effect */
+.faq-card:hover {
+  background: linear-gradient(135deg, rgba(188, 82, 220, 0.397), rgba(188, 82, 220, 0.726)); /* Gradient hover effect */
+}
+
+.faq-question {
+  font-size: 1.25rem; /* Increased font size for questions */
+}
+
+.faq-answer {
+  margin-top: 0.5rem;
+  font-size: 1.1rem; /* Increased font size for answers */
+  line-height: 1.5; /* Improved line height for better readability */
+}
+
+/* No Results and Loading Styles */
+.no-results {
+  font-size: 1.2rem;
+  color: var(--text-color);
+}
+
+.loading {
+  font-size: 1.2rem;
+  color: var(--text-color);
+}
+
+.spinner {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  border-top: 4px solid var(--primary-color);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 1rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+</style>
