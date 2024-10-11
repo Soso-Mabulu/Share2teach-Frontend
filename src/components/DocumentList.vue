@@ -17,15 +17,19 @@ export default {
       showNoDocumentsMessage: false, // Controls the visibility of the no documents message
     };
   },
+  created() {
+    // Fetch documents when component is created
+    this.fetchDocuments(this.$route.query.endpoint);
+  },
   methods: {
     async fetchDocuments(endpoint) {
       if (endpoint) {
         try {
-          const response = await this.$http.get(endpoint); // Adjust the method for HTTP requests if needed
-          this.documents = response.data.documents;
+          const response = await this.$http.get(endpoint); // Ensure you use the correct HTTP client (Axios, VueResource, etc.)
+          this.documents = response.data.documents || [];
+
           if (!this.documents.length) {
             this.showNoDocumentsMessage = true;
-            // Hide the message after 3 seconds
             setTimeout(() => {
               this.showNoDocumentsMessage = false;
             }, 3000);
