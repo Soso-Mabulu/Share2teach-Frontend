@@ -33,7 +33,7 @@ jobs:
       - name: Build Docker image
         run: |
           docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/share2teach-frontend:${{ github.sha }} \
-          -f ../Dockerfile .
+          -f ./Dockerfile .
 
       - name: Push Docker image to Docker Hub
         run: docker push ${{ secrets.DOCKER_HUB_USERNAME }}/share2teach-frontend:${{ github.sha }}
