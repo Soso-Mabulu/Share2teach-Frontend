@@ -222,7 +222,7 @@ const router = createRouter({
       component: AdminMaintainUsersView,
     },
     {
-      path: 'admin-advanced-reports',
+      path: '?admin-advanced-reports',
       name: 'AdminAdvancedReportsView',
       component: AdminAdvancedReportsView,
     },
