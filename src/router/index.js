@@ -15,6 +15,8 @@ import SubjectView from '@/views/SubjectView.vue'
 import SelfDirectedlearningView from '@/views/SelfDirectedlearningView.vue';
 import AllDocuments from '@/views/AllDocuments.vue'; // Adjust the path as necessary
 
+import ViewReportedView from '@/views/ViewReportedView.vue';
+import ContributorsView from '@/views/ContributorsView.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -99,7 +101,16 @@ const router = createRouter({
       name: 'SelfDirectedlearningView',
       component: SelfDirectedlearningView
     },
-
+    {
+      path: '/view-reported-documents',
+      name: 'ViewReportedView',
+      component: ViewReportedView
+    },
+    {
+      path: '/contributors',
+      name: 'ContributorsView',
+      component: ContributorsView
+    },
     {
       path: '/all-documents',
       name: 'AllDocuments',
