@@ -69,7 +69,7 @@
     { text: "FAQ", icon: "❓", route: `/moderator-faq?token=${token}` },
     { text: "Self Directed Learning", icon: "💡", route: `/moderator-self-learning?token=${token}` },
     { text: "Upload Documents", icon: "📤", route: `/moderator-upload-documents?token=${token}` }, // New link
-    { text: "Moderate Documents", icon: "⚖️", route: `/moderate-documents?token=${token}` }, // New link
+    { text: "Moderate Documents", icon: "⚖️", route: `/moderator-moderate-documents?token=${token}` }, // New link
     { text: "View Reported Documents", icon: "📜", route: `/moderator-view-reported-documents?token=${token}` }, // New link
     { text: "Logout", icon: "🚪", route: `/login` },
   ]);
