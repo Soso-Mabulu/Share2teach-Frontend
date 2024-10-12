@@ -63,7 +63,6 @@
 // Navigation links
 const links = ref([
     { text: "Dashboard", icon: "🏠", route: `/admin-dashboard?token=${token}` },
-    { text: "Admin Panel", icon: "👮", route: `/admin-panel?token=${token}` }, // New Admin Panel link
     { text: "Subject", icon: "📚", route: `/admin-subject?token=${token}` },
     { text: "Search", icon: "🔍", route: `/admin-search?token=${token}` },
     { text: "Contributors", icon: "👥", route: `/admin-contributors?token=${token}` },

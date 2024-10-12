@@ -32,7 +32,6 @@ import EducatorUpload from '@/components/EducatorUpload.vue';
 import AllApprovedDocumentsView from '@/views/AllApprovedDocumentsView.vue';
 
 // Admin views
-import AdminDashboardView from '@/views/AdminDashboardView.vue';
 import AdminViewReportedView from '@/views/Admin-ViewReportedView.vue';
 import AdminContributorsView from '@/views/Admin-ContributorsView.vue';
 import AdminSearchResultsView from '@/views/Admin-SearchResultsView.vue';
@@ -176,7 +175,7 @@ const router = createRouter({
     {
       path: '/admin-dashboard',
       name: 'AdminDashboardView',
-      component: AdminDashboardView,
+      component: AdminPanelView,
     },
     {
       path: '/admin-upload-documents',
@@ -222,11 +221,6 @@ const router = createRouter({
       path: '/admin-search-results',
       name: 'AdminSearchResultsView',
       component: AdminSearchResultsView,
-    },
-    {
-      path: '/admin-panel',
-      name: 'AdminPanelView',
-      component: AdminPanelView,
     },
     {
       path: '/admin-maintain-users',
