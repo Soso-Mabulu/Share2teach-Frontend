@@ -44,6 +44,7 @@ import AdminMaintainUsersView from '@/views/Admin-MaintainUsersView.vue';
 import AdminAdvancedReportsView from '@/views/Admin-AdvancedReportsView.vue';
 import AdminMaintainFAQ from '@/views/Admin-MaintainFAQ.vue';
 import AdminMaintainDocuments from '@/views/Admin-MaintainDocuments.vue';
+import AdminProfile from '@/views/Admin-ProfileView.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -73,98 +74,119 @@ const router = createRouter({
       path: '/user-dashboard',
       name: 'PublicUserView',
       component: PublicUserView,
+      meta: { requiresAuth: true }
     },
     {
       path: '/forgot-password',
       name: 'ForgotPasswordView',
       component: ForgotPasswordView,
+      meta: { requiresAuth: true }
     },
     {
       path: '/reset-password',
       name: 'ResetPasswordView',
       component: ResetPasswordView,
+      meta: { requiresAuth: true }
     },
     {
       path: '/search-results',
       name: 'search-results',
       component: SearchResultsView,
+      meta: { requiresAuth: true },
     },
     {
       path: '/all-documents',
       name: 'AllDocuments',
       component: AllDocuments,
+      meta: { requiresAuth: true },
     },
     {
       path: '/faq',
       name: 'FAQView',
       component: FAQView,
+      meta: { requiresAuth: true },
     },
     {
       path: '/update-profile',
       name: 'UpdateProfile',
-      component: () => import('@/components/UpdateProfilePage.vue')
+      component: () => import('@/components/UpdateProfilePage.vue'),
+      meta: { requiresAuth: true },
+
     },
 
     // Moderator routes
     {
       path: '/moderator-dashboard',
       name: 'ModeratorDashboardView',
-      component: ModeratorDashboardView
+      component: ModeratorDashboardView,
+      meta: { requiresAuth: true },
+
     },
     {
       path: '/moderator-approved-documents',
       name: 'AllApprovedDocumentsView',
-      component: ModeratorAllApprovedDocumentsView
+      component: ModeratorAllApprovedDocumentsView,
+      meta: { requiresAuth: true },
     },
     {
       path: '/moderator-pending-documents',
       name: 'PendingDocuments',
-      component: ModeratorViewAllDocumentsView
+      component: ModeratorViewAllDocumentsView,
+      meta: { requiresAuth: true },
     },
     {
       path: '/moderator-approved-documents',
       name: 'ApprovedDocuments',
-      component: ModeratorViewAllDocumentsView
+      component: ModeratorViewAllDocumentsView,
+      meta: { requiresAuth: true },
     },
     {
       path: '/moderator-moderate-documents',
       name: 'ModerateDocumentsView',
-      component: ModeratorModerateDocumentsView
+      component: ModeratorModerateDocumentsView,
+      meta: { requiresAuth: true },
     },
     {
       path: '/moderator-self-learning',
       name: 'SelfDirectedlearningView',
-      component: ModeratorSelfDirectedlearningView
+      component: ModeratorSelfDirectedlearningView,
+      meta: { requiresAuth: true },
     },
     {
       path: '/moderator-view-reported-documents',
       name: 'ViewReportedView',
-      component: ModeratorViewReportedView
+      component: ModeratorViewReportedView,
+      meta: { requiresAuth: true },
     },
     {
       path: '/moderator-contributors',
       name: 'ContributorsView',
-      component: ModeratorContributorsView
+      component: ModeratorContributorsView,
+      meta: { requiresAuth: true },
     },
     {
       path: '/moderator-search-results',
       name: 'ModeratorSearchResultsView',
       component: ModeratorSearchResultsView,
+      meta: { requiresAuth: true },
     },
     {
       path: '/moderator-upload-documents',
       name: 'ModeratorUploadDocuments',
-      component: ModeratorUploadDocuments
+      component: ModeratorUploadDocuments,
+      meta: { requiresAuth: true },
     },
     {
       path: '/moderator-subject',
       name: 'ModeratorSubjectView',
-      component: ModeratorSubjectView
+      component: ModeratorSubjectView,
+      meta: { requiresAuth: true },
     },
     {
       path: '/moderator-self-learning',
       name: 'ModeratorSelfDirectedlearningView',
-      component: ModeratorSelfDirectedlearningView
+      component: ModeratorSelfDirectedlearningView,
+      meta: { requiresAuth: true },
     },
 
     // Admin routes
@@ -172,105 +194,153 @@ const router = createRouter({
       path: '/admin-dashboard',
       name: 'AdminDashboardView',
       component: AdminPanelView,
+      meta: { requiresAuth: true },
     },
     {
       path: '/admin-upload-documents',
       name: 'AdminUploadDocuments',
       component: AdminUploadDocuments,
+      meta: { requiresAuth: true },
     },
     {
       path: '/admin-pending-documents',
       name: 'AdminPendingDocuments',
       component: AdminViewAllDocumentsView,
+      meta: { requiresAuth: true },
     },
     {
       path: '/admin-approved-documents',
       name: 'AdminApprovedDocuments',
       component: AdminViewAllDocumentsView,
+      meta: { requiresAuth: true },
     },
     {
       path: '/admin-moderate-documents',
       name: 'AdminModerateDocumentsView',
       component: AdminModerateDocumentsView,
+      meta: { requiresAuth: true },
     },
     {
       path: '/admin-subject',
       name: 'AdminSubjectView',
       component: AdminSubjectView,
+      meta: { requiresAuth: true },
     },
     {
       path: '/admin-self-learning',
       name: 'AdminSelfDirectedlearningView',
       component: AdminSelfDirectedlearningView,
+      meta: { requiresAuth: true },
     },
     {
       path: '/admin-view-reported-documents',
       name: 'AdminViewReportedView',
       component: AdminViewReportedView,
+      meta: { requiresAuth: true },
     },
     {
       path: '/admin-contributors',
       name: 'AdminContributorsView',
       component: AdminContributorsView,
+      meta: { requiresAuth: true },
     },
     {
       path: '/admin-search-results',
       name: 'AdminSearchResultsView',
       component: AdminSearchResultsView,
+      meta: { requiresAuth: true },
     },
     {
       path: '/admin-maintain-users',
       name: 'AdminMaintainUsersView',
       component: AdminMaintainUsersView,
+      meta: { requiresAuth: true },
     },
     {
       path: '/admin-advanced-reports',
       name: 'AdminAdvancedReportsView',
       component: AdminAdvancedReportsView,
+      meta: { requiresAuth: true },
     },
     {
       path: '/admin-maintain-faq',
       name: 'AdminMaintainFAQ',
       component: AdminMaintainFAQ,
+      meta: { requiresAuth: true },
     },
     {
       path: '/admin-maintain-documents',
       name: 'AdminMaintainDocuments',
-      component: AdminMaintainDocuments
+      component: AdminMaintainDocuments,
+      meta: { requiresAuth: true },
     },
+    {
+      path: '/admin-profile',
+      name: 'AdminProfile',
+      component: AdminProfile,
+      meta: { requiresAuth: true },
+    },
+
 
     // Educator routes
     {
       path: '/educator-dashboard',
       name: 'EducatorDashboardView',
       component: EducatorDashboardView,
+      meta: { requiresAuth: true },
     },
     {
       path: '/educator-subject',
       name: 'EducatorSubjectView',
       component: EducatorSubjectView,
+      meta: { requiresAuth: true },
     },
     {
       path: '/educator-contributor',
       name: 'EducatorContributorView',
       component: EducatorContributorView,
+      meta: { requiresAuth: true },
     },
     {
       path: '/educator-self-learning',
       name: 'EducatorSelfDirectedView',
       component: EducatorSelfDirectedView,
+      meta: { requiresAuth: true },
     },
     {
       path: '/educator-upload',
       name: 'EducatorUpload',
       component: EducatorUpload,
+      meta: { requiresAuth: true },
     },
     {
       path: '/educator-approved-documents',
       name: 'AllApprovedDocumentsView',
       component: AllApprovedDocumentsView,
+      meta: { requiresAuth: true },
     },
   ],
 });
+
+
+// Global before guard
+router.beforeEach((to, from, next) => {
+  const token = localStorage.getItem('token'); // Retrieve token from localStorage
+
+  // Check if the route requires authentication
+  if (to.matched.some(record => record.meta.requiresAuth)) {
+    if (!token) {
+      // If no token, redirect to login
+      next({ path: '/login' });
+    } else {
+      // If token exists, allow access
+      next();
+    }
+  } else {
+    // If route doesn't require auth, allow access
+    next();
+  }
+});
+
 
 export default router;

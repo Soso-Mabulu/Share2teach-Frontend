@@ -1,6 +1,10 @@
 <script setup>
 import { RouterLink } from 'vue-router';
 import { ref } from 'vue';
+import axios from 'axios';
+import { useRouter } from 'vue-router'; // Import the useRouter composable for navigation
+
+const router = useRouter(); // Initialize the router
 
 // State to track the menu's visibility on small screens
 const isMenuOpen = ref(false);
@@ -17,7 +21,6 @@ const links = ref([
     { text: "FAQ", icon: "❓", route: `/faq?token=${token}` },
     { text: "Self Directed Learning", icon: "💡", route: `/self-learning?token=${token}` },
     { text: "Upload Documents", icon: "📤", route: `/upload-documents?token=${token}` }, // New link
-    { text: "Logout", icon: "🚪", route: `/logout?token=${token}` },
 ]);
   
 
@@ -25,6 +28,27 @@ const links = ref([
 function toggleMenu() {
   isMenuOpen.value = !isMenuOpen.value;
 }
+  // Logout function
+  const logout = async () => {
+    const apiUrl = `${import.meta.env.VITE_API_URL}api/v1/auth/logout`;
+    
+    try {
+      await axios.post(apiUrl, {}, {
+        headers: {
+          Authorization: `Bearer ${token}` // Include the token in the request headers
+        }
+      });
+      
+      // Clear user data and token from localStorage
+      localStorage.removeItem('user');
+      localStorage.removeItem('token');
+
+      // Redirect to the landing page
+      router.push('/'); // Change '/landing-page' to your actual landing page route
+    } catch (error) {
+      console.error("Error logging out:", error);
+    }
+  };
 </script>
 
 <template>
@@ -60,6 +84,12 @@ function toggleMenu() {
           <span>{{ link.icon }}</span>
           <span>{{ link.text }}</span>
         </RouterLink>
+      </li>
+      <li>
+        <a href="#" class="nav-link" @click.prevent="logout">
+          <i class="icon">🚪</i>
+          <span v-if="isExpanded">Logout</span>
+        </a>
       </li>
     </ul>
   </nav>
