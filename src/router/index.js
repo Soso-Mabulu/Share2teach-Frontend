@@ -14,6 +14,7 @@ import ModerateDocumentsView from '@/views/ModerateDocumentsView.vue'
 import SubjectView from '@/views/SubjectView.vue'
 import SelfDirectedlearningView from '@/views/SelfDirectedlearningView.vue';
 import AllDocuments from '@/views/AllDocuments.vue'; // Adjust the path as necessary
+import FAQView from '@/views/FAQView.vue';
 
 
 const router = createRouter({
@@ -64,6 +65,11 @@ const router = createRouter({
       name: 'ModeratorDashboardView',
       component: ModeratorDashboardView
     },
+    {
+      path: '/faq',
+      name: 'FAQView',
+      component: FAQView,
+    }, 
     {
       path: '/upload-documents',
       name: 'UploadDocuments',
