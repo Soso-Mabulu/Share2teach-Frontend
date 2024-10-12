@@ -73,8 +73,10 @@ jobs:
     if: github.ref == 'refs/heads/main'
 
     steps:
-      - name: Manual approval for Production
-        run: echo "Production deployment approval required."
+      - name: Request Production Approval
+        run: |
+          echo "Production deployment approval required."
+          echo "::set-output name=approval_status::pending" # Or any custom logic for approval
 
   deploy-production:
     needs: approve-production
