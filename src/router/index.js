@@ -6,29 +6,30 @@ import SignupView from '@/views/SignupView.vue';
 import PublicUserView from '@/views/PublicUserView.vue';
 import ForgotPasswordView from '@/views/ForgotPasswordView.vue';
 import ResetPasswordView from '@/views/ResetPasswordView.vue';
-
 import DetailedView from '@/views/DetailedView.vue';
-import SearchResultsView from '@/views/SearchResultsView.vue'; // Import the new view
-
-import AllDocuments from '@/views/AllDocuments.vue'; // Adjust the path as necessary
+import SearchResultsView from '@/views/SearchResultsView.vue';
+import AllDocuments from '@/views/AllDocuments.vue';
 import FAQView from '@/views/FAQView.vue';
+
 // Moderator views  
+import ModeratorDashboardView from '@/views/ModeratorDashboardView.vue';
 import ModeratorViewReportedView from '@/views/Moderator-ViewReportedView.vue';
 import ModeratorContributorsView from '@/views/Moderator-ContributorsView.vue';
+import ModeratorSearchResultsView from '@/views/Moderator-SearchResultsView.vue';
+import ModeratorUploadDocuments from '@/views/Moderator-UploadDocumentsView.vue';
+import ModeratorViewAllDocumentsView from '@/views/Moderator-ViewAllDocumentsView.vue';
+import ModeratorModerateDocumentsView from '@/views/Moderator-ModerateDocumentsView.vue';
+import ModeratorSubjectView from '@/views/Moderator-SubjectView.vue';
+import ModeratorSelfDirectedlearningView from '@/views/Moderator-SelfDirectedlearningView.vue';
+import ModeratorAllApprovedDocumentsView from '@/views/Moderator-ViewAllDocumentsView.vue';
+
+// Educator views
 import EducatorDashboardView from '@/views/EducatorDashboardView.vue';
-import AllApprovedDocumentsView from '@/views/AllApprovedDocumentsView.vue';
 import EducatorSubjectView from '@/views/EducatorSubjectView.vue';
 import EducatorContributorView from '@/views/EducatorContributorView.vue';
 import EducatorSelfDirectedView from '@/views/EducatorSelfDirectedView.vue';
 import EducatorUpload from '@/components/EducatorUpload.vue';
-import ModeratorSearchResultsView from '@/views/Moderator-SearchResultsView.vue';
-import ModeratorDashboardView from '@/views/ModeratorDashboardView.vue'
-import ModeratorAllApprovedDocumentsView from '@/views/Moderator-AllApprovedDocumentsView.vue'
-import ModeratorUploadDocuments from '@/views/Moderator-UploadDocumentsView.vue';
-import ModeratorViewAllDocumentsView from '@/views/Moderator-ViewAllDocumentsView.vue';
-import ModeratorModerateDocumentsView from '@/views/Moderator-ModerateDocumentsView.vue'
-import ModeratorSubjectView from '@/views/Moderator-SubjectView.vue'
-import ModeratorSelfDirectedlearningView from '@/views/Moderator-SelfDirectedlearningView.vue';
+import AllApprovedDocumentsView from '@/views/AllApprovedDocumentsView.vue';
 
 // Admin views
 import AdminDashboardView from '@/views/AdminDashboardView.vue';
@@ -37,16 +38,16 @@ import AdminContributorsView from '@/views/Admin-ContributorsView.vue';
 import AdminSearchResultsView from '@/views/Admin-SearchResultsView.vue';
 import AdminUploadDocuments from '@/views/Admin-UploadDocumentsView.vue';
 import AdminViewAllDocumentsView from '@/views/Admin-ViewAllDocumentsView.vue';
-import AdminModerateDocumentsView from '@/views/Admin-ModerateDocumentsView.vue'
-import AdminSubjectView from '@/views/Admin-SubjectView.vue'
+import AdminModerateDocumentsView from '@/views/Admin-ModerateDocumentsView.vue';
+import AdminSubjectView from '@/views/Admin-SubjectView.vue';
 import AdminSelfDirectedlearningView from '@/views/Admin-SelfDirectedlearningView.vue';
 import AdminPanelView from '@/views/AdminPanelView.vue';
 import AdminMaintainUsersView from '@/views/Admin-MaintainUsersView.vue';
 
-
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
+    // Public routes
     {
       path: '/',
       name: 'home',
@@ -83,30 +84,37 @@ const router = createRouter({
       component: ResetPasswordView,
     },
     {
-      path: '/admin-dashboard',
-      name: 'AdminDashboardView',
-      component: AdminDashboardView,
-    },
-    {
       path: '/detailed-view',
       name: 'DetailedView',
       component: DetailedView,
       props: route => ({ activeEndpoint: route.params.endpoint }),
     },
     {
-      path: '/search-results', // New route for search results
+      path: '/search-results',
       name: 'search-results',
       component: SearchResultsView,
     },
     {
+      path: '/all-documents',
+      name: 'AllDocuments',
+      component: AllDocuments,
+    },
+    {
+      path: '/faq',
+      name: 'FAQView',
+      component: FAQView,
+    },
+    {
+      path: '/update-profile',
+      name: 'UpdateProfile',
+      component: () => import('@/components/UpdateProfilePage.vue')
+    },
+
+    // Moderator routes
+    {
       path: '/moderator-dashboard',
       name: 'ModeratorDashboardView',
       component: ModeratorDashboardView
-    },
-    {
-      path: '/educator-dashboard',
-      name: 'EducatorDashboardView',
-      component: EducatorDashboardView,
     },
     {
       path: '/moderator-approved-documents',
@@ -114,19 +122,14 @@ const router = createRouter({
       component: ModeratorAllApprovedDocumentsView
     },
     {
-      path: '/update-profile',
-      name: 'UpdateProfile',
-      component: () => import('@/components/UpdateProfilePage.vue')
+      path: '/moderator-pending-documents',
+      name: 'PendingDocuments',
+      component: ModeratorViewAllDocumentsView
     },
-    { 
-      path: '/moderator-pending-documents', 
-      name: 'PendingDocuments', 
-      component: ModeratorViewAllDocumentsView 
-    },
-    { 
-      path: '/moderator-approved-documents', 
-      name: 'ApprovedDocuments', 
-      component: ModeratorViewAllDocumentsView 
+    {
+      path: '/moderator-approved-documents',
+      name: 'ApprovedDocuments',
+      component: ModeratorViewAllDocumentsView
     },
     {
       path: '/moderator-moderate-documents',
@@ -149,19 +152,31 @@ const router = createRouter({
       component: ModeratorContributorsView
     },
     {
-      path: '/all-documents',
-      name: 'AllDocuments',
-      component: AllDocuments,
-    },  
-    {
-      path: '/faq',
-      name: 'FAQView',
-      component: FAQView,
-    },
-    {
       path: '/moderator-search-results',
       name: 'ModeratorSearchResultsView',
       component: ModeratorSearchResultsView,
+    },
+    {
+      path: '/moderator-upload-documents',
+      name: 'ModeratorUploadDocuments',
+      component: ModeratorUploadDocuments
+    },
+    {
+      path: '/moderator-subject',
+      name: 'ModeratorSubjectView',
+      component: ModeratorSubjectView
+    },
+    {
+      path: '/moderator-self-learning',
+      name: 'ModeratorSelfDirectedlearningView',
+      component: ModeratorSelfDirectedlearningView
+    },
+
+    // Admin routes
+    {
+      path: '/admin-dashboard',
+      name: 'AdminDashboardView',
+      component: AdminDashboardView,
     },
     {
       path: '/admin-upload-documents',
@@ -217,6 +232,38 @@ const router = createRouter({
       path: '/admin-maintain-users',
       name: 'AdminMaintainUsersView',
       component: AdminMaintainUsersView,
+    },
+
+    // Educator routes
+    {
+      path: '/educator-dashboard',
+      name: 'EducatorDashboardView',
+      component: EducatorDashboardView,
+    },
+    {
+      path: '/educator-subject',
+      name: 'EducatorSubjectView',
+      component: EducatorSubjectView,
+    },
+    {
+      path: '/educator-contributor',
+      name: 'EducatorContributorView',
+      component: EducatorContributorView,
+    },
+    {
+      path: '/educator-self-learning',
+      name: 'EducatorSelfDirectedView',
+      component: EducatorSelfDirectedView,
+    },
+    {
+      path: '/educator-upload',
+      name: 'EducatorUpload',
+      component: EducatorUpload,
+    },
+    {
+      path: '/educator-approved-documents',
+      name: 'AllApprovedDocumentsView',
+      component: AllApprovedDocumentsView,
     },
   ],
 });
