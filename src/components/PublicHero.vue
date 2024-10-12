@@ -38,76 +38,72 @@
       <!-- High Rated Documents -->
       <div class="mb-8 md:mb-12">
         <h2 class="text-2xl md:text-3xl font-bold text-center text-white mb-6 md:mb-8">High Rated Documents</h2>
-        <div class="flex justify-between mb-4">
-          <button 
-            class="px-3 md:px-4 py-1 md:py-2 bg-white bg-opacity-20 rounded-full text-white hover:bg-opacity-30 transition-all duration-300 ease-in-out"
-            @click="prevPage"
-            :disabled="currentPage === 0"
-          >
-            Previous
+        <div class="relative">
+          <button @click="scrollDocuments('left', 'highRated')" class="absolute left-0 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-30 rounded-full p-2 z-10">
+            ◀
           </button>
-          <button 
-            class="px-3 md:px-4 py-1 md:py-2 bg-white bg-opacity-20 rounded-full text-white hover:bg-opacity-30 transition-all duration-300 ease-in-out"
-            @click="nextPage"
-            :disabled="currentPage >= totalPages - 1"
-          >
-            Next
-          </button>
-        </div>
-        
-        <div class="flex overflow-x-auto space-x-6 pb-4">
-          <div 
-            v-for="(document, index) in paginatedDocuments" 
-            :key="index" 
-            @click="showPreview(document)"
-            class="flex-shrink-0 w-64 bg-white bg-opacity-10 backdrop-filter backdrop-blur-lg rounded-lg overflow-hidden transform hover:scale-105 transition-all duration-300 ease-in-out cursor-pointer"
-          >
-            <img :src="document.preview_image_url || defaultImage" alt="Document Preview" class="w-full h-40 object-cover" />
-            <div class="p-4">
-              <h3 class="text-lg font-semibold text-white mb-2">{{ document.title }}</h3>
-              <p class="text-sm text-gray-300 mb-2">{{ document.description }}</p>
-              <p class="text-xs text-gray-400">By: {{ document.author }}</p>
-              <div class="flex mt-2">
-                <span v-for="star in 5" :key="star" class="text-2xl" :class="{ 'text-yellow-400': star <= document.rating, 'text-gray-600': star > document.rating }">
-                  {{ star <= document.rating ? '★' : '☆' }}
-                </span>
+          <div ref="highRatedScrollContainer" class="flex overflow-x-auto space-x-6 pb-4 scrollbar-hide">
+            <div 
+              v-for="(document, index) in highRatedDocuments" 
+              :key="index" 
+              @click="showPreview(document)"
+              class="flex-shrink-0 w-64 md:w-1/4 bg-white bg-opacity-10 backdrop-filter backdrop-blur-lg rounded-lg overflow-hidden transform hover:scale-105 transition-all duration-300 ease-in-out cursor-pointer"
+            >
+              <img :src="document.preview_image_url || defaultImage" alt="Document Preview" class="w-full h-40 object-cover" />
+              <div class="p-4">
+                <h3 class="text-lg font-semibold text-white mb-2">{{ document.title }}</h3>
+                <p class="text-sm text-gray-300 mb-2">{{ document.description }}</p>
+                <p class="text-xs text-gray-400">By: {{ document.author }}</p>
+                <div class="flex mt-2">
+                  <span v-for="star in 5" :key="star" class="text-2xl" :class="{ 'text-yellow-400': star <= document.rating, 'text-gray-600': star > document.rating }">
+                    {{ star <= document.rating ? '★' : '☆' }}
+                  </span>
+                </div>
               </div>
             </div>
           </div>
+          <button @click="scrollDocuments('right', 'highRated')" class="absolute right-0 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-30 rounded-full p-2 z-10">
+            ▶
+          </button>
         </div>
       </div>
 
-  <!-- Approved Documents Section -->
-  <div class="mb-8 md:mb-12">
-    <h2 class="text-2xl md:text-3xl font-bold text-center text-white mb-6 md:mb-8">Browse for Documents</h2>
-    <div class="flex overflow-x-auto space-x-6 pb-4">
-      <div 
-        v-for="(document, index) in approvedDocuments" 
-        :key="index" 
-        @click="showPreview(document)"
-        class="flex-shrink-0 w-64 bg-white bg-opacity-10 backdrop-filter backdrop-blur-lg rounded-lg overflow-hidden transform hover:scale-105 transition-all duration-300 ease-in-out cursor-pointer"
-      >
-        <img :src="document.preview_image_url || defaultImage" alt="Document Preview" class="w-full h-40 object-cover" />
-        <div class="p-4">
-          <h3 class="text-lg font-semibold text-white mb-2">{{ document.title }}</h3>
-          <p class="text-sm text-gray-300 mb-2">{{ document.description }}</p>
-          <p class="text-xs text-gray-400">By: {{ document.author }}</p>
-          <div class="flex mt-2">
-            <span v-for="star in 5" :key="star" class="text-2xl" :class="{ 'text-yellow-400': star <= document.rating, 'text-gray-600': star > document.rating }">
-              {{ star <= document.rating ? '★' : '☆' }}
-            </span>
+      <!-- Approved Documents Section -->
+      <div class="mb-8 md:mb-12">
+        <h2 class="text-2xl md:text-3xl font-bold text-center text-white mb-6 md:mb-8">Browse for Documents</h2>
+        <div class="relative">
+          <button @click="scrollDocuments('left', 'approved')" class="absolute left-0 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-30 rounded-full p-2 z-10">
+            ◀
+          </button>
+          <div ref="approvedScrollContainer" class="flex overflow-x-auto space-x-6 pb-4 scrollbar-hide">
+            <div 
+              v-for="(document, index) in approvedDocuments" 
+              :key="index" 
+              @click="showPreview(document)"
+              class="flex-shrink-0 w-64 md:w-1/4 bg-white bg-opacity-10 backdrop-filter backdrop-blur-lg rounded-lg overflow-hidden transform hover:scale-105 transition-all duration-300 ease-in-out cursor-pointer"
+            >
+              <img :src="document.preview_image_url || defaultImage" alt="Document Preview" class="w-full h-40 object-cover" />
+              <div class="p-4">
+                <h3 class="text-lg font-semibold text-white mb-2">{{ document.title }}</h3>
+                <p class="text-sm text-gray-300 mb-2">{{ document.description }}</p>
+                <p class="text-xs text-gray-400">By: {{ document.author }}</p>
+                <div class="flex mt-2">
+                  <span v-for="star in 5" :key="star" class="text-2xl" :class="{ 'text-yellow-400': star <= document.rating, 'text-gray-600': star > document.rating }">
+                    {{ star <= document.rating ? '★' : '☆' }}
+                  </span>
+                </div>
+              </div>
+            </div>
           </div>
+          <button @click="scrollDocuments('right', 'approved')" class="absolute right-0 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-30 rounded-full p-2 z-10">
+            ▶
+          </button>
         </div>
       </div>
-    </div>
-  </div>
 
-
-
-<button @click="router.push({ name: 'AllDocuments' })" class="block mx-auto py-2 md:py-3 px-4 md:px-6 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-full text-white font-semibold transform hover:scale-105 transition-all duration-300 ease-in-out">
-  Explore All Cosmic Documents
-</button>
-
+      <button @click="router.push({ name: 'AllDocuments' })" class="block mx-auto py-2 md:py-3 px-4 md:px-6 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-full text-white font-semibold transform hover:scale-105 transition-all duration-300 ease-in-out">
+        Explore All Cosmic Documents
+      </button>
     </div>
 
     <!-- Preview Modal -->
@@ -147,27 +143,18 @@ import { useRouter } from 'vue-router';
 import axios from 'axios';
 
 const router = useRouter();
-const documents = ref([]);
-const ratings = ref([]);
 const highRatedDocuments = ref([]);
+const approvedDocuments = ref([]);
+const ratings = ref([]);
 const searchQuery = ref('');
 const isDarkMode = ref(false);
 const showModal = ref(false);
 const currentDocument = ref(null);
 const currentDocumentPreviewImages = ref([]);
 const currentImageIndex = ref(0);
-const defaultImage = '/api/placeholder/400/320'; // Placeholder image
-const currentPage = ref(0);
-const itemsPerPage = 8; // Show 8 documents at a time for better responsiveness
-
-const paginatedDocuments = computed(() => {
-  const start = currentPage.value * itemsPerPage;
-  return highRatedDocuments.value.slice(start, start + itemsPerPage);
-});
-
-const totalPages = computed(() => {
-  return Math.ceil(highRatedDocuments.value.length / itemsPerPage);
-});
+const defaultImage = '/api/placeholder/400/320';
+const highRatedScrollContainer = ref(null);
+const approvedScrollContainer = ref(null);
 
 const currentPreviewImage = computed(() => {
   return currentDocumentPreviewImages.value[currentImageIndex.value] || defaultImage;
@@ -175,6 +162,7 @@ const currentPreviewImage = computed(() => {
 
 onMounted(() => {
   fetchRatings();
+  fetchApprovedDocuments();
   initializeDarkMode();
 });
 
@@ -220,15 +208,6 @@ async function fetchHighRatedDocuments(ids, headers) {
   }
 }
 
-const approvedDocuments = ref([]);
-
-onMounted(() => {
-  fetchRatings();
-  fetchApprovedDocuments(); // Fetch approved documents on mount
-  initializeDarkMode();
-});
-
-// Modified fetchApprovedDocuments function
 async function fetchApprovedDocuments() {
   try {
     const token = localStorage.getItem('token');
@@ -237,24 +216,7 @@ async function fetchApprovedDocuments() {
     const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/v1/documents/approved`, { headers });
 
     if (response.data && response.data.status === 'success') {
-      // Map the approved documents and add the ratings if they exist
-      approvedDocuments.value = response.data.documents.map((doc) => {
-        const documentId = doc.id || doc.docId;
-        const documentRating = ratings.value.find(rating => rating.docId === documentId);
-
-        // Log each document's rating to the console
-        console.log(`Document ID: ${documentId}, Rating: ${documentRating ? documentRating.rating : 'No Rating'}`);
-
-        return {
-          docId: documentId,
-          title: doc.title || 'Unknown title',
-          preview_image_url: doc.preview_image_url || defaultImage,
-          description: doc.description || 'No description available',
-          author: doc.author || 'Unknown Author',
-          download_url: doc.download_url || '',
-          rating: documentRating ? documentRating.rating : 0 // Set the rating or default to 0 if not rated
-        };
-      });
+      approvedDocuments.value = response.data.documents.map((doc) => mapDocument(doc));
     } else {
       console.error('Failed to fetch approved documents:', response.data);
     }
@@ -262,8 +224,6 @@ async function fetchApprovedDocuments() {
     console.error('Failed to fetch approved documents:', error.message);
   }
 }
-
-
 
 function mapDocument(doc) {
   const documentId = doc.id || doc.docId;
@@ -276,7 +236,7 @@ function mapDocument(doc) {
     description: doc.description || 'No description available',
     author: doc.author || 'Unknown Author',
     light_preview_url: doc.light_preview_url || '',
-    download_url: doc.download_url || '',
+    download_url: doc.location || '',
     rating: documentRating ? documentRating.rating : 0 
   };
 }
@@ -316,56 +276,44 @@ function handleSearch() {
   }
 }
 
-function nextPage() {
-  if (currentPage.value < totalPages.value - 1) {
-    currentPage.value++;
-  }
-}
-
-function prevPage() {
-  if (currentPage.value > 0) {
-    currentPage.value--;
+function scrollDocuments(direction, section) {
+  const container = section === 'highRated' ? highRatedScrollContainer.value : approvedScrollContainer.value;
+  if (container) {
+    const scrollAmount = direction === 'left' ? -container.offsetWidth : container.offsetWidth;
+    container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
   }
 }
 </script>
 
-<style>
-@import 'tailwindcss/base';
-@import 'tailwindcss/components';
-@import 'tailwindcss/utilities';
-
+<style scoped>
 /* Custom scrollbar styles */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
 }
 
-::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.1);
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
-::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 4px;
+/* Responsive adjustments */
+@media (min-width: 768px) {
+  .container {
+    padding-top: 4rem;
+  }
+
+  .hero-container {
+    padding: 2rem;
+  }
+
+  .flex-shrink-0 {
+    width: 16rem;
+  }
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.5);
+@media (max-width: 767px) {
+  .flex-shrink-0 {
+    width: calc(100% - 1.5rem);
+  }
 }
-
-/* Ensure dark mode styles are applied */
-:root {
-  --text-color: #000;
-  --bg-color: #fff;
-}
-
-.dark {
-  --text-color: #fff;
-  --bg-color: #1a202c;
-}
-
-body {
-  color: var(--text-color);
-  background-color: var(--bg-color);
-}
-</style>"
+</style>
