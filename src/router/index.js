@@ -8,7 +8,7 @@ import ForgotPasswordView from '@/views/ForgotPasswordView.vue';
 import ResetPasswordView from '@/views/ResetPasswordView.vue';
 import SearchResultsView from '@/views/SearchResultsView.vue';
 import AllDocuments from '@/views/AllDocuments.vue';
-import FAQView from '@/views/FAQView.vue';
+
 
 // Moderator views  
 import ModeratorDashboardView from '@/views/ModeratorDashboardView.vue';
@@ -28,7 +28,8 @@ import EducatorSubjectView from '@/views/EducatorSubjectView.vue';
 import EducatorContributorView from '@/views/EducatorContributorView.vue';
 import EducatorSelfDirectedView from '@/views/EducatorSelfDirectedView.vue';
 import EducatorUpload from '@/components/EducatorUpload.vue';
-import AllApprovedDocumentsView from '@/views/AllApprovedDocumentsView.vue';
+import EducatorFAQView from '@/views/EducatorFAQView.vue';
+import EducatorAllApprovedDocumentsView from '@/views/EducatorAllApprovedDocumentsView.vue';
 
 // Admin views
 import AdminViewReportedView from '@/views/Admin-ViewReportedView.vue';
@@ -93,11 +94,6 @@ const router = createRouter({
       path: '/all-documents',
       name: 'AllDocuments',
       component: AllDocuments,
-    },
-    {
-      path: '/faq',
-      name: 'FAQView',
-      component: FAQView,
     },
     {
       path: '/update-profile',
@@ -261,14 +257,19 @@ const router = createRouter({
       component: EducatorSelfDirectedView,
     },
     {
+      path: '/faq',
+      name: 'EducatorFAQView',
+      component: EducatorFAQView,
+    },
+    {
       path: '/educator-upload',
       name: 'EducatorUpload',
       component: EducatorUpload,
     },
     {
-      path: '/educator-approved-documents',
-      name: 'AllApprovedDocumentsView',
-      component: AllApprovedDocumentsView,
+      path: '/approved-documents',
+      name: 'EducatorAllApprovedDocumentsView',
+      component: EducatorAllApprovedDocumentsView,
     },
   ],
 });
