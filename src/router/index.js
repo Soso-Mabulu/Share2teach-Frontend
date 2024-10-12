@@ -12,12 +12,18 @@ import SearchResultsView from '@/views/SearchResultsView.vue'; // Import the new
 
 import AllDocuments from '@/views/AllDocuments.vue'; // Adjust the path as necessary
 import FAQView from '@/views/FAQView.vue';
-
 // Moderator views  
 import ModeratorViewReportedView from '@/views/Moderator-ViewReportedView.vue';
 import ModeratorContributorsView from '@/views/Moderator-ContributorsView.vue';
+import EducatorDashboardView from '@/views/EducatorDashboardView.vue';
+import AllApprovedDocumentsView from '@/views/AllApprovedDocumentsView.vue';
+import EducatorSubjectView from '@/views/EducatorSubjectView.vue';
+import EducatorContributorView from '@/views/EducatorContributorView.vue';
+import EducatorSelfDirectedView from '@/views/EducatorSelfDirectedView.vue';
+import EducatorUpload from '@/components/EducatorUpload.vue';
 import ModeratorSearchResultsView from '@/views/Moderator-SearchResultsView.vue';
 import ModeratorDashboardView from '@/views/ModeratorDashboardView.vue'
+import ModeratorAllApprovedDocumentsView from '@/views/Moderator-AllApprovedDocumentsView.vue'
 import ModeratorUploadDocuments from '@/views/Moderator-UploadDocumentsView.vue';
 import ModeratorViewAllDocumentsView from '@/views/Moderator-ViewAllDocumentsView.vue';
 import ModeratorModerateDocumentsView from '@/views/Moderator-ModerateDocumentsView.vue'
@@ -98,14 +104,14 @@ const router = createRouter({
       component: ModeratorDashboardView
     },
     {
-      path: '/faq',
-      name: 'FAQView',
-      component: FAQView,
-    }, 
+      path: '/educator-dashboard',
+      name: 'EducatorDashboardView',
+      component: EducatorDashboardView,
+    },
     {
-      path: '/moderator-upload-documents',
-      name: 'UploadDocuments',
-      component: ModeratorUploadDocuments,
+      path: '/moderator-approved-documents',
+      name: 'AllApprovedDocumentsView',
+      component: ModeratorAllApprovedDocumentsView
     },
     {
       path: '/update-profile',
@@ -128,11 +134,6 @@ const router = createRouter({
       component: ModeratorModerateDocumentsView
     },
     {
-      path: '/moderator-subject',
-      name: 'SubjectView',
-      component: ModeratorSubjectView
-    },
-    {
       path: '/moderator-self-learning',
       name: 'SelfDirectedlearningView',
       component: ModeratorSelfDirectedlearningView
@@ -151,6 +152,11 @@ const router = createRouter({
       path: '/all-documents',
       name: 'AllDocuments',
       component: AllDocuments,
+    },  
+    {
+      path: '/faq',
+      name: 'FAQView',
+      component: FAQView,
     },
     {
       path: '/moderator-search-results',
@@ -211,7 +217,7 @@ const router = createRouter({
       path: '/admin-maintain-users',
       name: 'AdminMaintainUsersView',
       component: AdminMaintainUsersView,
-    },    
+    },
   ],
 });
 

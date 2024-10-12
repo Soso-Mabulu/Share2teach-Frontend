@@ -4,6 +4,8 @@ import MainFooter from '@/components/MainFooter.vue'; // Import the Footer
 import EducatorNavbar from '@/components/EducatorNavbar.vue';
 import FetchAllDocuments from '@/components/FetchAllDocuments.vue';
 
+
+
 </script>
 
 <template>

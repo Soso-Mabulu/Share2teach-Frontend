@@ -101,8 +101,6 @@
             user.value.role = response.data.role; // Set user role
             getRandomAvatar(user.value.userName, user.value.userLName);
   
-            // Set navigation links based on user role
-            setNavigationLinks(user.value.role);
           }
           localStorage.setItem('user', JSON.stringify(response.data)); // Store user data
         }
@@ -111,27 +109,31 @@
       }
     }
   };
-  
-  // Function to set navigation links based on user role
-  const setNavigationLinks = (role) => {
-    role = user.value.role;
+  //navigation links based on user role
+    const role = user.value.role;
     if (role === 'admin') {
       links.value = [
         { text: "Dashboard", icon: "🏠", route: "/admin-dashboard" },
-        { text: "Users", icon: "👥", route: "/admin/users" },
+        { text: "Contributors", icon: "👥", route: "/contributors" },
       ];
-    } else if (role === 'contributor') {
+    } else if (role === 'educator') {
       links.value = [
-        { text: "Dashboard", icon: "🏠", route: "/contributor-dashboard" },
-        { text: "Projects", icon: "📁", route: "/contributor/projects" },
+        { text: "Dashboard", icon: "🏠", route: "/educator-dashboard" },
+        { text: "Contributors", icon: "📁", route: "/contributors" },
       ];
-    } else {
+    } else if (role === 'moderator') {
+      links.value = [
+        { text: "Dashboard", icon: "🏠", route: "/moderator-dashboard" },
+        { text: "Contributors", icon: "📁", route: "/contributors" },
+      ];
+    }
+    else {
       links.value = [
         { text: "Dashboard", icon: "🏠", route: "/user-dashboard" },
         { text: "Contributors", icon: "👥", route: "/contributors" },
       ];
     }
-  };
+
   
   // Function to get a random avatar
   const getRandomAvatar = (userName, userLName) => {
