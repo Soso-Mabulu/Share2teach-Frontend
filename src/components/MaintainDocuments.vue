@@ -1,6 +1,9 @@
 <template>
     <div :class="['subject-view-page', { 'dark-mode': isDarkMode }]">
       <h1 class="page-title">Maintain Documents Page</h1>
+        <!-- Success message display -->
+        <div v-if="successMessage" class="success-message">{{ successMessage }}</div>
+
   
       <div class="search-filter-container">
         <div class="search-bar-wrapper">
@@ -142,7 +145,14 @@
             <input id="university" v-model="editingDocument.university" required>
           </div>
           <div class="form-actions">
-            <button type="submit" class="action-btn save-btn">Save Changes</button>
+            <button class="action-btn edit-btn" @click="editDocument" :disabled="isEditing">
+              <div v-if="isEditing" class="editing">
+                <div class="spinner-edit"></div>
+                <span>Editing...</span>
+              </div>
+              <div v-else>Edit</div>
+            </button>
+
             <button type="button" class="action-btn cancel-btn" @click="closeEditModal">Cancel</button>
           </div>
         </form>
@@ -155,7 +165,14 @@
         <h2>Confirm Deletion</h2>
         <p>Are you sure you want to delete this document? This action cannot be undone.</p>
         <div class="confirm-actions">
-          <button class="action-btn delete-btn" @click="deleteDocument">Delete</button>
+          <button class="action-btn delete-btn" @click="deleteDocument" :disabled="isDeleting">
+            <div v-if="isDeleting" class="loading">
+              <div class="spinner"></div>
+              <span>Deleting...</span>
+            </div>
+            <div v-else>Delete</div>
+          </button>
+
           <button class="action-btn cancel-btn" @click="closeConfirmModal">Cancel</button>
         </div>
       </div>
@@ -190,6 +207,9 @@
   const showEditModal = ref(false);
   const showConfirmModal = ref(false);
   const editingDocument = ref(null);
+  const successMessage = ref(''); // New property for success messages
+  const isEditing = ref(false); // New loading state for editing
+  const isDeleting = ref(false); // New loading state for deleting
 
   
   // Computed properties for unique categories and universities
@@ -308,6 +328,7 @@
   // Function to map document data to the desired structure
   function mapDocuments(docs) {
     return docs.map(doc => ({
+      id: doc.docId,
       title: doc.title || 'Unknown title',
       preview_image_url: doc.preview_image_url || defaultImage,
       description: doc.description || 'No description available',
@@ -338,6 +359,7 @@ function editDocumentMetadata() {
 
 // Function to update document metadata
 async function updateDocumentMetadata() {
+  isEditing.value = true; // Set loading state to true
   try {
     const token = localStorage.getItem('token');
     const headers = { Authorization: `Bearer ${token}` };
@@ -352,12 +374,21 @@ async function updateDocumentMetadata() {
         if (index !== -1) {
           documents.value[module][index] = { ...documents.value[module][index], ...editingDocument.value };
         }
+
       });
+      successMessage.value = 'Document Updated successfully!';
       closeEditModal();
+      setTimeout(() => { successMessage.value = ''; }, 3000);
+
     }
   } catch (error) {
     console.error('Failed to update document metadata:', error);
     // Handle error (e.g., show error message to user)
+    successMessage.value = 'Failed to update document metadata: Please try again.';
+    setTimeout(() => { successMessage.value = ''; }, 3000);
+  }
+  finally {
+    isEditing.value = false; // Reset loading state
   }
 }
 
@@ -374,6 +405,7 @@ function confirmDelete() {
 
 // Function to delete the document
 async function deleteDocument() {
+  isDeleting.value = true; // Set loading state to true
   try {
     const token = localStorage.getItem('token');
     const headers = { Authorization: `Bearer ${token}` };
@@ -384,12 +416,19 @@ async function deleteDocument() {
       ['pending', 'reported', 'approved'].forEach(module => {
         documents.value[module] = documents.value[module].filter(doc => doc.id !== currentDocument.value.id);
       });
+      successMessage.value = 'Document deleted successfully!';
       closeConfirmModal();
       closePreview();
+      setTimeout(() => { successMessage.value = ''; }, 3000);
     }
+
   } catch (error) {
     console.error('Failed to delete document:', error);
     // Handle error (e.g., show error message to user)
+    successMessage.value = 'Failed to delete document: Please try again later.';
+    setTimeout(() => { successMessage.value = ''; }, 3000);
+  }finally {
+    isDeleting.value = false; // Reset loading state
   }
 }
 
@@ -1067,5 +1106,74 @@ onMounted(() => {
 
 .dark-mode .action-btn:hover {
   opacity: 1;
+}
+
+.success-message {
+  color: green;
+  font-size: 1.2em;
+  margin: 1em 0;
+  padding: 1em;
+  border: 1px solid green;
+  background-color: #e9ffe9;
+  border-radius: 5px;
+  text-align: center;
+}
+.action-btn {
+  position: relative;
+  padding: 10px 20px;
+  font-size: 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.action-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6; /* Reduced opacity for disabled buttons */
+}
+
+/* Loading styles */
+.loading {
+  display: flex;
+  align-items: center;
+}
+
+.loading span {
+  margin-left: 5px; /* Space between icon and text */
+}
+
+.spinner {
+  border: 3px solid #f3f3f3; /* Light gray */
+  border-top: 3px solid #3498db; /* Blue */
+  border-radius: 50%;
+  width: 12px;
+  height: 12px;
+  animation: spin 1s linear infinite;
+  margin-right: 5px; /* Space between spinner and text */
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+/* Loading styles for editing */
+.editing {
+  display: flex;
+  align-items: center;
+}
+
+.editing span {
+  margin-left: 5px; /* Space between icon and text */
+}
+
+.spinner-edit {
+  border: 3px solid #f3f3f3; /* Light gray */
+  border-top: 3px solid #3498db; /* Blue */
+  border-radius: 50%;
+  width: 12px;
+  height: 12px;
+  animation: spin 1s linear infinite;
+  margin-right: 5px; /* Space between spinner and text */
 }
   </style>
