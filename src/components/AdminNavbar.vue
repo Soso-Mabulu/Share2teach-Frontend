@@ -10,15 +10,17 @@ const token = localStorage.getItem('token');
 
 // Navigation links
 const links = ref([
-    { text: "Dashboard", icon: "🏠", route: `/moderator-dashboard?token=${token}` },
-    { text: "Subject", icon: "📚", route: `/moderator-subject?token=${token}` },
-    { text: "Search", icon: "🔍", route: `/moderator-search?token=${token}` },
-    { text: "Contributors", icon: "👥", route: `/moderator-contributors?token=${token}` },
-    { text: "FAQ", icon: "❓", route: `/moderator-faq?token=${token}` },
-    { text: "Self Directed Learning", icon: "💡", route: `/moderator-self-learning?token=${token}` },
-    { text: "Upload Documents", icon: "📤", route: `/moderator-upload-documents?token=${token}` }, // New link
-    { text: "Moderate Documents", icon: "⚖️", route: `/moderate-documents?token=${token}` }, // New link
-    { text: "View Reported Documents", icon: "📜", route: `/moderator-view-reported-documents?token=${token}` }, // New link
+    { text: "Dashboard", icon: "🏠", route: `/admin-dashboard?token=${token}` },
+    { text: "Subject", icon: "📚", route: `/admin-subject?token=${token}` },
+    { text: "Search", icon: "🔍", route: `/admin-search?token=${token}` },
+    { text: "Contributors", icon: "👥", route: `/admin-contributors?token=${token}` },
+    { text: "FAQ", icon: "❓", route: `/admin-faq?token=${token}` },
+    { text: "Self Directed Learning", icon: "💡", route: `/admin-self-learning?token=${token}` },
+    { text: "Upload Documents", icon: "📤", route: `/admin-upload-documents?token=${token}` },
+    { text: "Moderate Documents", icon: "⚖️", route: `/admin-moderate-documents?token=${token}` },
+    { text: "View Reported Documents", icon: "📜", route: `/admin-view-reported-documents?token=${token}` },
+    { text: "Advanced Reports", icon: "📊", route: `/admin-advanced-reports?token=${token}` }, // New link
+    { text: "System Matrix", icon: "🔧", route: `/admin-system-matrix?token=${token}` }, // New link
     { text: "Logout", icon: "🚪", route: `/logout?token=${token}` },
 ]);
   

@@ -62,15 +62,13 @@
 
   // Navigation links
   const links = ref([
-    { text: "Dashboard", icon: "🏠", route: `/moderator-dashboard?token=${token}` },
-    { text: "Subject", icon: "📚", route: `/moderator-subject?token=${token}` },
-    { text: "Search", icon: "🔍", route: `/moderator-search?token=${token}` },
-    { text: "Contributors", icon: "👥", route: `/moderator-contributors?token=${token}` },
-    { text: "FAQ", icon: "❓", route: `/moderator-faq?token=${token}` },
-    { text: "Self Directed Learning", icon: "💡", route: `/moderator-self-learning?token=${token}` },
-    { text: "Upload Documents", icon: "📤", route: `/moderator-upload-documents?token=${token}` }, // New link
-    { text: "Moderate Documents", icon: "⚖️", route: `/moderator-moderate-documents?token=${token}` }, // New link
-    { text: "View Reported Documents", icon: "📜", route: `/moderator-view-reported-documents?token=${token}` }, // New link
+    { text: "Dashboard", icon: "🏠", route: `/educator-dashboard?token=${token}` },
+    { text: "Subject", icon: "📚", route: `/subject?token=${token}` },
+    { text: "Search", icon: "🔍", route: `/search?token=${token}` },
+    { text: "Contributors", icon: "👥", route: `contributors?token=${token}` },
+    { text: "FAQ", icon: "❓", route: `/faq?token=${token}` },
+    { text: "Self Directed Learning", icon: "💡", route: `/self-learning?token=${token}` },
+    { text: "Upload Documents", icon: "📤", route: `/upload-documents?token=${token}` }, // New link
     { text: "Logout", icon: "🚪", route: `/login` },
   ]);
   
@@ -86,7 +84,7 @@
     if (token) {
       try {
         const userId = parseToken(token); // Decode token and extract user ID
-        const apiUrl = `${import.meta.env.VITE_API_URL}api/v1/users/${userId}`; // Updated endpoint
+        const apiUrl = `${import.meta.env.VITE_API_URL}api/v1/auth/users/${userId}`; // Updated endpoint
   
         // Fetch user data from the API
         const response = await axios.get(apiUrl, {

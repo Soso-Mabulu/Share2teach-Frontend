@@ -1,71 +1,87 @@
 <template>
-  <div class="min-h-screen flex flex-col items-center bg-purple-50 dark:bg-gray-900 transition-colors duration-200">
-    <!-- Dark mode toggle -->
-    <div class="mt-4 mb-8">
-      <button @click="toggleDarkMode" class="relative inline-flex items-center h-6 rounded-full w-11 transition-colors duration-200 focus:outline-none bg-purple-300 dark:bg-purple-700" :class="{ 'bg-purple-600': isDarkMode }">
-        <span class="sr-only">Toggle dark mode</span>
-        <span class="inline-block w-4 h-4 transform transition duration-200 ease-in-out bg-white rounded-full shadow-sm" :class="[isDarkMode ? 'translate-x-6' : 'translate-x-1']"></span>
-        <svg xmlns="http://www.w3.org/2000/svg" class="absolute left-1 w-3 h-3 text-yellow-500" viewBox="0 0 20 20" fill="currentColor" :class="{ 'opacity-100': !isDarkMode, 'opacity-0': isDarkMode }">
-          <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd" />
-        </svg>
-        <svg xmlns="http://www.w3.org/2000/svg" class="absolute right-1 w-3 h-3 text-purple-200" viewBox="0 0 20 20" fill="currentColor" :class="{ 'opacity-0': !isDarkMode, 'opacity-100': isDarkMode }">
-          <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
-        </svg>
-      </button>
-    </div>
+  <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-900 via-indigo-900 to-black overflow-hidden relative">
+    <!-- Animated stars -->
+    <div class="stars"></div>
+    <div class="twinkling"></div>
+    
+    <!-- Cosmic dust -->
+    <div class="cosmic-dust"></div>
 
-    <div class="container mx-auto px-4 py-8 flex flex-col items-center">
-      <h1 class="text-3xl font-bold mb-6 text-purple-700 dark:text-purple-300">Update Profile</h1>
-      <form @submit.prevent="updateProfile" class="w-full max-w-lg">
-        <div class="mb-4">
-          <label for="userName" class="block text-sm font-medium text-gray-700 dark:text-gray-300">First Name</label>
-          <input
-            type="text"
-            id="userName"
-            v-model="form.userName"
-            class="mt-1 block w-full rounded-md border-purple-300 shadow-sm focus:border-purple-500 focus:ring focus:ring-purple-200 focus:ring-opacity-50 dark:bg-gray-700 dark:border-purple-600 dark:text-white"
-          />
+    <div class="container mx-auto px-4 py-8 relative z-10 flex items-center justify-center">
+      <div class="max-w-md w-full space-y-8 bg-purple-800 bg-opacity-20 backdrop-filter backdrop-blur-lg rounded-3xl p-10 shadow-2xl border border-purple-500 border-opacity-30">
+        <div>
+          <h1 class="text-4xl font-extrabold text-center text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-300 mb-2">
+            Cosmic Profile
+          </h1>
+          <p class="text-center text-purple-200 text-lg">Update Your Stellar Information</p>
         </div>
-        <div class="mb-4">
-          <label for="userLName" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Last Name</label>
-          <input
-            type="text"
-            id="userLName"
-            v-model="form.userLName"
-            class="mt-1 block w-full rounded-md border-purple-300 shadow-sm focus:border-purple-500 focus:ring focus:ring-purple-200 focus:ring-opacity-50 dark:bg-gray-700 dark:border-purple-600 dark:text-white"
-          />
-        </div>
-        <div class="mb-4">
-          <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
-          <input
-            type="email"
-            id="email"
-            v-model="form.email"
-            class="mt-1 block w-full rounded-md border-purple-300 shadow-sm focus:border-purple-500 focus:ring focus:ring-purple-200 focus:ring-opacity-50 dark:bg-gray-700 dark:border-purple-600 dark:text-white"
-          />
-        </div>
-        <div class="flex items-center justify-between">
-          <button
-            type="submit"
-            class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline dark:bg-purple-700 dark:hover:bg-purple-800"
-          >
-            Update Profile
-          </button>
-          <button
-            type="button"
-            @click="$router.push('/user-dashboard')"
-            class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline dark:bg-gray-600 dark:hover:bg-gray-700 dark:text-white"
-          >
-            Cancel
-          </button>
-        </div>
-      </form>
+        <form @submit.prevent="updateProfile" class="mt-8 space-y-6">
+          <div class="rounded-md shadow-sm -space-y-px">
+            <div>
+              <label for="userName" class="sr-only">First Name</label>
+              <input
+                type="text"
+                id="userName"
+                v-model="form.userName"
+                placeholder="First Name"
+                class="appearance-none rounded-none relative block w-full px-3 py-2 border border-purple-300 placeholder-purple-400 text-purple-100 rounded-t-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 focus:z-10 sm:text-sm bg-purple-700 bg-opacity-50"
+              />
+            </div>
+            <div>
+              <label for="userLName" class="sr-only">Last Name</label>
+              <input
+                type="text"
+                id="userLName"
+                v-model="form.userLName"
+                placeholder="Last Name"
+                class="appearance-none rounded-none relative block w-full px-3 py-2 border border-purple-300 placeholder-purple-400 text-purple-100 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 focus:z-10 sm:text-sm bg-purple-700 bg-opacity-50"
+              />
+            </div>
+            <div>
+              <label for="email" class="sr-only">Email</label>
+              <input
+                type="email"
+                id="email"
+                v-model="form.email"
+                placeholder="Email"
+                class="appearance-none rounded-none relative block w-full px-3 py-2 border border-purple-300 placeholder-purple-400 text-purple-100 rounded-b-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 focus:z-10 sm:text-sm bg-purple-700 bg-opacity-50"
+              />
+            </div>
+          </div>
+
+          <!-- Success Message Display -->
+          <div v-if="successMessage" class="text-green-400 font-bold text-center animate-pulse">
+            {{ successMessage }}
+          </div>
+
+          <div class="flex items-center justify-between space-x-4">
+            <button
+              type="submit"
+              class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-all duration-300 ease-in-out transform hover:scale-105"
+            >
+              <span class="absolute left-0 inset-y-0 flex items-center pl-3">
+                <svg class="h-5 w-5 text-purple-300 group-hover:text-purple-200" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                  <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
+                </svg>
+              </span>
+              Update Profile
+            </button>
+            <button
+              type="button"
+              @click="$router.push('/user-dashboard')"
+              class="group relative w-full flex justify-center py-2 px-4 border border-purple-400 text-sm font-medium rounded-md text-purple-300 bg-transparent hover:bg-purple-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-all duration-300 ease-in-out transform hover:scale-105"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, watchEffect } from 'vue';
+import { ref, onMounted } from 'vue';
 import axios from 'axios';
 import { useRouter } from 'vue-router';
 
@@ -75,8 +91,7 @@ const form = ref({
   userLName: '',
   email: '',
 });
-
-const isDarkMode = ref(false);
+const successMessage = ref('');
 
 const updateProfile = async () => {
   try {
@@ -85,7 +100,6 @@ const updateProfile = async () => {
 
     if (!userId) {
       console.error('User ID not found in token');
-      alert('User ID not found. Please log in again.');
       return;
     }
 
@@ -103,40 +117,26 @@ const updateProfile = async () => {
     });
 
     if (response.data) {
-      alert('Profile updated successfully!');
+      successMessage.value = 'Profile updated successfully!';
       localStorage.setItem('user', JSON.stringify(response.data));
-      router.push('/user-dashboard');
+      setTimeout(() => {
+        router.push('/user-dashboard');
+      }, 2000);
     }
   } catch (error) {
-    if (error.response) {
-      console.error('Error updating profile:', error.response.data);
-      alert(`Failed to update profile: ${error.response.data.message || 'Please try again.'}`);
-    } else {
-      console.error('Error updating profile:', error.message);
-      alert('Failed to update profile. Please check your network connection and try again.');
-    }
+    console.error('Error updating profile:', error.response?.data || error.message);
   }
 };
 
 const parseToken = (token) => {
-  if (!token) {
-    return { userId: null };
-  }
-
+  if (!token) return { userId: null };
   try {
     const decoded = JSON.parse(atob(token.split('.')[1]));
-    return {
-      userId: decoded.user_id || decoded.sub || decoded.id,
-    };
+    return { userId: decoded.user_id || decoded.sub || decoded.id };
   } catch (error) {
     console.error('Error parsing token:', error);
     return { userId: null };
   }
-};
-
-const toggleDarkMode = () => {
-  isDarkMode.value = !isDarkMode.value;
-  localStorage.setItem('darkMode', isDarkMode.value);
 };
 
 onMounted(() => {
@@ -146,16 +146,6 @@ onMounted(() => {
     form.value.userLName = userData.userLName;
     form.value.email = userData.email;
   }
-
-  isDarkMode.value = localStorage.getItem('darkMode') === 'true';
-});
-
-watchEffect(() => {
-  if (isDarkMode.value) {
-    document.documentElement.classList.add('dark');
-  } else {
-    document.documentElement.classList.remove('dark');
-  }
 });
 </script>
 
@@ -164,8 +154,79 @@ watchEffect(() => {
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
 
-/* Add any additional global styles here */
-body {
-  @apply bg-purple-50 text-gray-900 dark:bg-gray-900 dark:text-white transition-colors duration-200;
+/* Cosmic background */
+@keyframes move-twink-back {
+  from {background-position: 0 0;}
+  to {background-position: -10000px 5000px;}
+}
+
+.stars, .twinkling {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.stars {
+  background: #000 url(http://www.script-tutorials.com/demos/360/images/stars.png) repeat top center;
+  z-index: 0;
+}
+
+.twinkling {
+  background: transparent url(http://www.script-tutorials.com/demos/360/images/twinkling.png) repeat top center;
+  z-index: 1;
+  animation: move-twink-back 200s linear infinite;
+}
+
+/* Cosmic dust */
+.cosmic-dust {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 2;
+}
+
+.cosmic-dust::after {
+  content: '';
+  position: absolute;
+  top: -10rem;
+  left: -10rem;
+  width: calc(100% + 20rem);
+  height: calc(100% + 20rem);
+  background-image: 
+    radial-gradient(circle at 20% 25%, rgba(255, 166, 241, 0.07) 0%, rgba(255, 166, 241, 0) 50%),
+    radial-gradient(circle at 80% 75%, rgba(191, 129, 255, 0.09) 0%, rgba(191, 129, 255, 0) 50%),
+    radial-gradient(circle at 50% 50%, rgba(143, 143, 255, 0.06) 0%, rgba(143, 143, 255, 0) 60%);
+  animation: cosmic-dust-float 60s linear infinite;
+}
+
+@keyframes cosmic-dust-float {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  100% { transform: translate(-5%, 5%) rotate(360deg); }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(139, 92, 246, 0.1);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(139, 92, 246, 0.5);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(139, 92, 246, 0.7);
 }
 </style>

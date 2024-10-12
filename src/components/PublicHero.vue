@@ -1,127 +1,244 @@
 <template>
-  <div :class="['User-dashboard', { 'dark-mode': isDarkMode }]">
-    <h1 class="dashboard-title">User Dashboard</h1>
+  <div :class="['min-h-screen w-full max-w-none transition-all duration-500 ease-in-out', 
+                isDarkMode ? 'bg-gradient-to-br from-gray-900 via-purple-900 to-indigo-900' : 
+                'bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500']">
+    <div class="container mx-auto px-4 py-8">
+      <!-- Cosmic Toggle -->
+      <div class="flex justify-center mb-8">
+        <button @click="toggleDarkMode" class="relative w-16 h-16 md:w-24 md:h-24 rounded-full overflow-hidden group">
+          <div :class="['absolute inset-0 transition-all duration-500 ease-in-out transform group-hover:rotate-180',
+                        isDarkMode ? 'bg-indigo-900' : 'bg-yellow-300']">
+            <div :class="['absolute inset-2 rounded-full transform transition-all duration-500 ease-in-out group-hover:scale-75',
+                          isDarkMode ? 'bg-indigo-700' : 'bg-yellow-500']"></div>
+          </div>
+          <span class="absolute inset-0 flex items-center justify-center text-2xl md:text-4xl">
+            {{ isDarkMode ? '🌙' : '☀️' }}
+          </span>
+        </button>
+      </div>
 
-    <div class="search-filter-container">
-      <div class="search-bar-wrapper">
+      <h1 class="text-3xl md:text-4xl lg:text-6xl font-extrabold text-center text-white mb-8 md:mb-12 transform hover:scale-110 transition-transform duration-300 ease-in-out">
+        User Dashboard
+      </h1>
+
+      <!-- Search Bar -->
+      <div class="relative mb-8 md:mb-12 max-w-2xl mx-auto">
         <input 
           type="text" 
           v-model="searchQuery" 
-          placeholder="Search documents..." 
-          class="search-bar"
-          @keyup.enter="handleSearch" 
+          @keyup.enter="handleSearch"
+          placeholder="Search the cosmos..." 
+          class="w-full py-3 md:py-4 px-4 md:px-6 rounded-full bg-white bg-opacity-20 backdrop-filter backdrop-blur-lg text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-white"
         />
-        <i class="fas fa-search search-icon"></i>
+        <button @click="handleSearch" class="absolute right-2 top-2 bg-white bg-opacity-30 rounded-full p-2 hover:bg-opacity-50 transition-all duration-300 ease-in-out">
+          🔍
+        </button>
       </div>
-      <div class="filter-options">
-        <label class="dark-mode-switch">
-          <input type="checkbox" v-model="isDarkMode" @change="toggleDarkMode" />
-          <span class="toggle-slider"></span>
-          <span class="toggle-label">Dark Mode</span>
-        </label>
-      </div>
-    </div>
 
-    <!-- Only approved documents section -->
-    <div class="document-section">
-      <h2 class="section-title">High Rated Documents</h2>
-      <div class="documents-container">
-        <div class="documents-grid">
-          <div 
-            v-for="(document, index) in limitedDocuments.approved" 
-            :key="index" 
-            class="document-card"
-            @click="showPreview(document)"
-          >
-            <img :src="document.preview_image_url || defaultImage" alt="Document Preview" class="document-image" />
-            <div class="doc-info">
-              <h3 class="doc-title">{{ document.title }}</h3>
-              <p class="description">{{ document.description }}</p>
-              <p class="author">By: {{ document.author }}</p>
+      <!-- High Rated Documents -->
+      <div class="mb-8 md:mb-12">
+        <h2 class="text-2xl md:text-3xl font-bold text-center text-white mb-6 md:mb-8">High Rated Documents</h2>
+        <div class="relative">
+          <button @click="scrollDocuments('left', 'highRated')" class="absolute left-0 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-30 rounded-full p-2 z-10">
+            ◀
+          </button>
+          <div ref="highRatedScrollContainer" class="flex overflow-x-auto space-x-6 pb-4 scrollbar-hide">
+            <div 
+              v-for="(document, index) in highRatedDocuments" 
+              :key="index" 
+              @click="showPreview(document)"
+              class="flex-shrink-0 w-64 md:w-1/4 bg-white bg-opacity-10 backdrop-filter backdrop-blur-lg rounded-lg overflow-hidden transform hover:scale-105 transition-all duration-300 ease-in-out cursor-pointer"
+            >
+              <img :src="document.preview_image_url || defaultImage" alt="Document Preview" class="w-full h-40 object-cover" />
+              <div class="p-4">
+                <h3 class="text-lg font-semibold text-white mb-2">{{ document.title }}</h3>
+                <p class="text-sm text-gray-300 mb-2">{{ document.description }}</p>
+                <p class="text-xs text-gray-400">By: {{ document.author }}</p>
+                <div class="flex mt-2">
+                  <span v-for="star in 5" :key="star" class="text-2xl" :class="{ 'text-yellow-400': star <= document.rating, 'text-gray-600': star > document.rating }">
+                    {{ star <= document.rating ? '★' : '☆' }}
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
+          <button @click="scrollDocuments('right', 'highRated')" class="absolute right-0 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-30 rounded-full p-2 z-10">
+            ▶
+          </button>
         </div>
       </div>
-      <button class="view-all-btn">View All Approved Documents</button>
+
+      <!-- Approved Documents Section -->
+      <div class="mb-8 md:mb-12">
+        <h2 class="text-2xl md:text-3xl font-bold text-center text-white mb-6 md:mb-8">Browse for Documents</h2>
+        <div class="relative">
+          <button @click="scrollDocuments('left', 'approved')" class="absolute left-0 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-30 rounded-full p-2 z-10">
+            ◀
+          </button>
+          <div ref="approvedScrollContainer" class="flex overflow-x-auto space-x-6 pb-4 scrollbar-hide">
+            <div 
+              v-for="(document, index) in approvedDocuments" 
+              :key="index" 
+              @click="showPreview(document)"
+              class="flex-shrink-0 w-64 md:w-1/4 bg-white bg-opacity-10 backdrop-filter backdrop-blur-lg rounded-lg overflow-hidden transform hover:scale-105 transition-all duration-300 ease-in-out cursor-pointer"
+            >
+              <img :src="document.preview_image_url || defaultImage" alt="Document Preview" class="w-full h-40 object-cover" />
+              <div class="p-4">
+                <h3 class="text-lg font-semibold text-white mb-2">{{ document.title }}</h3>
+                <p class="text-sm text-gray-300 mb-2">{{ document.description }}</p>
+                <p class="text-xs text-gray-400">By: {{ document.author }}</p>
+                <div class="flex mt-2">
+                  <span v-for="star in 5" :key="star" class="text-2xl" :class="{ 'text-yellow-400': star <= document.rating, 'text-gray-600': star > document.rating }">
+                    {{ star <= document.rating ? '★' : '☆' }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <button @click="scrollDocuments('right', 'approved')" class="absolute right-0 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-30 rounded-full p-2 z-10">
+            ▶
+          </button>
+        </div>
+      </div>
+
+      <button @click="router.push({ name: 'AllDocuments' })" class="block mx-auto py-2 md:py-3 px-4 md:px-6 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-full text-white font-semibold transform hover:scale-105 transition-all duration-300 ease-in-out">
+        Explore All Cosmic Documents
+      </button>
     </div>
 
     <!-- Preview Modal -->
-    <div v-if="showModal" class="modal-overlay" @click="closePreview">
-      <div class="modal-content" @click.stop>
-        <h2>{{ currentDocument.title }}</h2>
-        <div class="preview-images-container">
-          <button @click="prevImage" class="nav-button left">
-            <i class="fas fa-chevron-left"></i>
-          </button>
-          <img :src="currentPreviewImage" alt="Preview" class="preview-image" />
-          <button @click="nextImage" class="nav-button right">
-            <i class="fas fa-chevron-right"></i>
+    <div v-if="showModal" class="fixed inset-0 bg-black bg-opacity-50 backdrop-filter backdrop-blur-sm flex items-center justify-center z-50" @click="closePreview">
+      <div class="bg-white dark:bg-gray-800 rounded-lg p-4 md:p-8 max-w-2xl w-full m-4 transform transition-all duration-300 ease-in-out" @click.stop>
+        <h2 class="text-xl md:text-2xl font-bold mb-4 text-gray-800 dark:text-white">{{ currentDocument.title }}</h2>
+        <div class="relative mb-4">
+          <img :src="currentPreviewImage" :alt="currentDocument.title" class="w-full h-48 md:h-64 object-cover rounded-lg" />
+          <div class="absolute inset-0 flex items-center justify-between">
+            <button @click="prevImage" class="bg-black bg-opacity-50 hover:bg-opacity-75 text-white rounded-full p-2 transform transition-all duration-300 ease-in-out hover:scale-110">
+              ◀
+            </button>
+            <button @click="nextImage" class="bg-black bg-opacity-50 hover:bg-opacity-75 text-white rounded-full p-2 transform transition-all duration-300 ease-in-out hover:scale-110">
+              ▶
+            </button>
+          </div>
+        </div>
+        <p class="text-sm text-gray-600 dark:text-gray-300 mb-2">{{ currentImageIndex + 1 }} / {{ currentDocumentPreviewImages.length }}</p>
+        <p class="text-gray-700 dark:text-gray-300 mb-4">{{ currentDocument.description }}</p>
+        <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">By: {{ currentDocument.author }}</p>
+        <div class="flex flex-col sm:flex-row justify-between">
+          <a :href="currentDocument.download_url" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded transition-colors duration-300 ease-in-out mb-2 sm:mb-0 text-center">
+            Download Full Document
+          </a>
+          <button @click="closePreview" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded transition-colors duration-300 ease-in-out">
+            Close
           </button>
         </div>
-        <p>{{ currentImageIndex + 1 }} / {{ currentDocumentPreviewImages.length }}</p>
-        <p class="description">{{ currentDocument.description }}</p>
-        <p class="author">By: {{ currentDocument.author }}</p>
-        <a :href="currentDocument.download_url" class="download-btn" download>Download Full Document</a>
-        <button class="close-btn" @click="closePreview">Close</button>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import axios from 'axios';
-import defaultImage from '@/assets/documentIcon.png';
 
-const documents = ref({
-  approved: [],
-});
-
+const router = useRouter();
+const highRatedDocuments = ref([]);
+const approvedDocuments = ref([]);
+const ratings = ref([]);
 const searchQuery = ref('');
 const isDarkMode = ref(false);
 const showModal = ref(false);
 const currentDocument = ref(null);
 const currentDocumentPreviewImages = ref([]);
 const currentImageIndex = ref(0);
-const router = useRouter();
-
-onMounted(() => {
-  fetchDocuments();
-});
-
-const limitedDocuments = computed(() => {
-  return {
-    approved: documents.value.approved.slice(0, 4),
-  };
-});
+const defaultImage = '/api/placeholder/400/320';
+const highRatedScrollContainer = ref(null);
+const approvedScrollContainer = ref(null);
 
 const currentPreviewImage = computed(() => {
   return currentDocumentPreviewImages.value[currentImageIndex.value] || defaultImage;
 });
 
-async function fetchDocuments() {
+onMounted(() => {
+  fetchRatings();
+  fetchApprovedDocuments();
+  initializeDarkMode();
+});
+
+watch(isDarkMode, (newValue) => {
+  document.documentElement.classList.toggle('dark', newValue);
+});
+
+async function fetchRatings() {
   try {
-    const urlParams = new URLSearchParams(window.location.search);
-    const token = urlParams.get('token');
+    const token = localStorage.getItem('token');
     const headers = { Authorization: `Bearer ${token}` };
 
-    const approvedResponse = await axios.get(`${import.meta.env.VITE_API_URL}api/v1/documents/approved`, { headers });
-    documents.value.approved = mapDocuments(approvedResponse.data.documents);
+    const ratingsResponse = await axios.get(`${import.meta.env.VITE_API_URL}/api/v1/ratings`, { headers });
+    ratings.value = ratingsResponse.data;
+
+    const highRatedIds = ratings.value
+      .filter(rating => rating.rating > 3)
+      .map(rating => rating.docId);
+
+    await fetchHighRatedDocuments(highRatedIds, headers);
   } catch (error) {
-    console.error('Failed to fetch documents:', error.message);
+    console.error('Failed to fetch ratings:', error.message);
   }
 }
 
-function mapDocuments(docs) {
-  return docs.map(doc => ({
+async function fetchHighRatedDocuments(ids, headers) {
+  try {
+    const documentPromises = ids.map(async (id) => {
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/v1/documents/${id}`, { headers });
+
+      if (response.data && response.data.status === 'success') {
+        return mapDocument(response.data.document);
+      } else {
+        console.error(`Failed to fetch document for ID ${id}:`, response.data);
+        return null;
+      }
+    });
+
+    const documentsArray = (await Promise.all(documentPromises)).filter(doc => doc !== null);
+    highRatedDocuments.value = documentsArray;
+  } catch (error) {
+    console.error('Failed to fetch documents for high ratings:', error.message);
+  }
+}
+
+async function fetchApprovedDocuments() {
+  try {
+    const token = localStorage.getItem('token');
+    const headers = { Authorization: `Bearer ${token}` };
+
+    const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/v1/documents/approved`, { headers });
+
+    if (response.data && response.data.status === 'success') {
+      approvedDocuments.value = response.data.documents.map((doc) => mapDocument(doc));
+    } else {
+      console.error('Failed to fetch approved documents:', response.data);
+    }
+  } catch (error) {
+    console.error('Failed to fetch approved documents:', error.message);
+  }
+}
+
+function mapDocument(doc) {
+  const documentId = doc.id || doc.docId;
+  const documentRating = ratings.value.find(rating => rating.docId === documentId);
+
+  return {
+    id: documentId,
     title: doc.title || 'Unknown title',
     preview_image_url: doc.preview_image_url || defaultImage,
     description: doc.description || 'No description available',
     author: doc.author || 'Unknown Author',
     light_preview_url: doc.light_preview_url || '',
-    download_url: doc.download_url || '',
-  }));
+    download_url: doc.location || '',
+    rating: documentRating ? documentRating.rating : 0 
+  };
 }
 
 function showPreview(document) {
@@ -136,7 +253,13 @@ function closePreview() {
 }
 
 function toggleDarkMode() {
-  document.body.classList.toggle('dark-mode', isDarkMode.value);
+  isDarkMode.value = !isDarkMode.value;
+  localStorage.setItem('darkMode', isDarkMode.value.toString());
+}
+
+function initializeDarkMode() {
+  const darkModePreference = localStorage.getItem('darkMode');
+  isDarkMode.value = darkModePreference === 'true';
 }
 
 function nextImage() {
@@ -152,364 +275,45 @@ function handleSearch() {
     router.push({ name: 'search-results', query: { term: searchQuery.value } });
   }
 }
+
+function scrollDocuments(direction, section) {
+  const container = section === 'highRated' ? highRatedScrollContainer.value : approvedScrollContainer.value;
+  if (container) {
+    const scrollAmount = direction === 'left' ? -container.offsetWidth : container.offsetWidth;
+    container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+  }
+}
 </script>
 
 <style scoped>
-.User-dashboard {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  padding: 20px;
-  color: #333;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background-color: #f5f5f5;
-}
-
-.dark-mode {
-  background-color: #1a1a1a;
-  color: #f5f5f5;
-}
-
-.dashboard-title {
-  text-align: center;
-  margin-bottom: 30px;
-  font-size: 2.5em;
-  color: #2c3e50;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  position: relative;
-  padding-bottom: 10px;
-}
-
-.dashboard-title::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 60px;
-  height: 4px;
-  background-color: #3498db;
-}
-
-.section-title {
-  text-align: center;
-  margin-bottom: 25px;
-  font-size: 1.8em;
-  color: #34495e;
-  text-transform: capitalize;
-  letter-spacing: 1px;
-}
-
-.search-filter-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 30px;
-  width: 100%;
-  max-width: 600px;
-}
-
-.search-bar-wrapper {
-  position: relative;
-  width: 100%;
-  margin-bottom: 20px;
-}
-
-.search-bar {
-  padding: 12px 40px 12px 20px;
-  width: 100%;
-  border-radius: 25px;
-  border: 2px solid #3498db;
-  font-size: 16px;
-  transition: all 0.3s ease;
-}
-
-.search-bar:focus {
-  outline: none;
-  box-shadow: 0 0 10px rgba(52, 152, 219, 0.5);
-}
-
-.search-icon {
-  position: absolute;
-  right: 15px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #3498db;
-}
-
-.dark-mode-switch {
-  display: inline-flex;
-  align-items: center;
-  cursor: pointer;
-}
-
-.dark-mode-switch input {
+/* Custom scrollbar styles */
+.scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
 
-.toggle-slider {
-  position: relative;
-  width: 50px;
-  height: 24px;
-  background-color: #ccc;
-  border-radius: 34px;
-  transition: .4s;
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
-.toggle-slider:before {
-  position: absolute;
-  content: "";
-  height: 20px;
-  width: 20px;
-  left: 2px;
-  bottom: 2px;
-  background-color: white;
-  border-radius: 50%;
-  transition: .4s;
+/* Responsive adjustments */
+@media (min-width: 768px) {
+  .container {
+    padding-top: 4rem;
+  }
+
+  .hero-container {
+    padding: 2rem;
+  }
+
+  .flex-shrink-0 {
+    width: 16rem;
+  }
 }
 
-input:checked + .toggle-slider {
-  background-color: #3498db;
-}
-
-input:checked + .toggle-slider:before {
-  transform: translateX(26px);
-}
-
-.toggle-label {
-  margin-left: 10px;
-  font-weight: 500;
-}
-
-.document-section {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 40px;
-}
-
-.documents-container {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-}
-
-.documents-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 20px;
-  margin-bottom: 30px;
-  max-width: 1200px;
-  width: 100%;
-}
-
-.document-card {
-  border: 1px solid #e0e0e0;
-  border-radius: 10px;
-  overflow: hidden;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  cursor: pointer;
-  background-color: #ffffff;
-}
-
-.document-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-}
-
-.document-image {
-  width: 100%;
-  height: 200px;
-  object-fit: cover;
-}
-
-.doc-info {
-  padding: 20px;
-}
-
-.doc-title {
-  margin: 0 0 10px;
-  font-size: 1.2em;
-  color: #2c3e50;
-}
-
-.description {
-  font-size: 0.9em;
-  color: #7f8c8d;
-  margin-bottom: 10px;
-}
-
-.author {
-  font-size: 0.8em;
-  color: #95a5a6;
-}
-
-.view-all-btn {
-  display: inline-block;
-  padding: 12px 24px;
-  background-color: #3498db;
-  color: white;
-  border: none;
-  border-radius: 25px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-size: 1em;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08);
-}
-
-.view-all-btn:hover {
-  background-color: #2980b9;
-  transform: translateY(-2px);
-  box-shadow: 0 7px 14px rgba(50, 50, 93, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08);
-}
-
-.view-all-btn:active {
-  transform: translateY(1px);
-}
-
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.8);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.modal-content {
-  background: white;
-  padding: 30px;
-  border-radius: 15px;
-  width: 90%;
-  max-width: 800px;
-  max-height: 90vh;
-  overflow-y: auto;
-  position: relative;
-}
-
-.preview-images-container {
-  position: relative;
-  margin: 20px 0;
-}
-
-.preview-image {
-  width: 100%;
-  max-height: 400px;
-  object-fit: contain;
-}
-
-.nav-button {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  background: rgba(0,0,0,0.5);
-  color: white;
-  border: none;
-  padding: 10px;
-  cursor: pointer;
-  transition: background 0.3s ease;
-}
-
-.nav-button:hover {
-  background: rgba(0,0,0,0.8);
-}
-
-.nav-button.left {
-  left: 10px;
-}
-
-.nav-button.right {
-  right: 10px;
-}
-
-.download-btn {
-  display: inline-block;
-  padding: 10px 20px;
-  background: #2ecc71;
-  color: white;
-  text-decoration: none;
-  border-radius: 5px;
-  margin-top: 20px;
-  transition: background-color 0.3s ease;
-}
-
-.download-btn:hover {
-  background: #27ae60;
-}
-
-.close-btn {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background: none;
-  border: none;
-  font-size: 24px;
-  cursor: pointer;
-  color: #333;
-}
-
-.close-btn:hover {
-  color: #e74c3c;
-}
-
-/* Dark mode styles */
-.dark-mode .dashboard-title {
-  color: #ecf0f1;
-}
-
-.dark-mode .dashboard-title::after {
-  background-color: #3498db;
-}
-
-.dark-mode .section-title {
-  color: #bdc3c7;
-}
-
-.dark-mode .search-bar {
-  background-color: #2c3e50;
-  color: #ecf0f1;
-  border-color: #3498db;
-}
-
-.dark-mode .search-icon {
-  color: #3498db;
-}
-
-.dark-mode .document-card {
-  background-color: #34495e;
-  border-color: #2c3e50;
-}
-
-.dark-mode .doc-title {
-  color: #ecf0f1;
-}
-
-.dark-mode .description {
-  color: #bdc3c7;
-}
-
-.dark-mode .author {
-  color: #95a5a6;
-}
-
-.dark-mode .modal-content {
-  background-color: #2c3e50;
-  color: #ecf0f1;
-}
-
-.dark-mode .close-btn {
-  color: #ecf0f1;
-}
-
-.dark-mode .close-btn:hover {
-  color: #e74c3c;
+@media (max-width: 767px) {
+  .flex-shrink-0 {
+    width: calc(100% - 1.5rem);
+  }
 }
 </style>

@@ -3,6 +3,12 @@ Improved Document Upload Component
 <script setup>
 import { ref, computed } from 'vue';
 import axios from 'axios';
+import { useRouter } from 'vue-router'; 
+import EducatorSidebar from '@/components/EducatorSidebar.vue'; 
+import MainFooter from '@/components/MainFooter.vue'; 
+import EducatorNavbar from '@/components/EducatorNavbar.vue';
+
+const router = useRouter();
 
 // Form state
 const title = ref('');
@@ -72,13 +78,10 @@ const handleDrop = (event) => {
   event.preventDefault();
   isDragging.value = false;
 
-  const droppedFiles = event.dataTransfer.files;
-
-  // Append dropped files to the existing list, preventing duplicates
-  for (let i = 0; i < droppedFiles.length; i++) {
-    if (!Array.from(files.value || []).some(file => file.name === droppedFiles[i].name)) {
-      files.value = [...(files.value || []), droppedFiles[i]];
-    }
+  if (event.dataTransfer.files.length > 0) {
+    files.value = event.dataTransfer.files;
+  } else {
+    console.error('No files dropped');
   }
 };
 
@@ -91,7 +94,6 @@ const handleDropZoneClick = () => {
     console.error('File input element not found');
   }
 };
-
 
 // Function to validate the academic year
 const isValidAcademicYear = (year) => {
@@ -158,23 +160,20 @@ const uploadDocuments = async () => {
       throw new Error('Authorization token not found');
     }
 
+    // Add token to form data to send to the backend
+    formData.append('token', token);
+
     const headers = { Authorization: `Bearer ${token}` };
 
     const response = await axios.post(`${import.meta.env.VITE_API_URL}api/v1/upload`, formData, { headers });
 
     if (response.status === 200) {
-      // Check if response.data.results exists and handle accordingly
-      const results = response.data.results;
-      if (results && results.length > 0) {
-        const uploadedUrls = results.map(result => result.url);
-        showToast.value = true;
-        toastMessage.value = `Documents uploaded successfully! ${uploadedUrls.join(', ')}`;
-      } else {
-        showToast.value = true;
-        toastMessage.value = 'Document uploaded successfully!';
-      }
+      const uploadedUrls = response.data.results.map(result => result.url);
+      showToast.value = true;
+      toastMessage.value = `Documents uploaded successfully! ${uploadedUrls.join(', ')}`;
       toastType.value = 'success';
       resetForm();
+      router.push('/dashboard');
     } else {
       throw new Error('Upload failed');
     }
@@ -187,6 +186,8 @@ const uploadDocuments = async () => {
     isUploading.value = false;
   }
 };
+
+
 
 
 // Function to reset form fields after successful upload
@@ -224,7 +225,9 @@ const selectAcademicYearSuggestion = (suggestion) => {
 </script>
 
 <template>
+  <EducatorNavbar />
   <div class="min-h-screen flex flex-col lg:flex-row bg-gray-50">
+    <EducatorSidebar />
   
     <div class="flex-grow p-8 bg-white shadow-lg rounded-lg lg:m-8">
       <h2 class="text-4xl font-extrabold text-gray-800 mb-8">Upload Documents</h2>
@@ -404,6 +407,8 @@ const selectAcademicYearSuggestion = (suggestion) => {
       </transition>
     </div>
   </div>
+
+  <MainFooter />
 </template>
 
 <style scoped>
