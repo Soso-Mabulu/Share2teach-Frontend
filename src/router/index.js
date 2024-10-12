@@ -6,7 +6,6 @@ import SignupView from '@/views/SignupView.vue';
 import PublicUserView from '@/views/PublicUserView.vue';
 import ForgotPasswordView from '@/views/ForgotPasswordView.vue';
 import ResetPasswordView from '@/views/ResetPasswordView.vue';
-import DetailedView from '@/views/DetailedView.vue';
 import SearchResultsView from '@/views/SearchResultsView.vue';
 import AllDocuments from '@/views/AllDocuments.vue';
 import FAQView from '@/views/FAQView.vue';
@@ -42,6 +41,7 @@ import AdminSubjectView from '@/views/Admin-SubjectView.vue';
 import AdminSelfDirectedlearningView from '@/views/Admin-SelfDirectedlearningView.vue';
 import AdminPanelView from '@/views/AdminPanelView.vue';
 import AdminMaintainUsersView from '@/views/Admin-MaintainUsersView.vue';
+import AdminAdvancedReportsView from '@/views/Admin-AdvancedReportsView.vue';
 import AdminMaintainFAQ from '@/views/Admin-MaintainFAQ.vue';
 import AdminMaintainDocuments from '@/views/Admin-MaintainDocuments.vue';
 
@@ -83,12 +83,6 @@ const router = createRouter({
       path: '/reset-password',
       name: 'ResetPasswordView',
       component: ResetPasswordView,
-    },
-    {
-      path: '/detailed-view',
-      name: 'DetailedView',
-      component: DetailedView,
-      props: route => ({ activeEndpoint: route.params.endpoint }),
     },
     {
       path: '/search-results',
@@ -228,6 +222,11 @@ const router = createRouter({
       path: '/admin-maintain-users',
       name: 'AdminMaintainUsersView',
       component: AdminMaintainUsersView,
+    },
+    {
+      path: '?admin-advanced-reports',
+      name: 'AdminAdvancedReportsView',
+      component: AdminAdvancedReportsView,
     },
     {
       path: '/admin-maintain-faq',

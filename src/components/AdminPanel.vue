@@ -57,10 +57,23 @@
   
   <script setup>
   import { ref, onMounted, computed } from 'vue';
-  import BarChart from './BarChart.vue'; // Assume we have a BarChart component
-  import { useRouter } from 'vue-router'
-
-  const router = useRouter()
+  import axios from 'axios';
+  import BarChart from './BarChart.vue';
+  import { useRouter } from 'vue-router';
+  
+  // API base URL and token
+  const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1';
+  const token = localStorage.getItem('token');
+  
+  // Axios instance with token for authentication
+  const axiosInstance = axios.create({
+    baseURL: apiBaseUrl,
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+  
+  const router = useRouter();
   
   const analytics = ref({
     totalDocuments: 0,
@@ -83,54 +96,71 @@
   const documentChartData = computed(() => ({
     labels: ['Total', 'Approved', 'Denied', 'Reported'],
     datasets: [{
-        label: 'Document Count',
-        data: [
+      label: 'Document Count',
+      data: [
         analytics.value.totalDocuments,
         analytics.value.approvedDocuments,
         analytics.value.deniedDocuments,
         analytics.value.reportedComments,
-        ],
-        backgroundColor: ['#3498db', '#2ecc71', '#e74c3c', '#f39c12'],
-    }],
-    }));
-    
-    onMounted(async () => {
+      ],
+      backgroundColor: ['#3498db', '#2ecc71', '#e74c3c', '#f39c12'],
+    }]
+  }));
+  
+  const getLastSixMonths = () => {
+    const endDate = new Date();
+    const startDate = new Date();
+    startDate.setMonth(endDate.getMonth() - 6);
+    return {
+      start_date: startDate.toISOString().split('T')[0],
+      end_date: endDate.toISOString().split('T')[0]
+    };
+  };
+  
+  onMounted(async () => {
+    const { start_date, end_date } = getLastSixMonths();
+
     try {
-        // Fetch analytics data (if needed, you can remove this if it's not required)
-        analytics.value = {
-            totalDocuments: 1000,
-            approvedDocuments: 800,
-            deniedDocuments: 50,
-            reportedComments: 25,
-            avgDocumentRating: 4.2,
-            avgFaqRating: 4.5,
-        };
+      // Fetch denied documents
+      const deniedResponse = await axiosInstance.get(`${apiBaseUrl}api/v1/analytics/denied-documents`, {
+        params: { start_date, end_date }
+      });
+      analytics.value.deniedDocuments = deniedResponse.data.denied_count;
 
-        // Fetch system metrics from the Cloud Run endpoint
-        const responseMetrics = await fetch('https://systemmetrics-494405022119.us-central1.run.app/system-metrics');
-        if (!responseMetrics.ok) throw new Error('Failed to fetch system metrics');
-        systemMetrics.value = await responseMetrics.json();
+      // Fetch reported documents
+      const reportedResponse = await axiosInstance.get(`${apiBaseUrl}api/v1/analytics/reported-documents`, {
+        params: { start_date, end_date }
+      });
+      analytics.value.reportedComments = reportedResponse.data.reported_count;
 
-        // Fetch logs from the Cloud Run endpoint
-        const responseLogs = await fetch('https://systemmetrics-494405022119.us-central1.run.app/recent-logs');
-        if (!responseLogs.ok) throw new Error('Failed to fetch logs');
-        logs.value = await responseLogs.json();
+      // Fetch pending documents
+      const pendingResponse = await axiosInstance.get(`${apiBaseUrl}api/v1/analytics/pending-documents`, {
+        params: { start_date, end_date }
+      });
+      analytics.value.totalDocuments = pendingResponse.data.pending_count;
+
+      // Mock system metrics and logs
+      systemMetrics.value = {
+        cpuUsage: 65,
+        memoryUsage: 70,
+        diskUsage: 55,
+        networkTraffic: 80,
+      };
+
+      logs.value = [
+        { timestamp: '2024-10-01 10:30:15', message: 'User authentication failed' },
+        { timestamp: '2024-10-01 10:31:22', message: 'Document upload successful' },
+        { timestamp: '2024-10-01 10:32:45', message: 'System backup completed' },
+      ];
+
     } catch (error) {
-        console.error('Error fetching data:', error);
+      console.error('Error fetching analytics data:', error);
     }
-});
+  });
 
   
-  const formatTitle = (key) => {
-    return key.replace(/([A-Z])/g, ' $1').replace(/^./, (str) => str.toUpperCase());
-  };
-  
-  const formatValue = (value) => {
-    if (typeof value === 'number') {
-      return value % 1 === 0 ? value : value.toFixed(2);
-    }
-    return value;
-  };
+  const formatTitle = (key) => key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
+  const formatValue = (value) => typeof value === 'number' && value % 1 !== 0 ? value.toFixed(2) : value;
   
   const getProgressBarColor = (value) => {
     if (value < 50) return 'bg-green-500';
@@ -139,6 +169,7 @@
   };
   
   const navigateTo = (route) => {
+    router.push(`/admin-${route}`);
     // Assuming Vue Router is properly configured
     if (route === 'users') {
         router.push('/admin-maintain-users'); // This will navigate to the Maintain Users page
