@@ -4,9 +4,6 @@ Improved Document Upload Component
 import { ref, computed } from 'vue';
 import axios from 'axios';
 import { useRouter } from 'vue-router'; 
-import ModaratorSidebar from '@/components/ModaratorSidebar.vue'; 
-import MainFooter from '@/components/MainFooter.vue'; 
-import ModaratorNavbar from '@/components/ModaratorNavbar.vue';
 
 const router = useRouter();
 
@@ -225,9 +222,7 @@ const selectAcademicYearSuggestion = (suggestion) => {
 </script>
 
 <template>
-  <ModaratorNavbar />
   <div class="min-h-screen flex flex-col lg:flex-row bg-gray-50">
-    <ModaratorSidebar />
   
     <div class="flex-grow p-8 bg-white shadow-lg rounded-lg lg:m-8">
       <h2 class="text-4xl font-extrabold text-gray-800 mb-8">Upload Documents</h2>
@@ -407,8 +402,6 @@ const selectAcademicYearSuggestion = (suggestion) => {
       </transition>
     </div>
   </div>
-
-  <MainFooter />
 </template>
 
 <style scoped>

@@ -62,17 +62,18 @@
 
 // Navigation links
 const links = ref([
-    { text: "Dashboard", icon: "🏠", route: `/moderator-dashboard?token=${token}` },
-    { text: "Subject", icon: "📚", route: `/subject?token=${token}` },
-    { text: "Search", icon: "🔍", route: `/search?token=${token}` },
-    { text: "Contributors", icon: "👥", route: `contributors?token=${token}` },
-    { text: "FAQ", icon: "❓", route: `/faq?token=${token}` },
-    { text: "Self Directed Learning", icon: "💡", route: `/self-learning?token=${token}` },
-    { text: "Upload Documents", icon: "📤", route: `/upload-documents?token=${token}` },
-    { text: "Moderate Documents", icon: "⚖️", route: `/moderate-documents?token=${token}` },
-    { text: "View Reported Documents", icon: "📜", route: `/view-reported-documents?token=${token}` },
-    { text: "Advanced Reports", icon: "📊", route: `/advanced-reports?token=${token}` }, // New link
-    { text: "System Matrix", icon: "🔧", route: `/system-matrix?token=${token}` }, // New link
+    { text: "Dashboard", icon: "🏠", route: `/admin-dashboard?token=${token}` },
+    { text: "Admin Panel", icon: "👮", route: `/admin-panel?token=${token}` }, // New Admin Panel link
+    { text: "Subject", icon: "📚", route: `/admin-subject?token=${token}` },
+    { text: "Search", icon: "🔍", route: `/admin-search?token=${token}` },
+    { text: "Contributors", icon: "👥", route: `/admin-contributors?token=${token}` },
+    { text: "FAQ", icon: "❓", route: `/admin-faq?token=${token}` },
+    { text: "Self Directed Learning", icon: "💡", route: `/admin-self-learning?token=${token}` },
+    { text: "Upload Documents", icon: "📤", route: `/admin-upload-documents?token=${token}` },
+    { text: "Moderate Documents", icon: "⚖️", route: `/admin-moderate-documents?token=${token}` },
+    { text: "View Reported Documents", icon: "📜", route: `/admin-view-reported-documents?token=${token}` },
+    { text: "Advanced Reports", icon: "📊", route: `/admin-advanced-reports?token=${token}` }, // New link
+    { text: "System Matrix", icon: "🔧", route: `/admin-system-matrix?token=${token}` }, // New link
     { text: "Logout", icon: "🚪", route: `/logout?token=${token}` },
 ]);
   
