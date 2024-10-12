@@ -1,46 +1,40 @@
 <template>
-    <div class="flex">
-      <div :class="['sidebar', { expanded: isExpanded }, 'bg-gradient-to-b from-[var(--color-teal-light)] to-[var(--color-blue-light)]']">
-        <!-- Toggle Button -->
-        <div class="toggle-btn" @click="toggleSidebar">
-          <i class="icon">{{ isExpanded ? '◀️' : '▶️' }}</i>
-        </div>
+    <div :class="['sidebar', { expanded: isExpanded }, 'bg-gradient-to-b from-[var(--color-teal-light)] to-[var(--color-blue-light)]']">
+      <!-- Toggle Button -->
+      <div class="toggle-btn" @click="toggleSidebar">
+        <i class="icon">{{ isExpanded ? '◀️' : '▶️' }}</i>
+      </div>
   
-        <!-- User Profile Section -->
-        <div class="user-profile">
-          <div class="flex items-center gap-2 p-4 hover:bg-gray-50">
-            <a href="#" @click.prevent="goToProfileUpdate" class="flex items-center">
-              <img :src="userAvatar || defaultAvatar" alt="User Avatar" class="w-10 h-10 rounded-full object-cover" />
+      <!-- Navigation -->
+      <nav>
+        <ul>
+          <li v-for="link in links" :key="link.text">
+            <router-link :to="link.route" class="nav-link">
+              <i class="icon">{{ link.icon }}</i>
+              <span v-if="isExpanded">{{ link.text }}</span>
+            </router-link>
+          </li>
+          <li>
+            <!-- Logout Link -->
+            <a href="#" @click="logout" class="nav-link">
+              <i class="icon">🚪</i>
+              <span v-if="isExpanded">Logout</span>
             </a>
-            <div v-if="isExpanded">
-              <p class="text-xs">
-                <strong class="block font-medium">
-                  {{ user.userName || 'Fetching first name...' }} {{ user.userLName || 'Fetching last name...' }}
-                </strong>
-                <span>{{ user.email || 'Fetching email...' }}</span>
-              </p>
-            </div>
-          </div>
-        </div>
+          </li>
+        </ul>
+      </nav>
   
-        <!-- Navigation -->
-        <nav>
-          <ul>
-            <li v-for="link in links" :key="link.text">
-              <router-link :to="link.route" class="nav-link">
-                <i class="icon">{{ link.icon }}</i>
-                <span v-if="isExpanded">{{ link.text }}</span>
-              </router-link>
-            </li>
-            <li>
-              <!-- Logout Link -->
-              <a href="#" @click="logout" class="nav-link">
-                <i class="icon">🚪</i>
-                <span v-if="isExpanded">Logout</span>
-              </a>
-            </li>
-          </ul>
-        </nav>
+      <!-- User Profile Section -->
+      <div class="user-profile">
+        <a href="#" class="flex items-center gap-2 p-4 hover:bg-gray-50">
+          <img :src="userAvatar || defaultAvatar" alt="User Avatar" class="w-10 h-10 rounded-full object-cover" />
+          <div v-if="isExpanded">
+            <p class="text-xs">
+              <strong class="block font-medium">{{ user.name || 'Guest User' }}</strong>
+              <span>{{ user.email || 'guest@example.com' }}</span>
+            </p>
+          </div>
+        </a>
       </div>
     </div>
   </template>
@@ -51,83 +45,73 @@
   import { useRouter } from 'vue-router';
   import defaultAvatar from '@/assets/images/profile.webp';
   
-  // Reactive references for user data, sidebar state, and avatar
-  const user = ref({ userName: '', userLName: '', email: '', role: '' }); // Added role
+  const user = ref({
+    firstName: "Firstname",
+    lastName: "Lastname",
+    email: '',
+    role: '' // Add role here
+  });
   const userAvatar = ref('');
   const isExpanded = ref(true);
   const router = useRouter();
+  const links = ref([]); // Initialize links
   
-  // Navigation links
-  const links = ref([]); // Start with an empty array
-  
-  // Method to toggle sidebar
   const toggleSidebar = () => {
     isExpanded.value = !isExpanded.value;
   };
   
-  // Navigate to the profile update page
-  const goToProfileUpdate = () => {
-    router.push('/update-profile');
-  };
-  
-  // Logout function
   const logout = () => {
-    localStorage.removeItem('token'); // Clear token
-    localStorage.removeItem('user'); // Clear user data
-    router.push('/login'); // Redirect to login page
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    router.push('/login');
   };
-  
-  // Function to fetch user info from API
-  const fetchUserFromAPI = async () => {
-    const token = localStorage.getItem('token'); // Get token from local storage
+ 
+  const fetchUserFromToken = async () => {
+    const token = new URLSearchParams(window.location.search).get('token');
   
     if (token) {
       try {
-        const { userId } = parseToken(token); // Decode token to get user ID
+        const userId = parseToken(token);
+        const apiUrl = `${import.meta.env.VITE_API_URL}/api/auth/user/${userId}`;
   
-        if (userId) {
-          const apiUrl = `${import.meta.env.VITE_API_URL}/api/v1/users/${userId}`; // Include user ID in the API URL
-  
-          // Fetch user data from API
-          const response = await axios.get(apiUrl, {
-            headers: { Authorization: `Bearer ${token}` } // Include token in headers
-          });
-  
-          // Update user object with fetched data
-          if (response.data) {
-            user.value.userName = response.data.userName;
-            user.value.userLName = response.data.userLName;
-            user.value.email = response.data.email;
-            user.value.role = response.data.role; // Set user role
-            getRandomAvatar(user.value.userName, user.value.userLName);
-  
+        const response = await axios.get(apiUrl, {
+          headers: {
+            Authorization: `Bearer ${token}`
           }
-          localStorage.setItem('user', JSON.stringify(response.data)); // Store user data
-        }
+        });
+  
+        user.value.name = `${response.data.firstname} ${response.data.lastname}`; 
+        user.value.email = response.data.email; 
+        user.value.role = response.data.role; // Store role
+        localStorage.setItem('user', JSON.stringify(response.data));
+        getRandomAvatar(user.value.name);
+        
       } catch (error) {
-        console.error('Error fetching user:', error);
+        // Handle error...
       }
+    } else {
+      // Handle missing token case...
     }
+   
   };
-  //navigation links based on user role
-    const role = user.value.role;
+  const role = user.value.role;
+  // Method to set navigation links based on user role
     if (role === 'admin') {
       links.value = [
         { text: "Dashboard", icon: "🏠", route: "/admin-dashboard" },
         { text: "Contributors", icon: "👥", route: "/contributors" },
       ];
-    } else if (role === 'educator') {
-      links.value = [
-        { text: "Dashboard", icon: "🏠", route: "/educator-dashboard" },
-        { text: "Contributors", icon: "📁", route: "/contributors" },
-      ];
     } else if (role === 'moderator') {
       links.value = [
         { text: "Dashboard", icon: "🏠", route: "/moderator-dashboard" },
-        { text: "Contributors", icon: "📁", route: "/contributors" },
+        { text: "Contributors", icon: "👥", route: "/contributors" },
       ];
-    }
-    else {
+    } else if (role === 'educator') {
+      links.value = [
+        { text: "Dashboard", icon: "🏠", route: "/educator-dashboard" },
+        { text: "Contributors", icon: "👥", route: "/contributors" },
+      ];
+    } else {
       links.value = [
         { text: "Dashboard", icon: "🏠", route: "/user-dashboard" },
         { text: "Contributors", icon: "👥", route: "/contributors" },
@@ -135,44 +119,40 @@
     }
 
   
-  // Function to get a random avatar
-  const getRandomAvatar = (userName, userLName) => {
-    const initials = `${userName.charAt(0).toUpperCase()}${userLName.charAt(0).toUpperCase()}`;
+  const getRandomAvatar = (name) => {
+    const initials = name
+      .split(' ')
+      .map((word) => word.charAt(0).toUpperCase())
+      .join('');
     userAvatar.value = `https://ui-avatars.com/api/?name=${initials}&size=285&background=random`;
   };
   
-  // Function to decode token and extract user info
   const parseToken = (token) => {
     try {
       const decoded = JSON.parse(atob(token.split('.')[1]));
-  
-      // Return userId
-      return {
-        userId: decoded.user_id || decoded.sub || decoded.id, // Adjust this based on your token's structure
-      };
-    } catch {
-      return { userId: null }; // Return null if there's an error
+      return decoded.user_id; 
+    } catch (error) {
+      return null;
     }
   };
   
-  // Lifecycle hook to fetch user data
   onMounted(() => {
-    fetchUserFromAPI(); // Fetch user data when component is mounted
+    fetchUserFromToken();
   });
   </script>
   
   <style scoped>
-  :root {
+   :root {
     --color-teal-light: #81e6d9;
     --color-blue-light: #ebf8ff;
   }
   
   .sidebar {
-    position: absolute; /* Changed to absolute positioning */
-    top: 65px; /* Adjust based on the height of the navbar */
+    position: relative;
+    top: 0;
     left: 0;
     width: 60px;
-    height: calc(100vh - 60px); /* Full height minus navbar height */
+    height: 100vh;
     transition: width 0.3s ease;
     overflow-x: hidden;
     display: block;
@@ -240,34 +220,32 @@
   }
   
   .user-profile {
+    position: absolute;
+    bottom: 0;
     width: 100%;
-    background-color: white; /* Optional: You can add a background color for better visibility */
   }
   
   .user-profile a {
     display: flex;
     align-items: center;
-    padding: 12px;
-    transition: background-color 0.3s ease; /* Add transition for background color */
-  }
-  
-  .user-profile a:hover {
-    background-color: rgba(200, 200, 200, 0.3); /* Change background color on hover */
+    padding: 10px;
+    background-color: white;
+    border-top: 1px solid #ddd;
   }
   
   .user-profile img {
     margin-right: 10px;
-    transition: transform 0.3s ease; /* Add transition for scaling effect */
   }
   
-  .user-profile a:hover img {
-    transform: scale(1.1); /* Scale up the image on hover */
+  .sticky {
+    position: sticky;
   }
   
-  @media (max-width: 1023px) {
+  @media (max-width: 1023px) { /* Hide sidebar on mobile */
     .sidebar {
       display: none;
     }
   }
   </style>
   
+ 
