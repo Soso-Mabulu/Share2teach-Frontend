@@ -94,35 +94,32 @@
     }],
     }));
     
-  onMounted(async () => {
-    // Fetch analytics data
-    // Replace with actual API call
-    analytics.value = {
-      totalDocuments: 1000,
-      approvedDocuments: 800,
-      deniedDocuments: 50,
-      reportedComments: 25,
-      avgDocumentRating: 4.2,
-      avgFaqRating: 4.5,
-    };
-  
-    // Fetch system metrics
-    // Replace with actual API call
-    systemMetrics.value = {
-      cpuUsage: 65,
-      memoryUsage: 70,
-      diskUsage: 55,
-      networkTraffic: 80,
-    };
-  
-    // Fetch logs
-    // Replace with actual API call
-    logs.value = [
-      { timestamp: '2023-05-01 10:30:15', message: 'User authentication failed' },
-      { timestamp: '2023-05-01 10:31:22', message: 'Document upload successful' },
-      { timestamp: '2023-05-01 10:32:45', message: 'System backup completed' },
-    ];
-  });
+    onMounted(async () => {
+    try {
+        // Fetch analytics data (if needed, you can remove this if it's not required)
+        analytics.value = {
+            totalDocuments: 1000,
+            approvedDocuments: 800,
+            deniedDocuments: 50,
+            reportedComments: 25,
+            avgDocumentRating: 4.2,
+            avgFaqRating: 4.5,
+        };
+
+        // Fetch system metrics from the Cloud Run endpoint
+        const responseMetrics = await fetch('https://systemmetrics-494405022119.us-central1.run.app/system-metrics');
+        if (!responseMetrics.ok) throw new Error('Failed to fetch system metrics');
+        systemMetrics.value = await responseMetrics.json();
+
+        // Fetch logs from the Cloud Run endpoint
+        const responseLogs = await fetch('https://systemmetrics-494405022119.us-central1.run.app/recent-logs');
+        if (!responseLogs.ok) throw new Error('Failed to fetch logs');
+        logs.value = await responseLogs.json();
+    } catch (error) {
+        console.error('Error fetching data:', error);
+    }
+});
+
   
   const formatTitle = (key) => {
     return key.replace(/([A-Z])/g, ' $1').replace(/^./, (str) => str.toUpperCase());
