@@ -101,6 +101,14 @@ const isValidAcademicYear = (year) => {
 };
 
 const uploadDocuments = async () => {
+  // Validate all required fields
+  if (!title.value || !module.value || !description.value || !university.value || !category.value || !academicYear.value) {
+    showToast.value = true;
+    toastMessage.value = 'Please fill in all required fields.';
+    toastType.value = 'error';
+    return;
+  }
+
   if (!isValidAcademicYear(academicYear.value)) {
     showToast.value = true;
     toastMessage.value = 'Please enter a valid academic year (YYYY).';
@@ -108,19 +116,35 @@ const uploadDocuments = async () => {
     return;
   }
 
-  const formData = new FormData();
-  
-  if (files.value && files.value.length > 0) {
-    for (let i = 0; i < files.value.length; i++) {
-      formData.append('files', files.value[i]);
-    }
-  } else {
+  if (!files.value || files.value.length === 0) {
     showToast.value = true;
     toastMessage.value = 'Please select files to upload.';
     toastType.value = 'error';
     return;
   }
-  
+
+  const allowedFileTypes = [
+    'application/pdf',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    'application/vnd.openxmlformats-officedocument.presentationml.presentation'
+  ];
+
+  for (let i = 0; i < files.value.length; i++) {
+    if (!allowedFileTypes.includes(files.value[i].type)) {
+      showToast.value = true;
+      toastMessage.value = 'Unsupported file type. Only PDF, DOCX, XLSX, and PPTX are allowed.';
+      toastType.value = 'error';
+      return;
+    }
+  }
+
+  const formData = new FormData();
+
+  for (let i = 0; i < files.value.length; i++) {
+    formData.append('files', files.value[i]);
+  }
+
   formData.append('title', title.value);
   formData.append('module', module.value);
   formData.append('description', description.value);
@@ -129,16 +153,24 @@ const uploadDocuments = async () => {
   formData.append('academicYear', academicYear.value);
 
   try {
-    isUploading.value = true;    
-    const urlParams = new URLSearchParams(window.location.search);
-    const token = urlParams.get('token');
+    isUploading.value = true;
+
+    const token = localStorage.getItem('token');
+    if (!token) {
+      throw new Error('Authorization token not found');
+    }
+
+    // Add token to form data to send to the backend
+    formData.append('token', token);
+
     const headers = { Authorization: `Bearer ${token}` };
 
     const response = await axios.post(`${import.meta.env.VITE_API_URL}api/v1/upload`, formData, { headers });
 
     if (response.status === 200) {
+      const uploadedUrls = response.data.results.map(result => result.url);
       showToast.value = true;
-      toastMessage.value = 'Documents uploaded successfully!';
+      toastMessage.value = `Documents uploaded successfully! ${uploadedUrls.join(', ')}`;
       toastType.value = 'success';
       resetForm();
       router.push('/dashboard');
@@ -148,12 +180,15 @@ const uploadDocuments = async () => {
   } catch (error) {
     console.error('Upload failed:', error);
     showToast.value = true;
-    toastMessage.value = 'Failed to upload documents. Please try again.';
+    toastMessage.value = error.message || 'Failed to upload documents. Please try again.';
     toastType.value = 'error';
   } finally {
     isUploading.value = false;
   }
 };
+
+
+
 
 // Function to reset form fields after successful upload
 const resetForm = () => {
