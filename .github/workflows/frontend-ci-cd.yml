@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-      - developer # Update this with your development branch name
+      - Developer
 
 jobs:
   build:
@@ -19,7 +19,7 @@ jobs:
         with:
           node-version: '16'
 
-      - name: Install dependencies 
+      - name: Install dependencies
         working-directory: .
         run: npm install
 
@@ -43,13 +43,21 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          version: 'latest'
+
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
 
       - name: Set GCP Project
-        run: gcloud config set project share2teach  # Update this with your project ID
+        run: gcloud config set project share2teach
 
       - name: Deploy to Cloud Run (Development)
         run: |
@@ -67,20 +75,25 @@ jobs:
     steps:
       - name: Manual approval for Production
         run: echo "Production deployment approval required."
-  
+
   deploy-production:
     needs: approve-production
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
 
     steps:
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          version: 'latest'
+
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
 
       - name: Set GCP Project
-        run: gcloud config set project share2teach  # Update this with your project ID
+        run: gcloud config set project share2teach
 
       - name: Deploy to Cloud Run (Production)
         run: |
