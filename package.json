@@ -18,6 +18,7 @@
     "@tato30/vue-pdf": "^1.11.1",
     "@vue-pdf-viewer/viewer": "^1.4.0",
     "axios": "^1.7.7",
+    "pdf-lib": "^1.17.1",
     "pdfjs-dist": "^4.6.82",
     "vue": "^3.4.29",
     "vue-router": "^4.3.3",

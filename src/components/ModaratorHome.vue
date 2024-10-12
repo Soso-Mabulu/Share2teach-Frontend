@@ -1,16 +1,10 @@
 <template>
-  <div :class="['User-dashboard', { 'dark-mode': isDarkMode }]">
-    <h1 class="dashboard-title">User Dashboard</h1>
+  <div :class="['moderator-dashboard', { 'dark-mode': isDarkMode }]">
+    <h1 class="dashboard-title">Moderator Dashboard</h1>
 
     <div class="search-filter-container">
       <div class="search-bar-wrapper">
-        <input 
-          type="text" 
-          v-model="searchQuery" 
-          placeholder="Search documents..." 
-          class="search-bar"
-          @keyup.enter="handleSearch" 
-        />
+        <input type="text" v-model="searchQuery" placeholder="Search documents..." class="search-bar" />
         <i class="fas fa-search search-icon"></i>
       </div>
       <div class="filter-options">
@@ -22,13 +16,12 @@
       </div>
     </div>
 
-    <!-- Only approved documents section -->
-    <div class="document-section">
-      <h2 class="section-title">High Rated Documents</h2>
+    <div v-for="sectionName in ['pending', 'approved']" :key="sectionName" class="document-section">
+      <h2 class="section-title">{{ getSectionTitle(sectionName) }}</h2>
       <div class="documents-container">
         <div class="documents-grid">
           <div 
-            v-for="(document, index) in limitedDocuments.approved" 
+            v-for="(document, index) in limitedDocuments[sectionName]" 
             :key="index" 
             class="document-card"
             @click="showPreview(document)"
@@ -42,7 +35,7 @@
           </div>
         </div>
       </div>
-      <button class="view-all-btn">View All Approved Documents</button>
+      <button class="view-all-btn"  @click="viewAllDocuments(sectionName)">View All {{ sectionName }} Documents</button>
     </div>
 
     <!-- Preview Modal -->
@@ -70,11 +63,12 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
+import { useRouter } from 'vue-router'; // Import the router
 import axios from 'axios';
 import defaultImage from '@/assets/documentIcon.png';
 
 const documents = ref({
+  pending: [],
   approved: [],
 });
 
@@ -84,21 +78,39 @@ const showModal = ref(false);
 const currentDocument = ref(null);
 const currentDocumentPreviewImages = ref([]);
 const currentImageIndex = ref(0);
-const router = useRouter();
+const router = useRouter(); // Initialize router
 
 onMounted(() => {
+  console.log('Component mounted, fetching documents...');
   fetchDocuments();
 });
 
-const limitedDocuments = computed(() => {
-  return {
-    approved: documents.value.approved.slice(0, 4),
-  };
+const filteredDocuments = computed(() => {
+  const filtered = { pending: [], approved: [] };
+  for (const key in documents.value) {
+    filtered[key] = documents.value[key].filter(document => 
+      document.title.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+      document.description.toLowerCase().includes(searchQuery.value.toLowerCase())
+    );
+  }
+  return filtered;
 });
 
-const currentPreviewImage = computed(() => {
-  return currentDocumentPreviewImages.value[currentImageIndex.value] || defaultImage;
+const limitedDocuments = computed(() => {
+  const limited = { pending: [], approved: [] };
+  for (const key in filteredDocuments.value) {
+    limited[key] = filteredDocuments.value[key].slice(0, 4);
+  }
+  return limited;
 });
+
+function viewAllDocuments(sectionName) {
+  if (sectionName === 'pending') {
+    router.push({ name: 'PendingDocuments' });
+  } else if (sectionName === 'approved') {
+    router.push({ name: 'ApprovedDocuments' });
+  }
+}
 
 async function fetchDocuments() {
   try {
@@ -106,8 +118,12 @@ async function fetchDocuments() {
     const token = urlParams.get('token');
     const headers = { Authorization: `Bearer ${token}` };
 
+    const pendingResponse = await axios.get(`${import.meta.env.VITE_API_URL}api/v1/documents/pending`, { headers });
     const approvedResponse = await axios.get(`${import.meta.env.VITE_API_URL}api/v1/documents/approved`, { headers });
+
+    documents.value.pending = mapDocuments(pendingResponse.data.documents);
     documents.value.approved = mapDocuments(approvedResponse.data.documents);
+
   } catch (error) {
     console.error('Failed to fetch documents:', error.message);
   }
@@ -120,7 +136,7 @@ function mapDocuments(docs) {
     description: doc.description || 'No description available',
     author: doc.author || 'Unknown Author',
     light_preview_url: doc.light_preview_url || '',
-    download_url: doc.download_url || '',
+    download_url: doc.location || '',
   }));
 }
 
@@ -130,13 +146,19 @@ function showPreview(document) {
   currentImageIndex.value = 0;
   showModal.value = true;
 }
-
+const currentPreviewImage = computed(() => {
+    return currentDocumentPreviewImages.value[currentImageIndex.value] || defaultImage;
+  });
 function closePreview() {
   showModal.value = false;
 }
 
 function toggleDarkMode() {
   document.body.classList.toggle('dark-mode', isDarkMode.value);
+}
+
+function getSectionTitle(section) {
+  return section.charAt(0).toUpperCase() + section.slice(1) + ' Documents';
 }
 
 function nextImage() {
@@ -146,16 +168,11 @@ function nextImage() {
 function prevImage() {
   currentImageIndex.value = (currentImageIndex.value - 1 + currentDocumentPreviewImages.value.length) % currentDocumentPreviewImages.value.length;
 }
-
-function handleSearch() {
-  if (searchQuery.value) {
-    router.push({ name: 'search-results', query: { term: searchQuery.value } });
-  }
-}
 </script>
 
+
 <style scoped>
-.User-dashboard {
+.moderator-dashboard {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   padding: 20px;
   color: #333;
