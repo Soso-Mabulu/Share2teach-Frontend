@@ -93,7 +93,7 @@
     if (token) {
       try {
         const userId = parseToken(token); // Decode token and extract user ID
-        const apiUrl = `${import.meta.env.VITE_API_URL}api/v1/auth/users/${userId}`; // Updated endpoint
+        const apiUrl = `${import.meta.env.VITE_API_URL}api/v1/users/${userId}`; // Updated endpoint
   
         // Fetch user data from the API
         const response = await axios.get(apiUrl, {

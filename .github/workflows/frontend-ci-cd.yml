@@ -1,0 +1,91 @@
+name: Frontend CI/CD
+
+on:
+  push:
+    branches:
+      - main
+      - Developer
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+
+      - name: Install dependencies
+        working-directory: .
+        run: npm install
+
+      - name: Build Vue.js application
+        working-directory: .
+        run: npm run build
+
+      - name: Log in to Docker Hub
+        run: echo "${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
+
+      - name: Build Docker image
+        run: |
+          docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/share2teach-frontend:${{ github.sha }} \
+          -f ../Dockerfile .
+
+      - name: Push Docker image to Docker Hub
+        run: docker push ${{ secrets.DOCKER_HUB_USERNAME }}/share2teach-frontend:${{ github.sha }}
+
+  deploy-dev:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Set GCP Project
+        run: gcloud config set project share2teach  # Update this with your project ID
+
+      - name: Deploy to Cloud Run (Development)
+        run: |
+          gcloud run deploy frontend-dev \
+          --image ${{ secrets.DOCKER_HUB_USERNAME }}/share2teach-frontend:${{ github.sha }} \
+          --region ${{ secrets.GCP_REGION }} \
+          --allow-unauthenticated \
+          --port 8080  # Ensure it listens on the correct port
+
+  approve-production:
+    needs: deploy-dev
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Manual approval for Production
+        run: echo "Production deployment approval required."
+  
+  deploy-production:
+    needs: approve-production
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Set GCP Project
+        run: gcloud config set project share2teach  # Update this with your project ID
+
+      - name: Deploy to Cloud Run (Production)
+        run: |
+          gcloud run deploy frontend \
+          --image ${{ secrets.DOCKER_HUB_USERNAME }}/share2teach-frontend:${{ github.sha }} \
+          --region ${{ secrets.GCP_REGION }} \
+          --allow-unauthenticated \
+          --port 8080  # Ensure it listens on the correct port
