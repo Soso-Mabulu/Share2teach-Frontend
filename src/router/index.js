@@ -184,7 +184,7 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
 
-    // Admin routes
+    // Admin routess
     {
       path: '/admin-dashboard',
       name: 'AdminDashboardView',
