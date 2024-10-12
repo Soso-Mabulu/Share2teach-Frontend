@@ -10,6 +10,7 @@ import SearchResultsView from '@/views/SearchResultsView.vue';
 import AllDocuments from '@/views/AllDocuments.vue';
 
 
+
 // Moderator views  
 import ModeratorDashboardView from '@/views/ModeratorDashboardView.vue';
 import ModeratorViewReportedView from '@/views/Moderator-ViewReportedView.vue';
@@ -30,6 +31,7 @@ import EducatorSelfDirectedView from '@/views/Educator-SelfDirectedLearningView.
 import EducatorUpload from '@/views/Educator-Upload.vue';
 import EducatorFAQView from '@/views/Educator-FAQView.vue';
 import EducatorAllApprovedDocumentsView from '@/views/EducatorAllApproved-DocumentsView.vue';
+
 
 // Admin views
 import AdminViewReportedView from '@/views/Admin-ViewReportedView.vue';
@@ -234,17 +236,23 @@ const router = createRouter({
       name: 'AdminMaintainDocuments',
       component: AdminMaintainDocuments
     },
-
     // Educator routes
     {
       path: '/educator-dashboard',
       name: 'EducatorDashboardView',
       component: EducatorDashboardView,
     },
+    
+    
     {
       path: '/educator-subject',
       name: 'EducatorSubjectView',
       component: EducatorSubjectView,
+    },
+    {
+      path: '/educator-search',
+      name: 'SearchResultsView',
+      component: SearchResultsView,
     },
     {
       path: '/educator-contributors',

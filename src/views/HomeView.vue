@@ -6,6 +6,8 @@ import LandingFeatures from '@/components/LandingFeatures.vue'
 import RecentUploadedDocuments from '@/components/RecentUploadedDocuments.vue'
 import LandingFAQ from '@/components/LandingFAQ.vue'
 import LandingFooter from '@/components/LandingFooter.vue'
+import LandingContactUs from '@/components/LandingContactUs.vue' // Import the LandingContactUs component
+import LandingService from '@/components/LandingService.vue' // Import the LandingService component
 </script>
 
 <template>
@@ -20,6 +22,8 @@ import LandingFooter from '@/components/LandingFooter.vue'
       <RecentUploadedDocuments />
       <LandingFeatures />
       <LandingFAQ />
+      <LandingService /> <!-- Added LandingService component -->
+      <LandingContactUs /> <!-- Added LandingContactUs component -->
     </main>
 
     <!-- Footer component -->
@@ -28,5 +32,5 @@ import LandingFooter from '@/components/LandingFooter.vue'
 </template>
 
 <style scoped>
-/* Add additional global styles here if needed */
+
 </style>

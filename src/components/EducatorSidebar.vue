@@ -68,7 +68,8 @@
     { text: "Contributors", icon: "👥", route: `/educator-contributors?token=${token}` },
     { text: "FAQ", icon: "❓", route: `/educator-faq?token=${token}` },
     { text: "Self Directed Learning", icon: "💡", route: `/educator-self-learning?token=${token}` },
-    { text: "Upload Documents", icon: "📤", route: `/educator-upload?token=${token}` }, // New link
+    { text: "Upload Documents", icon: "📤", route: `/educator-upload?token=${token}` }, 
+    { text: "Contact Us", icon: "📞", route: `/educator-contact?token=${token}` }, 
     { text: "Logout", icon: "🚪", route: `/login` },
   ]);
   

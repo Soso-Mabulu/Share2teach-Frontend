@@ -15,6 +15,8 @@
         </div>
       </div>
     </div>
+
+    <MainFooter /> <!-- Footer at the bottom -->
   </div>
 </template>
 
@@ -22,6 +24,7 @@
 import FetchFAQ from '@/components/FetchFAQ.vue';
 import EducatorSideBar from '@/components/EducatorSidebar.vue'; // Import EducatorSideBar
 import EducatorNavBar from '@/components/EducatorNavbar.vue'; // Import EducatorNavBar
+import MainFooter from '@/components/MainFooter.vue'; // Import MainFooter
 
 export default {
   name: 'FAQView',
@@ -29,11 +32,11 @@ export default {
     FetchFAQ,
     EducatorSideBar,
     EducatorNavBar,
+    MainFooter, // Register the MainFooter component
   },
 };
 </script>
 
 <style scoped>
-
-
+/* Add any additional styling if needed */
 </style>
