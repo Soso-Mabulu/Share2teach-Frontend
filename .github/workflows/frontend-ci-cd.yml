@@ -61,7 +61,7 @@ jobs:
 
       - name: Deploy to Cloud Run (Development)
         run: |
-          gcloud run deploy frontend-dev \
+          gcloud run deploy share2teach-frontend-dev \
           --image ${{ secrets.DOCKER_HUB_USERNAME }}/share2teach-frontend:${{ github.sha }} \
           --region ${{ secrets.GCP_REGION }} \
           --allow-unauthenticated \
@@ -97,7 +97,7 @@ jobs:
 
       - name: Deploy to Cloud Run (Production)
         run: |
-          gcloud run deploy frontend \
+          gcloud run deploy share2teach-frontend \
           --image ${{ secrets.DOCKER_HUB_USERNAME }}/share2teach-frontend:${{ github.sha }} \
           --region ${{ secrets.GCP_REGION }} \
           --allow-unauthenticated \
