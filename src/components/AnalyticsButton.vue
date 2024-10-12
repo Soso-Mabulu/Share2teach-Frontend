@@ -1,6 +1,7 @@
+<!-- ButtonComponent.vue -->
 <template>
   <div class="button-container">
-    <button class="view-all" @click="emitToggleResults">
+    <button class="view-all" @click="navigateToDetailView">
       {{ buttonLabel }}
     </button>
   </div>
@@ -19,8 +20,12 @@ export default {
     },
   },
   methods: {
-    emitToggleResults() {
-      this.$emit('toggle-results', this.endpoint); // Emit endpoint to the parent
+    navigateToDetailView() {
+      // Navigate to the detailed view with the endpoint as a query parameter
+      this.$router.push({
+        name: "DetailedView",
+        query: { endpoint: this.endpoint },
+      });
     },
   },
 };
