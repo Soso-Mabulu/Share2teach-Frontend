@@ -42,6 +42,8 @@ import AdminSubjectView from '@/views/Admin-SubjectView.vue';
 import AdminSelfDirectedlearningView from '@/views/Admin-SelfDirectedlearningView.vue';
 import AdminPanelView from '@/views/AdminPanelView.vue';
 import AdminMaintainUsersView from '@/views/Admin-MaintainUsersView.vue';
+import AdminMaintainFAQ from '@/views/Admin-MaintainFAQ.vue';
+import AdminMaintainDocuments from '@/views/Admin-MaintainDocuments.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -226,6 +228,16 @@ const router = createRouter({
       path: '/admin-maintain-users',
       name: 'AdminMaintainUsersView',
       component: AdminMaintainUsersView,
+    },
+    {
+      path: '/admin-maintain-faq',
+      name: 'AdminMaintainFAQ',
+      component: AdminMaintainFAQ,
+    },
+    {
+      path: '/admin-maintain-documents',
+      name: 'AdminMaintainDocuments',
+      component: AdminMaintainDocuments
     },
 
     // Educator routes

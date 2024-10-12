@@ -29,7 +29,7 @@
         <h2 class="section-title">Quick Links</h2>
         <div class="links-grid">
           <button @click="navigateTo('faqs')" class="quick-link-btn">Maintain FAQs</button>
-          <button @click="navigateTo('upload')" class="quick-link-btn">Upload Documents</button>
+          <button @click="navigateTo('upload')" class="quick-link-btn">Maintain Documents</button>
           <button @click="navigateTo('users')" class="quick-link-btn">Maintain Users</button>
         </div>
       </div>
@@ -145,7 +145,14 @@
     // Assuming Vue Router is properly configured
     if (route === 'users') {
         router.push('/admin-maintain-users'); // This will navigate to the Maintain Users page
-    } else {
+    } 
+    else if (route === 'upload') {
+        router.push('/admin-maintain-documents'); // This will navigate to the Upload Documents page
+    } 
+    else if (route === 'faqs') {
+        router.push('/admin-maintain-faq'); // This will navigate to the Maintain FAQs page
+    }
+    else {
         console.log(`Navigating to ${route}`);
     }
   };
