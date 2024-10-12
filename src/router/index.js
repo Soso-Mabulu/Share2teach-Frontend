@@ -17,9 +17,14 @@ import SubjectView from '@/views/SubjectView.vue'
 import SelfDirectedlearningView from '@/views/SelfDirectedlearningView.vue';
 import AllDocuments from '@/views/AllDocuments.vue'; // Adjust the path as necessary
 import FAQView from '@/views/FAQView.vue';
-
 import ViewReportedView from '@/views/ViewReportedView.vue';
 import ContributorsView from '@/views/ContributorsView.vue';
+import EducatorDashboardView from '@/views/EducatorDashboardView.vue';
+import AllApprovedDocumentsView from '@/views/AllApprovedDocumentsView.vue';
+import EducatorSubjectView from '@/views/EducatorSubjectView.vue';
+import EducatorContributorView from '@/views/EducatorContributorView.vue';
+import EducatorSelfDirectedView from '@/views/EducatorSelfDirectedView.vue';
+import EducatorUpload from '@/components/EducatorUpload.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -81,14 +86,14 @@ const router = createRouter({
       component: ModeratorDashboardView
     },
     {
-      path: '/faq',
-      name: 'FAQView',
-      component: FAQView,
-    }, 
+      path: '/educator-dashboard',
+      name: 'EducatorDashboardView',
+      component: EducatorDashboardView,
+    },
     {
-      path: '/upload-documents',
-      name: 'UploadDocuments',
-      component: UploadDocuments,
+      path: '/approved-documents',
+      name: 'AllApprovedDocumentsView',
+      component: AllApprovedDocumentsView
     },
     {
       path: '/update-profile',
@@ -111,11 +116,6 @@ const router = createRouter({
       component: ModerateDocumentsView
     },
     {
-      path: '/subject',
-      name: 'SubjectView',
-      component: SubjectView
-    },
-    {
       path: '/self-learning',
       name: 'SelfDirectedlearningView',
       component: SelfDirectedlearningView
@@ -134,7 +134,12 @@ const router = createRouter({
       path: '/all-documents',
       name: 'AllDocuments',
       component: AllDocuments,
-    },    
+    },  
+    {
+      path: '/faq',
+      name: 'FAQView',
+      component: FAQView,
+    },
   ],
 });
 

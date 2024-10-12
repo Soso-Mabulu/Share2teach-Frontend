@@ -7,7 +7,7 @@ const isMenuOpen = ref(false);
 
 // Navbar links
 const links = [
-  { text: "Dashboard", icon: "🏠", route: "/dashboard" },
+  { text: "Dashboard", icon: "🏠", route:`/dashboard`},
   { text: "Contributors", icon: "👥", route: "/contributors" },
   { text: "Logout", icon: "🚪", route: "/logout" },
 ];

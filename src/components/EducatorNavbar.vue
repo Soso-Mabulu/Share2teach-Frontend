@@ -10,7 +10,7 @@ const token = localStorage.getItem('token');
 
 // Navigation links
 const links = ref([
-    { text: "Dashboard", icon: "🏠", route: `/moderator-dashboard?token=${token}` },
+    { text: "Dashboard", icon: "🏠", route: `/educator-dashboard?token=${token}` },
     { text: "Subject", icon: "📚", route: `/subject?token=${token}` },
     { text: "Search", icon: "🔍", route: `/search?token=${token}` },
     { text: "Contributors", icon: "👥", route: `contributors?token=${token}` },
