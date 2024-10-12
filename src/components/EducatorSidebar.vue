@@ -63,12 +63,12 @@
   // Navigation links
   const links = ref([
     { text: "Dashboard", icon: "🏠", route: `/educator-dashboard?token=${token}` },
-    { text: "Subject", icon: "📚", route: `/subject?token=${token}` },
-    { text: "Search", icon: "🔍", route: `/search?token=${token}` },
-    { text: "Contributors", icon: "👥", route: `contributors?token=${token}` },
-    { text: "FAQ", icon: "❓", route: `/faq?token=${token}` },
-    { text: "Self Directed Learning", icon: "💡", route: `/self-learning?token=${token}` },
-    { text: "Upload Documents", icon: "📤", route: `/upload-documents?token=${token}` }, // New link
+    { text: "Subject", icon: "📚", route: `/educator-subject?token=${token}` },
+    { text: "Search", icon: "🔍", route: `/educator-search?token=${token}` },
+    { text: "Contributors", icon: "👥", route: `/educator-contributors?token=${token}` },
+    { text: "FAQ", icon: "❓", route: `/educator-faq?token=${token}` },
+    { text: "Self Directed Learning", icon: "💡", route: `/educator-self-learning?token=${token}` },
+    { text: "Upload Documents", icon: "📤", route: `/educator-upload?token=${token}` }, // New link
     { text: "Logout", icon: "🚪", route: `/login` },
   ]);
   

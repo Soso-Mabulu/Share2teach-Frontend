@@ -23,13 +23,13 @@ import ModeratorSelfDirectedlearningView from '@/views/Moderator-SelfDirectedlea
 import ModeratorAllApprovedDocumentsView from '@/views/Moderator-ViewAllDocumentsView.vue';
 
 // Educator views
-import EducatorDashboardView from '@/views/EducatorDashboardView.vue';
-import EducatorSubjectView from '@/views/EducatorSubjectView.vue';
-import EducatorContributorView from '@/views/EducatorContributorView.vue';
-import EducatorSelfDirectedView from '@/views/EducatorSelfDirectedView.vue';
-import EducatorUpload from '@/components/EducatorUpload.vue';
-import EducatorFAQView from '@/views/EducatorFAQView.vue';
-import EducatorAllApprovedDocumentsView from '@/views/EducatorAllApprovedDocumentsView.vue';
+import EducatorDashboardView from '@/views/Educator-DashboardView.vue';
+import EducatorSubjectView from '@/views/Educator-SubjectView.vue';
+import EducatorContributorView from '@/views/Educator-ContributorView.vue';
+import EducatorSelfDirectedView from '@/views/Educator-SelfDirectedLearningView.vue';
+import EducatorUpload from '@/views/Educator-Upload.vue';
+import EducatorFAQView from '@/views/Educator-FAQView.vue';
+import EducatorAllApprovedDocumentsView from '@/views/EducatorAllApproved-DocumentsView.vue';
 
 // Admin views
 import AdminViewReportedView from '@/views/Admin-ViewReportedView.vue';
@@ -247,7 +247,7 @@ const router = createRouter({
       component: EducatorSubjectView,
     },
     {
-      path: '/educator-contributor',
+      path: '/educator-contributors',
       name: 'EducatorContributorView',
       component: EducatorContributorView,
     },
@@ -257,7 +257,7 @@ const router = createRouter({
       component: EducatorSelfDirectedView,
     },
     {
-      path: '/faq',
+      path: '/educator-faq',
       name: 'EducatorFAQView',
       component: EducatorFAQView,
     },
