@@ -29,6 +29,12 @@
               <span v-if="isExpanded">{{ link.text }}</span>
             </router-link>
           </li>
+          <li>
+            <a href="#" class="nav-link" @click.prevent="logout">
+              <i class="icon">🚪</i>
+              <span v-if="isExpanded">Logout</span>
+            </a>
+          </li>
         </ul>
       </nav>
   
@@ -39,6 +45,10 @@
   <script setup>
   import { ref, onMounted } from 'vue';
   import axios from 'axios';
+  import { useRouter } from 'vue-router'; // Import the useRouter composable for navigation
+
+  const router = useRouter(); // Initialize the router
+  
   
   // Default avatar image
   import defaultAvatar from '@/assets/images/profile.webp';
@@ -73,7 +83,6 @@ const links = ref([
     { text: "View Reported Documents", icon: "📜", route: `/admin-view-reported-documents?token=${token}` },
     { text: "Advanced Reports", icon: "📊", route: `/admin-advanced-reports?token=${token}` }, // New link
     { text: "System Matrix", icon: "🔧", route: `/admin-system-matrix?token=${token}` }, // New link
-    { text: "Logout", icon: "🚪", route: `/logout?token=${token}` },
 ]);
   
   // Method to toggle sidebar
@@ -143,10 +152,35 @@ const links = ref([
       return null; // Return null if there's an error
     }
   };
+
+  // Logout function
+  const logout = async () => {
+    const apiUrl = `${import.meta.env.VITE_API_URL}api/v1/auth/logout`;
+    
+    try {
+      await axios.post(apiUrl, {}, {
+        headers: {
+          Authorization: `Bearer ${token}` // Include the token in the request headers
+        }
+      });
+      
+      // Clear user data and token from localStorage
+      localStorage.removeItem('user');
+      localStorage.removeItem('token');
+
+      // Redirect to the landing page
+      router.push('/'); // Change '/landing-page' to your actual landing page route
+    } catch (error) {
+      console.error("Error logging out:", error);
+    }
+  };
+
   
   onMounted(() => {
     fetchUserFromToken(); 
   });
+
+
   </script>
   
   

@@ -29,6 +29,12 @@
               <span v-if="isExpanded">{{ link.text }}</span>
             </router-link>
           </li>
+          <li>
+            <a href="#" class="nav-link" @click.prevent="logout">
+              <i class="icon">🚪</i>
+              <span v-if="isExpanded">Logout</span>
+            </a>
+          </li>
         </ul>
       </nav>
   
@@ -39,6 +45,10 @@
   <script setup>
   import { ref, onMounted } from 'vue';
   import axios from 'axios';
+  import { useRouter } from 'vue-router'; // Import the useRouter composable for navigation
+
+  const router = useRouter(); // Initialize the router
+  
   
   // Default avatar image
   import defaultAvatar from '@/assets/images/profile.webp';
@@ -68,9 +78,7 @@
     { text: "Contributors", icon: "👥", route: `/educator-contributors?token=${token}` },
     { text: "FAQ", icon: "❓", route: `/educator-faq?token=${token}` },
     { text: "Self Directed Learning", icon: "💡", route: `/educator-self-learning?token=${token}` },
-    { text: "Upload Documents", icon: "📤", route: `/educator-upload?token=${token}` }, 
-    { text: "Contact Us", icon: "📞", route: `/educator-contact?token=${token}` }, 
-    { text: "Logout", icon: "🚪", route: `/login` },
+    { text: "Upload Documents", icon: "📤", route: `/educator-upload?token=${token}` }, // New link
   ]);
   
   // Method to toggle sidebar
@@ -85,7 +93,7 @@
     if (token) {
       try {
         const userId = parseToken(token); // Decode token and extract user ID
-        const apiUrl = `${import.meta.env.VITE_API_URL}api/v1/auth/users/${userId}`; // Updated endpoint
+        const apiUrl = `${import.meta.env.VITE_API_URL}api/v1/users/${userId}`; // Updated endpoint
   
         // Fetch user data from the API
         const response = await axios.get(apiUrl, {
@@ -138,6 +146,28 @@
     } catch (error) {
       console.error("Token parsing error:", error);
       return null; // Return null if there's an error
+    }
+  };
+
+    // Logout function
+    const logout = async () => {
+    const apiUrl = `${import.meta.env.VITE_API_URL}api/v1/auth/logout`;
+    
+    try {
+      await axios.post(apiUrl, {}, {
+        headers: {
+          Authorization: `Bearer ${token}` // Include the token in the request headers
+        }
+      });
+      
+      // Clear user data and token from localStorage
+      localStorage.removeItem('user');
+      localStorage.removeItem('token');
+
+      // Redirect to the landing page
+      router.push('/'); // Change '/landing-page' to your actual landing page route
+    } catch (error) {
+      console.error("Error logging out:", error);
     }
   };
   
