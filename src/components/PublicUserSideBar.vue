@@ -60,7 +60,7 @@ const router = useRouter();
 const token = localStorage.getItem('token');
 const links = [
   { text: "Dashboard", icon: "🏠", route: `/public-user-dashboard?token=${token}` },
-  { text: "Subject", icon: "📚", route: "/subject" },
+  { text: "Subject", icon: "📚", route: "/public-user-view-all-documents?token=${token}" },
   { text: "Search", icon: "🔍", route: "/public-user-search-results" },
   { text: "Contributors", icon: "👥", route: `/public-user-contributors?token=${token}` },
   { text: "FAQ", icon: "❓", route: `/public-user-faq?token=${token}` },

@@ -101,8 +101,8 @@
         </div>
       </div>
 
-      <button @click="router.push({ name: 'public-user-view-all-documents' })" class="block mx-auto py-2 md:py-3 px-4 md:px-6 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-full text-white font-semibold transform hover:scale-105 transition-all duration-300 ease-in-out">
-        Explore All Cosmic Documents
+      <button @click="router.push({ name: '/public-user-view-all-documents?token=${token}' })" class="block mx-auto py-2 md:py-3 px-4 md:px-6 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-full text-white font-semibold transform hover:scale-105 transition-all duration-300 ease-in-out">
+        Explore Documents
       </button>
     </div>
 
