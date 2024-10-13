@@ -91,7 +91,7 @@
     try {
       const token = localStorage.getItem('token');
       const updatedData = { ...form.value, interests: interests.value };
-      const response = await axios.put(`${import.meta.env.VITE_API_URL}/api/v1/users/update`, updatedData, {
+      const response = await axios.put(`${import.meta.env.VITE_API_URL}api/v1/users/update`, updatedData, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
