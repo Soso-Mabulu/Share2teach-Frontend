@@ -35,7 +35,7 @@
             </div>
           </div>
         </div>
-        <router-link to="/approved-documents">
+        <router-link to="/educator-approved-documents">
         <button class="view-all-btn">View All Approved Documents</button>
         </router-link>
       </div>
