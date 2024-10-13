@@ -1,6 +1,6 @@
 <script setup>
-import Sidebar from '@/components/PublicUserSideBar.vue'; // Adjust the import path as necessary
-import PublicHero from '@/components/PublicUserHome.vue'; // Import the PublicHero component
+import PublicUserSideBar from '@/components/PublicUserSideBar.vue';
+import PublicUserHome from '@/components/PublicUserHome.vue';
 import MainFooter from '@/components/MainFooter.vue'; // Import the Footer
 import MainNavbar from '@/components/MainNavbar.vue'; // Import the MainNavbar component
 </script>
@@ -9,9 +9,9 @@ import MainNavbar from '@/components/MainNavbar.vue'; // Import the MainNavbar c
   <div class="public-user-view">
     <MainNavbar />
     <div class="main-content">
-      <Sidebar />
+      <PublicUserSideBar />
       <div class="hero-container">
-        <PublicHero />
+        <PublicUserHome />
       </div>
     </div>
     <MainFooter />
