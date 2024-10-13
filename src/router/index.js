@@ -64,7 +64,6 @@ import PublicUserViewAllDocumentsView from '@/views/PublicUser-ViewAllDocumentsV
 import PublicUserProfileView from '@/components/PublicUserProfileUpdate.vue';
 
 
-
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
