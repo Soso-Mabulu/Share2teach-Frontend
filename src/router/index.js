@@ -260,7 +260,7 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
-      path: '/admin-search-results',
+      path: '/admin-search',
       name: 'AdminSearchResultsView',
       component: AdminSearchResultsView,
       meta: { requiresAuth: true },
@@ -299,6 +299,7 @@ const router = createRouter({
       path: '/admin-faq',
       name: 'AdminFAQView',
       component: AdminFAQView,
+      meta: { requiresAuth: true },
     },
 
 
@@ -339,11 +340,13 @@ const router = createRouter({
       path: '/educator-faq',
       name: 'EducatorFAQView',
       component: EducatorFAQView,
+      meta: { requiresAuth: true },
     },
     {
       path: '/educator-faq',
       name: 'EducatorFAQView',
       component: EducatorFAQView,
+      meta: { requiresAuth: true },
     },
     {
       path: '/educator-upload',
