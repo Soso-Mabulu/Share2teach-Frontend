@@ -40,9 +40,7 @@
             ></label>
             <span>Remember me</span>
           </div>
-          <a @click="forgotPassword" class="text-center text-indigo-600 hover:text-indigo-500"
-            >Forgot password?</a
-          >
+          <a @click="forgotPassword" class="text-center text-indigo-600 hover:text-indigo-500">Forgot password?</a>
         </div>
         <button
           type="submit"
@@ -66,9 +64,7 @@
       </button>
       <p class="text-center">
         Don't have an account?
-        <router-link to="/signup" class="font-medium text-indigo-600 hover:text-indigo-500"
-          >Sign up</router-link
-        >
+        <router-link to="/signup" class="font-medium text-indigo-600 hover:text-indigo-500">Sign up</router-link>
       </p>
       <p v-if="errorMessage" class="text-red-600 text-center">{{ errorMessage }}</p>
     </div>
@@ -89,9 +85,6 @@ const errorMessage = ref('')
 // Use router
 const router = useRouter()
 
-// Function to decode base64 URL
-// Removed duplicate function declaration
-
 // Login function
 async function login() {
   loading.value = true // Set loading to true at the beginning
@@ -111,7 +104,7 @@ async function login() {
     const userRole = decodedToken.role
 
     if (userRole === 'admin') {
-        router.push({ path: '/admin-dashboard', query: { token } });
+      router.push({ path: '/admin-dashboard', query: { token } });
     } 
     else if (userRole === 'educator') {
       router.push({ path: '/educator-dashboard', query: { token } });
