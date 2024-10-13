@@ -9,8 +9,8 @@ import TutoringServices from '@/views/TutoringServices.vue';
 import OnlineCourses from '@/views/OnlineCourses.vue';
 import StudentCounseling from '@/views/StudentCounseling.vue';
 import SearchResultsView from '@/components/SearchResults.vue';
-import ContactUsView from '@/views/ContactUsView.vue';
-import ServiceView from '@/views/ServiceView.vue';
+import ViewAllDocuments from '@/components/ViewAllDocuments.vue';
+
 
 
 // Moderator views  
@@ -136,6 +136,30 @@ const router = createRouter({
       path: '/student-counseling',
       name: 'StudentCounseling',
       component: StudentCounseling,
+    },
+    {
+      path: '/documents/approved',
+      name: 'ViewAllDocuments',
+      component: ViewAllDocuments,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/documents/pending',
+      name: 'PendingDocuments', // Unique name
+      component: ViewAllDocuments,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/documents/reported',
+      name: 'ReportedDocuments', // Unique name
+      component: ViewAllDocuments,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/documents/denied',
+      name: 'DeniedDocuments', // Unique name
+      component: ViewAllDocuments,
+      meta: { requiresAuth: true },
     },
     {
       path: '/documents/approved',
