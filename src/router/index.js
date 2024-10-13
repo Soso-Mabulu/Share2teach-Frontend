@@ -295,6 +295,12 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
+      path: '/educator-search',
+      name: 'SearchResultsView',
+      component: SearchResultsView,
+      meta: { requiresAuth: true },
+    },
+    {
       path: '/educator-contributors',
       name: 'EducatorContributorView',
       component: EducatorContributorView,
