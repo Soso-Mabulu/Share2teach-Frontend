@@ -1,62 +1,56 @@
 <template>
-  <main class="w-full h-screen flex flex-col items-center justify-center px-4">
-    <div class="max-w-sm w-full text-gray-600 space-y-5">
-      <div class="text-center pb-8">
+  <main class="w-full min-h-screen flex flex-col items-center justify-center px-4 bg-purple-50">
+    <div class="max-w-md w-full bg-white rounded-xl shadow-lg p-8 space-y-6">
+      <div class="text-center">
         <img
           src="@/assets/logo.jpg"
-          width="150"
-          class="mx-auto rounded-xl"
+          width="120"
+          class="mx-auto rounded-full border-4 border-purple-200"
           alt="Vault-Xpence Logo"
         />
-        <div class="mt-5">
-          <h3 class="text-gray-800 text-2xl font-bold sm:text-3xl">Log in to your account</h3>
-        </div>
+        <h3 class="mt-4 text-purple-800 text-2xl font-bold">Log in to your account</h3>
       </div>
       <form @submit.prevent="login" class="space-y-5">
         <div>
-          <label class="font-medium">Email</label>
+          <label class="block text-sm font-medium text-purple-700 mb-1">Email</label>
           <input
             type="email"
             v-model="email"
             required
-            class="w-full mt-2 px-3 py-2 text-gray-500 bg-transparent outline-none border focus:border-indigo-600 shadow-sm rounded-lg"
+            class="w-full px-3 py-2 text-purple-700 bg-purple-50 border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent"
           />
         </div>
         <div>
-          <label class="font-medium">Password</label>
+          <label class="block text-sm font-medium text-purple-700 mb-1">Password</label>
           <input
             type="password"
             v-model="password"
             required
-            class="w-full mt-2 px-3 py-2 text-gray-500 bg-transparent outline-none border focus:border-indigo-600 shadow-sm rounded-lg"
+            class="w-full px-3 py-2 text-purple-700 bg-purple-50 border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent"
           />
         </div>
         <div class="flex items-center justify-between text-sm">
-          <div class="flex items-center gap-x-3">
-            <input type="checkbox" id="remember-me-checkbox" class="checkbox-item peer hidden" />
-            <label
-              for="remember-me-checkbox"
-              class="relative flex w-5 h-5 bg-white peer-checked:bg-indigo-600 rounded-md border ring-offset-2 ring-indigo-600 duration-150 peer-active:ring cursor-pointer after:absolute after:inset-x-0 after:top-[3px] after:m-auto after:w-1.5 after:h-2.5 after:border-r-2 after:border-b-2 after:border-white after:rotate-45"
-            ></label>
-            <span>Remember me</span>
+          <div class="flex items-center">
+            <input type="checkbox" id="remember-me-checkbox" class="form-checkbox h-4 w-4 text-purple-600 transition duration-150 ease-in-out" />
+            <label for="remember-me-checkbox" class="ml-2 block text-purple-700">Remember me</label>
           </div>
-          <a @click="forgotPassword" class="text-center text-indigo-600 hover:text-indigo-500">Forgot password?</a>
+          <a @click="forgotPassword" class="text-purple-600 hover:text-purple-800 font-medium">Forgot password?</a>
         </div>
         <button
           type="submit"
           :disabled="loading"
-          class="w-full px-4 py-2 text-white font-medium bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-600 rounded-lg duration-150 flex items-center justify-center gap-2"
+          class="w-full px-4 py-2 text-white font-medium bg-purple-600 hover:bg-purple-700 rounded-lg transition duration-150 ease-in-out flex items-center justify-center"
         >
-          <span v-if="loading" class="loader"></span>
-          <span v-else>Sign in</span>
+          <span v-if="loading" class="loader mr-2"></span>
+          <span>{{ loading ? 'Signing in...' : 'Sign in' }}</span>
         </button>
       </form>
-      <div id="googleButton"></div>
-      <p class="text-center">
+      <div id="googleButton" class="flex justify-center"></div>
+      <p class="text-center text-purple-700">
         Don't have an account?
-        <router-link to="/signup" class="font-medium text-indigo-600 hover:text-indigo-500">Sign up</router-link>
+        <router-link to="/signup" class="font-medium text-purple-600 hover:text-purple-800">Sign up</router-link>
       </p>
-      <p v-if="errorMessage" class="text-red-600 text-center">{{ errorMessage }}</p>
+      <p v-if="errorMessage" class="text-red-600 text-center text-sm">{{ errorMessage }}</p>
     </div>
   </main>
 </template>
@@ -201,20 +195,16 @@ async function handleTokenFromRedirect() {
 
 <style scoped>
 .loader {
-  border: 2px solid #f3f3f3;
+  border: 2px solid #e2e8f0;
   border-radius: 50%;
-  border-top: 2px solid #3498db;
-  width: 16px;
-  height: 16px;
+  border-top: 2px solid #8b5cf6;
+  width: 18px;
+  height: 18px;
   animation: spin 1s linear infinite;
 }
 
 @keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 </style>
