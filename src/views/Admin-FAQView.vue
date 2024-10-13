@@ -2,7 +2,7 @@
 import AdminSidebar from '@/components/AdminSidebar.vue'; // Adjust the import path as necessary
 import MainFooter from '@/components/MainFooter.vue'; // Import the Footer
 import AdminNavbar from '@/components/AdminNavbar.vue';
-import FetchFAQ from '@/components/FetchFAQ.vue';
+import MaintainFAQ from '@/components/MaintainFAQ.vue';
 
 </script>
 
@@ -12,7 +12,7 @@ import FetchFAQ from '@/components/FetchFAQ.vue';
     <div class="flex-grow flex">
       <AdminSidebar class="hidden lg:block flex-shrink-0" />
       <main class="flex-grow overflow-auto">
-        <FetchFAQ />
+        <MaintainFAQ />
       </main>
     </div>
     <MainFooter />

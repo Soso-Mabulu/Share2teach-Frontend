@@ -24,7 +24,6 @@ const links = ref([
     { text: "Moderate Documents", icon: "⚖️", route: `/admin-moderate-documents?token=${token}` },
     { text: "View Reported Documents", icon: "📜", route: `/admin-view-reported-documents?token=${token}` },
     { text: "Advanced Reports", icon: "📊", route: `/admin-advanced-reports?token=${token}` }, // New link
-    { text: "System Matrix", icon: "🔧", route: `/admin-system-matrix?token=${token}` }, // New link
 ]);
   
 
