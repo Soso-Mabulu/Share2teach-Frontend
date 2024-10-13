@@ -64,14 +64,6 @@
                 <li>
                   <router-link
                     class="text-gray-600 transition-colors duration-300 hover:text-blue-500"
-                    to="/blog"
-                  >
-                    Blog
-                  </router-link>
-                </li>
-                <li>
-                  <router-link
-                    class="text-gray-600 transition-colors duration-300 hover:text-blue-500"
                     to="/about"
                   >
                     About Us
@@ -109,33 +101,6 @@
               </ul>
             </div>
             <div>
-              <h4 class="font-bold text-gray-800">Follow Us</h4>
-              <ul class="mt-4 space-y-2">
-                <li>
-                  <a
-                    class="text-gray-600 transition-colors duration-300 hover:text-blue-500"
-                    href="#"
-                  >
-                    Facebook
-                  </a>
-                </li>
-                <li>
-                  <a
-                    class="text-gray-600 transition-colors duration-300 hover:text-blue-500"
-                    href="#"
-                  >
-                    Twitter
-                  </a>
-                </li>
-                <li>
-                  <a
-                    class="text-gray-600 transition-colors duration-300 hover:text-blue-500"
-                    href="#"
-                  >
-                    LinkedIn
-                  </a>
-                </li>
-              </ul>
             </div>
           </div>
         </div>

@@ -279,11 +279,12 @@ input:checked + .slider:before {
   width: 100%;
   padding: 1rem 3rem 1rem 1rem;
   font-size: 1rem;
-  border: 2px solid var(--border-color);
+  border: 2px solid var(--border-color); /* Existing border */
   border-radius: 30px;
   background-color: var(--card-background);
   color: var(--text-color);
   transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Add shadow for more depth */
 }
 
 .search-bar:focus {
@@ -310,12 +311,19 @@ input:checked + .slider:before {
 .filter-select {
   flex: 1;
   padding: 0.5rem;
-  border: 1px solid var(--border-color);
+  border: 2px solid var(--border-color); /* Make the border more visible */
   border-radius: 5px;
   background-color: var(--card-background);
   color: var(--text-color);
+  transition: border-color 0.3s ease; /* Add transition for smoother effect */
 }
 
+.filter-select:focus,
+.search-bar:focus { /* Style for focused state */
+  outline: none; /* Remove default outline */
+  border-color: var(--primary-color); /* Change border color on focus */
+  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.3); /* Add shadow on focus */
+}
 .results-title {
   font-size: 1.5rem;
   margin-bottom: 1.5rem;

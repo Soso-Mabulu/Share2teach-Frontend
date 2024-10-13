@@ -1,14 +1,26 @@
 <template>
-  <div>
-    <div class="flex flex-col lg:flex-row items-center justify-between p-12 bg-gradient-to-r relative">
+  <div class="min-h-screen bg-gradient-to-r">
+    <!-- LandingNavbar component added here -->
+    <LandingNavbar />
+
+    <!-- Get in Touch section with adjusted spacing -->
+    <div class="flex flex-col lg:flex-row items-center justify-between p-12 relative mt-12"> 
       <div class="w-full lg:w-1/2 p-6">
         <h1 class="text-5xl font-bold text-black animate-vibrate">Get in Touch</h1>
         <p class="mt-4 text-lg text-black">
-          We would love to hear from you! Whether you have questions, feedback, or just want to say hello, feel free to reach out. Our team is dedicated to providing you with the best support and assistance. Your inquiries are important to us, and we strive to respond promptly. Let's connect and work together to make your experience even better!
+          Have any questions or need further assistance? We’re here to help! Whether you’re curious about our services or have suggestions for improvement, don’t hesitate to reach out. Our team is always ready to listen and offer the support you need to make your experience with us exceptional. Let's start a conversation!
         </p>
+
+        <!-- Success message moved here below the paragraph -->
+        <div v-if="messageSent" class="mt-4 p-4 bg-green-100 text-green-700 rounded">
+          Your message has been sent successfully! We'll get back to you shortly.
+        </div>
       </div>
+
       <form @submit.prevent="submitForm" class="bg-white rounded-lg shadow-lg p-8 w-full lg:w-1/2 mt-6 lg:mt-0">
         <h2 class="text-xl font-bold mb-4">Drop a Message</h2>
+
+        <!-- Full Name Input -->
         <div class="mb-4">
           <label for="full-name" class="block text-sm font-medium text-gray-700">Full Name</label>
           <input
@@ -20,6 +32,7 @@
           />
         </div>
 
+        <!-- Phone Input -->
         <div class="mb-4">
           <label for="phone" class="block text-sm font-medium text-gray-700">Phone</label>
           <input
@@ -31,6 +44,7 @@
           />
         </div>
 
+        <!-- Email Input -->
         <div class="mb-4">
           <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
           <input
@@ -42,6 +56,7 @@
           />
         </div>
 
+        <!-- Subject Input -->
         <div class="mb-4">
           <label for="subject" class="block text-sm font-medium text-gray-700">Subject</label>
           <input
@@ -53,6 +68,7 @@
           />
         </div>
 
+        <!-- Message Input -->
         <div class="mb-4">
           <label for="message" class="block text-sm font-medium text-gray-700">Message</label>
           <textarea
@@ -64,6 +80,7 @@
           ></textarea>
         </div>
 
+        <!-- Submit Button -->
         <button
           type="submit"
           class="w-full py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition"
@@ -76,7 +93,12 @@
 </template>
 
 <script>
+import LandingNavbar from '@/components/LandingNavbar.vue'; // Import the LandingNavbar component
+
 export default {
+  components: {
+    LandingNavbar, // Register the LandingNavbar component
+  },
   data() {
     return {
       formData: {
@@ -85,14 +107,25 @@ export default {
         email: '',
         subject: '',
         message: ''
-      }
+      },
+      messageSent: false // Add a property to track form submission
     };
   },
   methods: {
     submitForm() {
       console.log('Form submitted:', this.formData);
       // Handle form submission, e.g., send data to an API
-      this.formData = { fullName: '', phone: '', email: '', subject: '', message: '' }; // Reset the form
+
+      // Show success message
+      this.messageSent = true;
+
+      // Reset the form
+      this.formData = { fullName: '', phone: '', email: '', subject: '', message: '' };
+
+      // Optionally, hide the success message after a longer duration
+      setTimeout(() => {
+        this.messageSent = false;
+      }, 1000); // Hide message after 10 seconds
     }
   }
 };
@@ -100,7 +133,14 @@ export default {
 
 <style scoped>
 .bg-gradient-to-r {
-  background: linear-gradient(to top, #d9ccf2, #ffffff); /* Dark purple at the bottom, light purple at the top */
+  background: linear-gradient(to top, #e9cef0, #ffffff) /* Dark purple at the right, light purple at the left */
 }
 
+.min-h-screen {
+  min-height: 100vh; /* Ensure the background covers the entire height of the page */
+}
+
+.mt-12 {
+  margin-top: 3rem; /* Adjust this value to increase or decrease the space */
+}
 </style>
