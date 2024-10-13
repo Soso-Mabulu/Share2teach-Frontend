@@ -37,7 +37,12 @@ const filteredFAQs = computed(() => {
 async function fetchFAQs() {
   isLoading.value = true;
   try {
-    const response = await axios.get(`${import.meta.env.VITE_API_URL}api/v1/faq/`);
+    const token = localStorage.getItem('token');
+    const response = await axios.get(`${import.meta.env.VITE_API_URL}api/v1/faq/`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
     faqs.value = response.data.map(faq => ({ ...faq, isOpen: false }));
   } catch (error) {
     console.error('Failed to fetch FAQs:', error);
@@ -66,7 +71,12 @@ function closeCreateDialog() {
 
 async function createFAQ() {
   try {
-    await axios.post(`${import.meta.env.VITE_API_URL}api/v1/faq/newfaq`, newFAQ.value);
+    const token = localStorage.getItem('token');
+    await axios.post(`${import.meta.env.VITE_API_URL}api/v1/faq/newfaq`, newFAQ.value, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
     await fetchFAQs();
     closeCreateDialog();
     showAlert('FAQ created successfully!', 'success');
@@ -88,7 +98,12 @@ function closeEditDialog() {
 
 async function updateFAQ() {
   try {
-    await axios.put(`${import.meta.env.VITE_API_URL}api/v1/faq/${editingFAQ.value.faqId}`, editingFAQ.value);
+    const token = localStorage.getItem('token');
+    await axios.put(`${import.meta.env.VITE_API_URL}api/v1/faq/${editingFAQ.value.faqId}`, editingFAQ.value, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
     await fetchFAQs();
     closeEditDialog();
     showAlert('FAQ updated successfully!', 'success');
@@ -101,7 +116,12 @@ async function updateFAQ() {
 async function deleteFAQ(faqId) {
   if (confirm('Are you sure you want to delete this FAQ?')) {
     try {
-      await axios.delete(`${import.meta.env.VITE_API_URL}api/v1/faq/${faqId}`);
+      const token = localStorage.getItem('token');
+      await axios.delete(`${import.meta.env.VITE_API_URL}api/v1/faq/${faqId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
       await fetchFAQs();
       showAlert('FAQ deleted successfully!', 'success');
     } catch (error) {
