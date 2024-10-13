@@ -46,65 +46,54 @@
             Join 31,000+ educators and never miss out on new teaching tips, tutorials, and resources to enhance your skills.
           </p>
         </div>
-        
-        <!-- Quick Links -->
-        <div>
-          <h6 class="mb-4 flex justify-center font-semibold uppercase md:justify-start">
-            Quick Links
-          </h6>
-          <p class="mb-4">
-            <a href="#" class="text-surface/75 dark:text-white/75">About Us</a>
-          </p>
-          <p class="mb-4">
-            <a href="#" class="text-surface/75 dark:text-white/75">Courses</a>
-          </p>
-          <p class="mb-4">
-            <a href="#" class="text-surface/75 dark:text-white/75">Blog</a>
-          </p>
-          <p>
-            <a href="#" class="text-surface/75 dark:text-white/75">Contact</a>
-          </p>
-        </div>
 
-        <!-- Resources -->
-        <div>
-          <h6 class="mb-4 flex justify-center font-semibold uppercase md:justify-start">
-            Resources
-          </h6>
-          <p class="mb-4">
-            <a href="#" class="text-surface/75 dark:text-white/75">Teaching Tips</a>
-          </p>
-          <p class="mb-4">
-            <a href="#" class="text-surface/75 dark:text-white/75">Lesson Plans</a>
-          </p>
-          <p class="mb-4">
-            <a href="#" class="text-surface/75 dark:text-white/75">Webinars</a>
-          </p>
-          <p>
-            <a href="#" class="text-surface/75 dark:text-white/75">Community Forum</a>
-          </p>
-        </div>
-
-        <!-- Newsletter -->
-        <div>
-          <h6 class="mb-4 flex justify-center font-semibold uppercase md:justify-start">
-            Newsletter
-          </h6>
-          <p class="mb-4">Stay updated with our latest news and offers.</p>
-          <form class="flex flex-col gap-4">
-            <input
-              type="email"
-              placeholder="Enter your email"
-              class="rounded-md border border-neutral-300 bg-white px-4 py-2 text-surface/75 dark:border-neutral-600 dark:bg-neutral-700 dark:text-white/75"
-              required
-            />
-            <button
-              type="submit"
-              class="rounded-md bg-blue-600 px-4 py-2 text-white transition duration-300 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-            >
-              Subscribe
-            </button>
-          </form>
+        <div class="w-full mt-8 lg:mt-0 lg:w-3/5">
+          <div class="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+            <div>
+              <h4 class="font-bold text-gray-800">Resources</h4>
+              <ul class="mt-4 space-y-2">
+                <li>
+                  <router-link
+                    class="text-gray-600 transition-colors duration-300 hover:text-blue-500"
+                    to="/about"
+                  >
+                    About Us
+                  </router-link>
+                </li>
+                <li>
+                  <router-link
+                    class="text-gray-600 transition-colors duration-300 hover:text-blue-500"
+                    to="/contact"
+                  >
+                    Contact
+                  </router-link>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h4 class="font-bold text-gray-800">Company</h4>
+              <ul class="mt-4 space-y-2">
+                <li>
+                  <router-link
+                    class="text-gray-600 transition-colors duration-300 hover:text-blue-500"
+                    to="/terms"
+                  >
+                    Terms of Service
+                  </router-link>
+                </li>
+                <li>
+                  <router-link
+                    class="text-gray-600 transition-colors duration-300 hover:text-blue-500"
+                    to="/privacy"
+                  >
+                    Privacy Policy
+                  </router-link>
+                </li>
+              </ul>
+            </div>
+            <div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
