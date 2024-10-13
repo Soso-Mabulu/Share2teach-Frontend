@@ -1,6 +1,6 @@
 <template>
   <div :class="['admin-dashboard', { 'dark-mode': isDarkMode }]">
-    <h1 class="dashboard-title">Advanced Admin Report</h1>
+    <h1 class="dashboard-title">Admin Analytics Dashboard</h1>
 
     <div class="filter-options">
       <label class="dark-mode-switch">
@@ -8,6 +8,16 @@
         <span class="toggle-slider"></span>
         <span class="toggle-label">Dark Mode</span>
       </label>
+      <div class="time-frame-picker">
+        <label>Time Frame:</label>
+        <select v-model="selectedTimeFrame" @change="fetchData">
+          <option value="" disabled>--select--</option>
+          <option value="daily">Daily</option>
+          <option value="weekly">Weekly</option>
+          <option value="monthly">Monthly</option>
+          <option value="yearly">Yearly</option>
+        </select>
+      </div>
       <div class="date-range-picker">
         <label>Date Range:</label>
         <input type="date" v-model="startDate" @change="fetchData" />
@@ -16,68 +26,30 @@
     </div>
 
     <div class="report-sections">
-      <div class="report-section user-stats">
-        <h2>User Statistics</h2>
-        <div v-for="(value, key) in userStats" :key="key" class="stat-item">
-          <span class="stat-label">{{ formatLabel(key) }}:</span>
-          <span class="stat-value">{{ value }}</span>
+      <div class="report-section analytics-comparison">
+        <h2>Analytics Comparison</h2>
+        <div class="chart-container" v-if="!isLoading">
+          <BarChart :chart-data="analyticsChartData" :options="chartOptions" />
         </div>
-        <div class="chart-container">
-          <LineChart :chart-data="userSignupChartData" :options="chartOptions" />
-        </div>
+        <div v-else class="loading">Loading...</div>
       </div>
 
-      <div class="report-section document-stats">
-        <h2>Document Statistics</h2>
-        <div v-for="(value, key) in documentStats" :key="key" class="stat-item">
-          <span class="stat-label">{{ formatLabel(key) }}:</span>
-          <span class="stat-value">{{ value }}</span>
-        </div>
-        <div class="chart-container">
-          <DoughnutChart :chart-data="documentStatusChartData" :options="chartOptions" />
-        </div>
-      </div>
-
-      <div class="report-section rating-stats">
-        <h2>Rating Statistics</h2>
-        <div class="stat-item">
-          <span class="stat-label">Average Rating:</span>
-          <span class="stat-value">{{ ratingStats.averageRating.toFixed(2) }}</span>
-        </div>
-        <div class="chart-container">
-          <LineChart :chart-data="ratingChartData" :options="chartOptions" />
-        </div>
-      </div>
-
-      <div class="report-section top-documents">
-        <h2>Top Rated Documents</h2>
-        <ul class="document-list">
-          <li v-for="doc in topRatedDocuments" :key="doc.id" class="document-item">
-            <span class="document-title">{{ doc.title }}</span>
-            <span class="document-rating">
-              <i class="fas fa-star"></i> {{ doc.rating.toFixed(1) }}
-            </span>
-          </li>
-        </ul>
-      </div>
-
-      <div class="report-section user-activity">
-        <h2>User Activity Heatmap</h2>
-        <div class="heatmap-container">
-          <!-- Placeholder for heatmap visualization -->
-          <div class="heatmap-placeholder">User Activity Heatmap Visualization</div>
-        </div>
-      </div>
-
-      <div class="report-section recent-actions">
-        <h2>Recent Admin Actions</h2>
-        <ul class="action-list">
-          <li v-for="action in recentAdminActions" :key="action.id" class="action-item">
-            <span class="action-type">{{ action.type }}</span>
-            <span class="action-details">{{ action.details }}</span>
-            <span class="action-time">{{ formatDate(action.timestamp) }}</span>
-          </li>
-        </ul>
+      <div class="report-section analytics-details">
+        <h2>Analytics Details</h2>
+        <table class="analytics-table">
+          <thead>
+            <tr>
+              <th>Metric</th>
+              <th>Value</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="endpoint in analyticsEndpoints" :key="endpoint.endpoint">
+              <td>{{ endpoint.name }}</td>
+              <td>{{ analyticsData[endpoint.endpoint] || 'N/A' }}</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
   </div>
@@ -85,125 +57,85 @@
 
 <script>
 import { ref, onMounted, computed } from 'vue';
-import { Line as LineChart, Doughnut as DoughnutChart } from 'vue-chartjs';
-import { Chart as ChartJS, Title, Tooltip, Legend, LineElement, LinearScale, PointElement, CategoryScale, ArcElement } from 'chart.js';
+import { Bar as BarChart } from 'vue-chartjs';
+import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale } from 'chart.js';
 
-ChartJS.register(Title, Tooltip, Legend, LineElement, LinearScale, PointElement, CategoryScale, ArcElement);
+ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale);
 
 export default {
   components: {
-    LineChart,
-    DoughnutChart
+    BarChart
   },
   setup() {
-    // const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+    const API_URL = 'http://localhost:3000/api/v1/analytics';
     const isDarkMode = ref(false);
+    const selectedTimeFrame = ref(''); // Default value is an empty string
     const startDate = ref('');
     const endDate = ref('');
+    const analyticsData = ref({});
+    const isLoading = ref(true);
 
-    const userStats = ref({
-      totalUsers: 0,
-      activeUsers: 0,
-      newSignups: 0,
-    });
+    const analyticsEndpoints = [
+      { name: 'Denied Documents', endpoint: 'denied-documents' },
+      { name: 'Reported Documents', endpoint: 'reported-documents' },
+      { name: 'Pending Documents', endpoint: 'pending-documents' },
+      { name: 'Total Users', endpoint: 'total-users' },
+      { name: 'Active Users', endpoint: 'active-users' },
+      { name: 'User Signups', endpoint: 'user-signups' },
+      { name: 'Uploaded Documents', endpoint: 'uploaded-documents' },
+    ];
 
-    const documentStats = ref({
-      pendingDocuments: 0,
-      approvedDocuments: 0,
-      deniedDocuments: 0,
-      reportedDocuments: 0,
-      uploadedDocuments: 0,
-    });
-
-    const ratingStats = ref({
-      averageRating: 0,
-      ratingsOverTime: [],
-    });
-
-    const topRatedDocuments = ref([]);
-    const recentAdminActions = ref([]);
-
-    const userSignupChartData = computed(() => ({
-      labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+    const analyticsChartData = computed(() => ({
+      labels: analyticsEndpoints.map(endpoint => endpoint.name),
       datasets: [{
-        label: 'User Signups',
-        data: [65, 59, 80, 81, 56, 55, 40, 30, 45, 60, 70, 75],
-        borderColor: '#3498db',
-        fill: false
-      }]
-    }));
-
-    const documentStatusChartData = computed(() => ({
-      labels: ['Pending', 'Approved', 'Denied', 'Reported'],
-      datasets: [{
-        data: [
-          documentStats.value.pendingDocuments,
-          documentStats.value.approvedDocuments,
-          documentStats.value.deniedDocuments,
-          documentStats.value.reportedDocuments
+        label: 'Analytics Comparison',
+        data: analyticsEndpoints.map(endpoint => analyticsData.value[endpoint.endpoint] || 0),
+        backgroundColor: [
+          '#3498db', '#2ecc71', '#e74c3c', '#f39c12', '#9b59b6', '#1abc9c', '#34495e'
         ],
-        backgroundColor: ['#f39c12', '#2ecc71', '#e74c3c', '#9b59b6']
-      }]
-    }));
-
-    const ratingChartData = computed(() => ({
-      labels: ratingStats.value.ratingsOverTime.map(r => r.date),
-      datasets: [{
-        label: 'Average Rating',
-        data: ratingStats.value.ratingsOverTime.map(r => r.averageRating),
-        borderColor: '#3498db',
-        fill: false
       }]
     }));
 
     const chartOptions = {
       responsive: true,
       maintainAspectRatio: false,
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      }
     };
 
     onMounted(() => {
-      startDate.value = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-      endDate.value = new Date().toISOString().split('T')[0];
+      const today = new Date();
+      endDate.value = today.toISOString().split('T')[0];
+      startDate.value = new Date(today.getFullYear(), today.getMonth() - 1, today.getDate()).toISOString().split('T')[0];
       fetchData();
     });
 
     const fetchData = async () => {
-      // Simulated API calls
-      userStats.value = {
-        totalUsers: 10000,
-        activeUsers: 7500,
-        newSignups: 500,
-      };
+      isLoading.value = true;
+      try {
+        if (!selectedTimeFrame.value) {
+          return; // Do not fetch data if no time frame is selected
+        }
 
-      documentStats.value = {
-        pendingDocuments: 150,
-        approvedDocuments: 8000,
-        deniedDocuments: 200,
-        reportedDocuments: 50,
-        uploadedDocuments: 9000,
-      };
+        const promises = analyticsEndpoints.map(endpoint =>
+          fetch(`${API_URL}/${endpoint.endpoint}?startDate=${startDate.value}&endDate=${endDate.value}&timeFrame=${selectedTimeFrame.value}`)
+            .then(response => response.json())
+        );
 
-      ratingStats.value = {
-        averageRating: 4.2,
-        ratingsOverTime: [
-          { date: '2023-01-01', averageRating: 4.0 },
-          { date: '2023-02-01', averageRating: 4.1 },
-          { date: '2023-03-01', averageRating: 4.3 },
-          { date: '2023-04-01', averageRating: 4.2 },
-        ],
-      };
+        const results = await Promise.all(promises);
 
-      topRatedDocuments.value = [
-        { id: 1, title: 'Advanced Mathematics', rating: 4.9 },
-        { id: 2, title: 'Introduction to AI', rating: 4.8 },
-        { id: 3, title: 'Web Development Basics', rating: 4.7 },
-      ];
-
-      recentAdminActions.value = [
-        { id: 1, type: 'Document Approval', details: 'Approved "Machine Learning Fundamentals"', timestamp: new Date() },
-        { id: 2, type: 'User Ban', details: 'Banned user for violation of terms', timestamp: new Date(Date.now() - 86400000) },
-        { id: 3, type: 'Report Resolution', details: 'Resolved copyright infringement report', timestamp: new Date(Date.now() - 172800000) },
-      ];
+        analyticsData.value = results.reduce((acc, result, index) => {
+          acc[analyticsEndpoints[index].endpoint] = result.value;
+          return acc;
+        }, {});
+      } catch (error) {
+        console.error('Error fetching analytics data:', error);
+      } finally {
+        isLoading.value = false;
+      }
     };
 
     const toggleDarkMode = () => {
@@ -211,31 +143,18 @@ export default {
       document.body.classList.toggle('dark-mode', isDarkMode.value);
     };
 
-    const formatLabel = (key) => {
-      return key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
-    };
-
-    const formatDate = (date) => {
-      return new Date(date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
-    };
-
     return {
       isDarkMode,
+      selectedTimeFrame,
       startDate,
       endDate,
-      userStats,
-      documentStats,
-      ratingStats,
-      topRatedDocuments,
-      recentAdminActions,
-      userSignupChartData,
-      documentStatusChartData,
-      ratingChartData,
+      analyticsData,
+      analyticsChartData,
       chartOptions,
       toggleDarkMode,
       fetchData,
-      formatLabel,
-      formatDate
+      analyticsEndpoints,
+      isLoading
     };
   }
 };
@@ -269,16 +188,32 @@ export default {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 30px;
+  flex-wrap: wrap;
 }
 
-.dark-mode-switch {
-  display: inline-flex;
-  align-items: center;
-  cursor: pointer;
+.dark-mode-switch,
+.time-frame-picker,
+.date-range-picker {
+  margin: 10px;
+}
+
+.time-frame-picker select,
+.date-range-picker input {
+  padding: 5px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+.dark-mode .time-frame-picker select,
+.dark-mode .date-range-picker input {
+  background-color: #2c3e50;
+  color: #f5f5f5;
+  border-color: #34495e;
 }
 
 .toggle-slider {
   position: relative;
+  display: inline-block;
   width: 50px;
   height: 24px;
   background-color: #ccc;
@@ -308,7 +243,7 @@ input:checked + .toggle-slider:before {
 
 .report-sections {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: 1fr;
   gap: 20px;
 }
 
@@ -319,78 +254,67 @@ input:checked + .toggle-slider:before {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
+.dark-mode .report-section {
+  background-color: #2c3e50;
+}
+
 .report-section h2 {
   margin-bottom: 20px;
   color: #2c3e50;
-}
-
-.stat-item {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 10px;
-}
-
-.stat-label {
-  font-weight: bold;
-}
-
-.stat-value {
-  color: #3498db;
-}
-
-.chart-container {
-  height: 300px;
-  margin-top: 20px;
-}
-
-.document-list, .action-list {
-  list-style-type: none;
-  padding: 0;
-}
-
-.document-item, .action-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 0;
-  border-bottom: 1px solid #ecf0f1;
-}
-
-.document-rating, .action-type {
-  font-weight: bold;
-  color: #3498db;
-}
-
-.heatmap-container {
-  height: 300px;
-  background-color: #ecf0f1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-weight: bold;
-  color: #7f8c8d;
-}
-
-/* Dark mode styles */
-.dark-mode .report-section {
-  background-color: #2c3e50;
-  color: #ecf0f1;
 }
 
 .dark-mode .report-section h2 {
   color: #3498db;
 }
 
-.dark-mode .stat-value {
-  color: #2ecc71;
+.chart-container {
+  height: 400px;
+  margin-top: 20px;
 }
 
-.dark-mode .heatmap-container {
-  background-color: #34495e;
-  color: #bdc3c7;
+.analytics-table {
+  width: 100%;
+  border-collapse: collapse;
 }
 
-.dark-mode .document-item, .dark-mode .action-item {
+.analytics-table th,
+.analytics-table td {
+  padding: 10px;
+  text-align: left;
+  border-bottom: 1px solid #ecf0f1;
+}
+
+.dark-mode .analytics-table th,
+.dark-mode .analytics-table td {
   border-bottom-color: #34495e;
+}
+
+.analytics-table th {
+  background-color: #f7f9fa;
+  font-weight: bold;
+}
+
+.dark-mode .analytics-table th {
+  background-color: #d1dfec;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 400px;
+  font-size: 1.2em;
+  color: #0d1586;
+}
+
+@media (max-width: 768px) {
+  .filter-options {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .report-sections {
+    grid-template-columns: 1fr;
+  }
 }
 </style>
