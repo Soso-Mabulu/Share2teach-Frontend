@@ -147,6 +147,8 @@ async function fetchRatings() {
     const headers = { Authorization: `Bearer ${token}` };
     const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/v1/ratings`, { headers });
     ratings.value = response.data || [];
+    //console.log(ratings);
+
   } catch (error) {
     console.error('Failed to fetch ratings:', error.message);
   }
@@ -164,7 +166,7 @@ async function fetchApprovedDocuments() {
         const documentRating = ratings.value.find(rating => rating.docId === documentId);
         
         return {
-          docId: documentId,
+          docId: doc.documentId,
           title: doc.title || 'Unknown title',
           preview_image_url: doc.preview_image_url || defaultImage,
           description: doc.description || 'No description available',
@@ -178,6 +180,7 @@ async function fetchApprovedDocuments() {
           light_preview_url: doc.light_preview_url || []
         };
       });
+      console.log(approvedDocuments.value);
     } else {
       console.error('Failed to fetch approved documents:', response.data);
     }
