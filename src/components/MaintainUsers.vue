@@ -181,6 +181,7 @@ const deleteUser = async () => {
   padding: 2rem;
   background: linear-gradient(135deg, #f5f7fa, #e8eaf6);
   min-height: 100vh;
+  z-index: -1;
 }
 
 .page-title {

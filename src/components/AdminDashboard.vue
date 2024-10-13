@@ -98,7 +98,8 @@ export default {
   display: flex;  
   flex-direction: column;  
   align-items: center;  
-  background-color: #f5f5f5;  
+  background-color: #f5f5f5;
+  z-index: -1;  
 }  
   
 .admin-title {  

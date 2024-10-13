@@ -13,13 +13,6 @@
         />
         <i class="fas fa-search search-icon"></i>
       </div>
-      <div class="filter-options">
-        <label class="dark-mode-switch">
-          <input type="checkbox" v-model="isDarkMode" @change="toggleDarkMode" />
-          <span class="toggle-slider"></span>
-          <span class="toggle-label">Dark Mode</span>
-        </label>
-      </div>
     </div>
 
     <div class="contributors-grid">
@@ -108,10 +101,6 @@ async function fetchContributors() {
   }
 }
 
-function toggleDarkMode() {
-  isDarkMode.value = !isDarkMode.value;
-  document.body.classList.toggle('dark-mode', isDarkMode.value);
-}
 
 function viewContributorDetails(contributor) {
   selectedContributor.value = contributor;
@@ -139,6 +128,7 @@ function formatDate(dateString) {
     background-color: #f5f5f5;
     min-height: 100vh;
     transition: background-color 0.3s ease;
+    z-index: -1;
   }
   
   .dark-mode {

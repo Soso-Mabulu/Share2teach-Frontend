@@ -21,23 +21,19 @@
           <option v-for="university in universities" :key="university" :value="university">{{ university }}</option>
         </select>
       </div>
-    </div>
-    <div class="search-filter-container">
-      <div class="search-bar-wrapper">
-        <div class="filter-options">
-          <label class="dark-mode-switch">
-            <input type="checkbox" v-model="isDarkMode" @change="toggleDarkMode" />
-            <span class="toggle-slider"></span>
-            <span class="toggle-label">Dark Mode</span>
-          </label>
-        </div>
+      <div class="dark-mode-switch">
+        <input type="checkbox" v-model="isDarkMode" @change="toggleDarkMode" id="darkModeToggle" />
+        <label for="darkModeToggle" class="toggle-slider"></label>
+        <span class="toggle-label">Dark Mode</span>
       </div>
     </div>
 
     <div v-for="module in modules" :key="module" class="subject-section">
       <h2 class="section-title">{{ module }}</h2>
       <div class="documents-container">
-        <button @click="prevSlide(module)" class="carousel-button prev">&lt;</button>
+        <button @click="prevSlide(module)" class="carousel-button prev" aria-label="Previous slide">
+          <i class="fas fa-chevron-left"></i>
+        </button>
         <div class="documents-carousel">
           <div
             v-for="(document, index) in visibleDocuments(module)"
@@ -55,7 +51,9 @@
             </div>
           </div>
         </div>
-        <button @click="nextSlide(module)" class="carousel-button next">&gt;</button>
+        <button @click="nextSlide(module)" class="carousel-button next" aria-label="Next slide">
+          <i class="fas fa-chevron-right"></i>
+        </button>
       </div>
       <button class="view-all-btn" @click="viewAllDocuments(module)">View All {{ module }} Documents</button>
     </div>
@@ -65,21 +63,23 @@
       <div class="modal-content" @click.stop>
         <h2>{{ currentDocument.title }}</h2>
         <div class="preview-images-container">
-          <button @click="prevImage" class="nav-button left">
+          <button @click="prevImage" class="nav-button left" aria-label="Previous image">
             <i class="fas fa-chevron-left"></i>
           </button>
           <img :src="currentPreviewImage" alt="Preview" class="preview-image" />
-          <button @click="nextImage" class="nav-button right">
+          <button @click="nextImage" class="nav-button right" aria-label="Next image">
             <i class="fas fa-chevron-right"></i>
           </button>
         </div>
-        <p>{{ currentImageIndex + 1 }} / {{ currentDocumentPreviewImages.length }}</p>
+        <p class="image-counter">{{ currentImageIndex + 1 }} / {{ currentDocumentPreviewImages.length }}</p>
         <p class="description">{{ currentDocument.description }}</p>
         <p class="author">By: {{ currentDocument.author }}</p>
         <p class="category">Category: {{ currentDocument.category }}</p>
         <p class="university">University: {{ currentDocument.university }}</p>
         <a :href="currentDocument.download_url" class="download-btn" download>Download Full Document</a>
-        <button class="close-btn" @click="closePreview">Close</button>
+        <button class="close-btn" @click="closePreview" aria-label="Close preview">
+          <i class="fas fa-times"></i>
+        </button>
       </div>
     </div>
   </div>
@@ -275,7 +275,7 @@ function viewAllDocuments(module) {
   router.push({ name: 'DocumentsByModule', params: { module } });
 }
 </script>
-<style scoped>  
+<style scoped>
 /* Base styles */
 .subject-view-page {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -298,7 +298,7 @@ function viewAllDocuments(module) {
 .page-title {
   text-align: center;
   margin: 20px 0 30px;
-  font-size: 2.5em;
+  font-size: clamp(1.8rem, 4vw, 2.5rem);
   color: #2c3e50;
   text-transform: uppercase;
   letter-spacing: 2px;
@@ -322,7 +322,7 @@ function viewAllDocuments(module) {
 .section-title {
   text-align: center;
   margin: 0 0 20px;
-  font-size: 1.8em;
+  font-size: clamp(1.4rem, 3vw, 1.8rem);
   color: #34495e;
   text-transform: capitalize;
   letter-spacing: 1px;
@@ -371,9 +371,9 @@ function viewAllDocuments(module) {
 
 /* Dark mode switch */
 .dark-mode-switch {
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  cursor: pointer;
+  justify-content: center;
   margin-top: 15px;
 }
 
@@ -388,6 +388,7 @@ function viewAllDocuments(module) {
   background-color: #ccc;
   border-radius: 34px;
   transition: .4s;
+  cursor: pointer;
 }
 
 .toggle-slider:before {
@@ -486,10 +487,10 @@ input:checked + .toggle-slider:before {
   line-height: 1.4;
 }
 
-.author {
+.author, .category, .university {
   font-size: 0.8em;
   color: #95a5a6;
-  font-style: italic;
+  margin-bottom: 5px;
 }
 
 /* View all button */
@@ -515,7 +516,6 @@ input:checked + .toggle-slider:before {
   transform: translateY(-2px);
   box-shadow: 0 4px 6px rgba(50, 50, 93, 0.1);
 }
-
 
 .view-all-btn:active {
   transform: translateY(1px);
@@ -591,6 +591,13 @@ input:checked + .toggle-slider:before {
   right: 20px;
 }
 
+.image-counter {
+  text-align: center;
+  margin-top: 10px;
+  font-size: 0.9em;
+  color: #7f8c8d;
+}
+
 .download-btn {
   display: inline-block;
   padding: 12px 25px;
@@ -627,7 +634,6 @@ input:checked + .toggle-slider:before {
   transform: scale(1.1);
 }
 
-
 /* Filter options */
 .filter-options {
   display: flex;
@@ -648,6 +654,8 @@ input:checked + .toggle-slider:before {
   transition: all 0.3s ease;
   cursor: pointer;
   outline: none;
+  flex: 1 1 auto;
+  min-width: 120px;
 }
 
 .filter-select:hover, .filter-select:focus {
@@ -708,13 +716,17 @@ input:checked + .toggle-slider:before {
 }
 
 @media (max-width: 600px) {
+  .subject-view-page {
+    padding: 10px;
+  }
+
+  .search-filter-container {
+    max-width: 100%;
+  }
+
   .document-card {
     flex: 0 0 100%;
     max-width: 100%;
-  }
-  
-  .search-filter-container {
-    flex-direction: column;
   }
   
   .filter-options {
@@ -726,15 +738,28 @@ input:checked + .toggle-slider:before {
   }
   
   .documents-container {
-    padding: 0 20px;
+    padding: 0 10px;
   }
   
-  .page-title {
-    font-size: 2em;
+  .carousel-button {
+    width: 30px;
+    height: 30px;
+    font-size: 16px;
   }
-  
-  .section-title {
-    font-size: 1.5em;
+
+  .modal-content {
+    padding: 20px;
+  }
+
+  .nav-button {
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+  }
+
+  .download-btn {
+    width: 100%;
+    text-align: center;
   }
 }
 
@@ -774,7 +799,7 @@ input:checked + .toggle-slider:before {
   color: #bdc3c7;
 }
 
-.dark-mode .author {
+.dark-mode .author, .dark-mode .category, .dark-mode .university {
   color: #95a5a6;
 }
 
@@ -803,5 +828,229 @@ input:checked + .toggle-slider:before {
 
 .dark-mode .carousel-button:hover {
   background-color: rgba(52, 152, 219, 1);
+}
+
+/* Accessibility improvements */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Focus styles for better keyboard navigation */
+.search-bar:focus,
+.filter-select:focus,
+.document-card:focus,
+.view-all-btn:focus,
+.carousel-button:focus,
+.nav-button:focus,
+.download-btn:focus,
+.close-btn:focus {
+  outline: 2px solid #3498db;
+  outline-offset: 2px;
+}
+
+.dark-mode .search-bar:focus,
+.dark-mode .filter-select:focus,
+.dark-mode .document-card:focus,
+.dark-mode .view-all-btn:focus,
+.dark-mode .carousel-button:focus,
+.dark-mode .nav-button:focus,
+.dark-mode .download-btn:focus,
+.dark-mode .close-btn:focus {
+  outline-color: #ecf0f1;
+}
+/* Updated and new responsive styles */
+@media (max-width: 1200px) {
+  .document-card {
+    flex: 0 0 calc(33.33% - 13.33px);
+    max-width: calc(33.33% - 13.33px);
+  }
+}
+
+@media (max-width: 900px) {
+  .document-card {
+    flex: 0 0 calc(50% - 10px);
+    max-width: calc(50% - 10px);
+  }
+  
+  .documents-container {
+    padding: 0 30px;
+  }
+
+  .search-filter-container {
+    background-color: rgba(52, 152, 219, 0.1);
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .dark-mode .search-filter-container {
+    background-color: rgba(52, 152, 219, 0.2);
+  }
+}
+
+@media (max-width: 600px) {
+  .subject-view-page {
+    padding: 10px;
+  }
+
+  .search-filter-container {
+    max-width: 100%;
+  }
+
+  .document-card {
+    flex: 0 0 calc(50% - 10px);
+    max-width: calc(50% - 10px);
+    margin-bottom: 20px;
+  }
+  
+  .filter-options {
+    flex-direction: column;
+  }
+  
+  .filter-select {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+  
+  .documents-container {
+    padding: 0 10px;
+  }
+  
+  .carousel-button {
+    width: 30px;
+    height: 30px;
+    font-size: 16px;
+    background-color: rgba(52, 152, 219, 0.9);
+  }
+
+  .modal-content {
+    padding: 20px;
+  }
+
+  .nav-button {
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+  }
+
+  .download-btn {
+    width: 100%;
+    text-align: center;
+  }
+
+  /* Creative additions for small screens */
+  .document-card {
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .document-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, rgba(52, 152, 219, 0.5), rgba(46, 204, 113, 0.5));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .document-card:hover::before {
+    opacity: 1;
+  }
+
+  .document-card:hover {
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  }
+
+  .doc-info {
+    position: relative;
+    z-index: 1;
+    background-color: rgba(255, 255, 255, 0.9);
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+    transform: translateY(70%);
+    transition: transform 0.3s ease;
+  }
+
+  .document-card:hover .doc-info {
+    transform: translateY(0);
+  }
+
+  .dark-mode .doc-info {
+    background-color: rgba(44, 62, 80, 0.9);
+  }
+
+  .section-title {
+    position: relative;
+    display: inline-block;
+    padding: 0 10px;
+  }
+
+  .section-title::before,
+  .section-title::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 30px;
+    height: 2px;
+    background-color: #3498db;
+  }
+
+  .section-title::before {
+    left: -40px;
+  }
+
+  .section-title::after {
+    right: -40px;
+  }
+
+  .dark-mode .section-title::before,
+  .dark-mode .section-title::after {
+    background-color: #ecf0f1;
+  }
+
+  .view-all-btn {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .view-all-btn::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 70%);
+    transform: scale(0);
+    transition: transform 0.6s ease-out;
+  }
+
+  .view-all-btn:hover::before {
+    transform: scale(1);
+  }
+}
+
+@media (max-width: 400px) {
+  .document-card {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+
+  .doc-info {
+    transform: translateY(0);
+  }
 }
 </style>

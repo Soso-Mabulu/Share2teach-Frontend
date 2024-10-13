@@ -180,6 +180,7 @@ function prevImage() {
   flex-direction: column;
   align-items: center;
   background-color: #f5f5f5;
+  z-index: -1; /* Lower than navbar */
 }
 
 .dark-mode {
@@ -225,6 +226,8 @@ function prevImage() {
   margin-bottom: 30px;
   width: 100%;
   max-width: 600px;
+  position: relative; /* or absolute */
+  z-index: 1; /* Ensure this is lower than the navbar */
 }
 
 .search-bar-wrapper {

@@ -174,6 +174,7 @@
     background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
     padding: 20px;
     transition: background 0.3s ease;
+    z-index: -1;
   }
   
   .profile-card {

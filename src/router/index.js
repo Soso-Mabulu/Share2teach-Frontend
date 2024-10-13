@@ -21,6 +21,8 @@ import ModeratorModerateDocumentsView from '@/views/Moderator-ModerateDocumentsV
 import ModeratorSubjectView from '@/views/Moderator-SubjectView.vue';
 import ModeratorSelfDirectedlearningView from '@/views/Moderator-SelfDirectedlearningView.vue';
 import ModeratorAllApprovedDocumentsView from '@/views/Moderator-ViewAllDocumentsView.vue';
+import ModeratorFAQView from '@/views/Moderator-FAQView.vue';
+import ModeratorProfileView from '@/views/Moderator-ProfileView.vue';
 
 // Educator views
 import EducatorDashboardView from '@/views/Educator-DashboardView.vue';
@@ -30,6 +32,7 @@ import EducatorSelfDirectedView from '@/views/Educator-SelfDirectedLearningView.
 import EducatorUpload from '@/views/Educator-Upload.vue';
 import EducatorFAQView from '@/views/Educator-FAQView.vue';
 import EducatorAllApprovedDocumentsView from '@/views/EducatorAllApproved-DocumentsView.vue';
+import EducatorProfileView from '@/views/Educator-ProfileView.vue';
 
 // Admin views
 import AdminViewReportedView from '@/views/Admin-ViewReportedView.vue';
@@ -46,6 +49,8 @@ import AdminAdvancedReportsView from '@/views/Admin-AdvancedReportsView.vue';
 import AdminMaintainFAQ from '@/views/Admin-MaintainFAQ.vue';
 import AdminMaintainDocuments from '@/views/Admin-MaintainDocuments.vue';
 import AdminProfile from '@/views/Admin-ProfileView.vue';
+import AdminFAQView from '@/views/Admin-FAQView.vue';
+
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -118,19 +123,19 @@ const router = createRouter({
 
     },
     {
-      path: '/moderator-approved-documents',
+      path: '/approved-documents',
       name: 'AllApprovedDocumentsView',
       component: ModeratorAllApprovedDocumentsView,
       meta: { requiresAuth: true },
     },
     {
-      path: '/moderator-pending-documents',
+      path: '/pending-documents',
       name: 'PendingDocuments',
       component: ModeratorViewAllDocumentsView,
       meta: { requiresAuth: true },
     },
     {
-      path: '/moderator-approved-documents',
+      path: '/approved-documents',
       name: 'ApprovedDocuments',
       component: ModeratorViewAllDocumentsView,
       meta: { requiresAuth: true },
@@ -160,7 +165,7 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
-      path: '/moderator-search-results',
+      path: '/moderator-search',
       name: 'ModeratorSearchResultsView',
       component: ModeratorSearchResultsView,
       meta: { requiresAuth: true },
@@ -183,6 +188,19 @@ const router = createRouter({
       component: ModeratorSelfDirectedlearningView,
       meta: { requiresAuth: true },
     },
+    {
+      path: '/moderator-faq',
+      name: 'ModeratorFAQView',
+      component: ModeratorFAQView,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/moderator-profile',
+      name: 'ModeratorProfileView',
+      component: ModeratorProfileView,
+      meta: { requiresAuth: true },
+    },
+
 
     // Admin routes
     {
@@ -275,6 +293,11 @@ const router = createRouter({
       component: AdminProfile,
       meta: { requiresAuth: true },
     },
+    {
+      path: '/admin-faq',
+      name: 'AdminFAQView',
+      component: AdminFAQView,
+    },
 
 
     // Educator routes
@@ -322,6 +345,12 @@ const router = createRouter({
       path: '/approved-documents',
       name: 'EducatorAllApprovedDocumentsView',
       component: EducatorAllApprovedDocumentsView,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/educator-profile',
+      name: 'EducatorProfileView',
+      component: EducatorProfileView,
       meta: { requiresAuth: true },
     },
   ],

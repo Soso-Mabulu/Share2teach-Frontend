@@ -193,6 +193,7 @@ export default {
   color: var(--text-color);
   min-height: 100vh;
   transition: all 0.3s ease;
+  z-index: -1;
 }
 
 .container {

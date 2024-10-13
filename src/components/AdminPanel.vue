@@ -192,6 +192,7 @@
     padding: 20px;
     background-color: #f5f5f5;
     min-height: 100vh;
+    z-index: -1;
   }
   
   .page-title {

@@ -294,6 +294,7 @@
     align-items: center;
     background-color: #f5f5f5;
     min-height: 100vh;
+    z-index: -1;
   }
   
   .dark-mode {

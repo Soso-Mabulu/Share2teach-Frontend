@@ -173,6 +173,7 @@
     flex-direction: column;
     align-items: center;
     background-color: #f5f5f5;
+    z-index: -1;
   }
   
   .dark-mode {

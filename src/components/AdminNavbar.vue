@@ -94,10 +94,19 @@ function toggleMenu() {
           <span>{{ link.text }}</span>
         </RouterLink>
       </li>
-      <li>
-        <a href="#" class="nav-link" @click.prevent="logout">
-          <i class="icon">🚪</i>
-          <span v-if="isExpanded">Logout</span>
+      <li class="border-b border-gray-200">
+        <RouterLink
+          to="/admin-profile"
+          class="block px-4 py-3 text-gray-700 hover:bg-gray-100 hover:text-blue-600 flex items-center space-x-2"
+        >
+          <span>👤</span> <!-- Profile icon -->
+          <span>Profile</span>
+        </RouterLink>
+      </li>
+      <li class="border-b border-gray-200">
+        <a href="#" class="block px-4 py-3 text-gray-700 hover:bg-gray-100 hover:text-blue-600 flex items-center space-x-2" @click.prevent="logout">
+          <span>🚪</span>
+          <span>Logout</span>
         </a>
       </li>
     </ul>

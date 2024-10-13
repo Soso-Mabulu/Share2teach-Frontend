@@ -23,7 +23,7 @@ function toggleMenu() {
         <RouterLink
           to="/login"
           type="button"
-          class="text-white bg-purple-600 hover:bg-purple-700 focus:ring-4 focus:outline-none focus:ring-purple-300 font-medium rounded-full text-sm px-4 py-2 text-center"
+          class="text-white bg-purple-600 hover:bg-purple-700 focus:ring-4 focus:outline-none focus:ring-purple-300 font-medium rounded-full text-sm px-4 py-2 text-center button-nav"
         >
           Get Started
         </RouterLink>
@@ -63,7 +63,7 @@ function toggleMenu() {
           <li>
             <RouterLink
               to="/"
-              class="block py-2 px-4 text-white rounded-full hover:bg-purple-600 transition-colors duration-300"
+              class="block py-2 px-4 text-white rounded-full hover:bg-purple-600 transition-colors duration-300 link"
               aria-current="page"
               >Home</RouterLink
             >
@@ -71,21 +71,21 @@ function toggleMenu() {
           <li>
             <RouterLink
               to="/about"
-              class="block py-2 px-4 text-white rounded-full hover:bg-purple-600 transition-colors duration-300"
+              class="block py-2 px-4 text-white rounded-full hover:bg-purple-600 transition-colors duration-300 link"
               >About</RouterLink
             >
           </li>
           <li>
             <RouterLink
               to="/services"
-              class="block py-2 px-4 text-white rounded-full hover:bg-purple-600 transition-colors duration-300"
+              class="block py-2 px-4 text-white rounded-full hover:bg-purple-600 transition-colors duration-300 link"
               >Services</RouterLink
             >
           </li>
           <li>
             <RouterLink
               to="/contact"
-              class="block py-2 px-4 text-white rounded-full hover:bg-purple-600 transition-colors duration-300"
+              class="block py-2 px-4 text-white rounded-full hover:bg-purple-600 transition-colors duration-300 link"
               >Contact</RouterLink
             >
           </li>
@@ -107,5 +107,46 @@ nav button {
 
 nav button:hover {
   transform: scale(1.05);
+}
+
+@media (max-width: 768px) {
+  nav .flex.md\\:order-2 {
+    order: 1;
+  }
+
+  nav .md\\:order-1 {
+    order: 2;
+  }
+
+  nav .md\\:space-x-0 {
+    margin-top: 1rem;
+  }
+
+  nav .md\\:w-auto {
+    width: 100%;
+  }
+
+  nav .md\\:flex-row {
+    flex-direction: column;
+  }
+
+  nav .md\\:mt-0 {
+    margin-top: 1rem;
+  }
+
+  nav .md\\:border-0 {
+    border: 1px solid #e5e7eb;
+  }
+
+  nav .md\\:bg-transparent {
+    background-color: #f9fafb;
+  }
+  .link {
+    color: #4b5563;
+  }
+  nav button
+  {
+    background-color: #f9fafb;
+  }
 }
 </style>

@@ -70,11 +70,13 @@ function toggleMenu() {
         </svg>
       </button>
     </div>
-
     <!-- Profile Button (visible on larger screens) -->
-    <a class="hidden lg:inline-block py-2 px-6 bg-purple-600 hover:bg-purple-800 text-sm text-white font-bold rounded-xl transition duration-200" href="#">
+    <router-link
+      to="/moderator-profile"
+      class="hidden lg:inline-block py-2 px-6 bg-purple-600 hover:bg-purple-800 text-sm text-white font-bold rounded-xl transition duration-200"
+    >
       Profile
-    </a>
+    </router-link>
 
     <!-- Navbar Links (visible when isMenuOpen is true on small screens) -->
     <ul v-if="isMenuOpen" class="lg:hidden bg-white shadow-lg absolute top-full left-0 w-full">
@@ -87,10 +89,19 @@ function toggleMenu() {
           <span>{{ link.text }}</span>
         </RouterLink>
       </li>
-      <li>
-        <a href="#" class="nav-link" @click.prevent="logout">
-          <i class="icon">🚪</i>
-          <span v-if="isExpanded">Logout</span>
+      <li class="border-b border-gray-200">
+        <RouterLink
+          to="/moderator-profile"
+          class="block px-4 py-3 text-gray-700 hover:bg-gray-100 hover:text-blue-600 flex items-center space-x-2"
+        >
+          <span>👤</span> <!-- Profile icon -->
+          <span>Profile</span>
+        </RouterLink>
+      </li>
+      <li class="border-b border-gray-200">
+        <a href="#" class="block px-4 py-3 text-gray-700 hover:bg-gray-100 hover:text-blue-600 flex items-center space-x-2" @click.prevent="logout">
+          <span>🚪</span>
+          <span>Logout</span>
         </a>
       </li>
     </ul>
