@@ -45,8 +45,8 @@
           <span>{{ loading ? 'Signing in...' : 'Sign in' }}</span>
         </button>
       </form>
-      <div id="googleButton" class="flex justify-center"></div>
-      <p class="text-center text-purple-700">
+      <div id="googleButton"></div>
+      <p class="text-center">
         Don't have an account?
         <router-link to="/signup" class="font-medium text-purple-600 hover:text-purple-800">Sign up</router-link>
       </p>
@@ -56,6 +56,7 @@
 </template>
 
 <script setup>
+import { ref, onMounted } from 'vue'
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
@@ -134,6 +135,20 @@ function handleCredentialResponse(response) {
     console.error('Google login error:', error);
     errorMessage.value = 'Google login failed. Please try again.';
   });
+// Function to handle Google Sign-In response
+function handleCredentialResponse(response) {
+  axios.post(`${import.meta.env.VITE_API_URL}/api/v1/auth/google`, {
+    token: response.credential
+  })
+  .then(res => {
+    const { token, redirectUrl } = res.data;
+    localStorage.setItem('token', token);
+    window.location.href = redirectUrl;
+  })
+  .catch(error => {
+    console.error('Google login error:', error);
+    errorMessage.value = 'Google login failed. Please try again.';
+  });
 }
 
 // Function to decode base64 URL-encoded token
@@ -143,6 +158,30 @@ function base64UrlDecode(str) {
   return JSON.parse(window.atob(padded))
 }
 
+onMounted(() => {
+  // Load the Google Sign-In API script
+  const script = document.createElement('script');
+  script.src = 'https://accounts.google.com/gsi/client';
+  script.async = true;
+  script.defer = true;
+  document.head.appendChild(script);
+
+  script.onload = () => {
+    window.google.accounts.id.initialize({
+      client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+      callback: handleCredentialResponse
+    });
+    window.google.accounts.id.renderButton(
+      document.getElementById('googleButton'),
+      { theme: 'outline', size: 'large' }  // Customization attributes
+    );
+  };
+
+  // Handle token from redirect (if any)
+  handleTokenFromRedirect();
+});
+
+// Function to handle token from redirect
 onMounted(() => {
   // Load the Google Sign-In API script
   const script = document.createElement('script');
@@ -182,6 +221,9 @@ async function handleTokenFromRedirect() {
     } 
     else if (userRole === 'educator') {
       router.push({ path: '/educator-dashboard' })
+    }
+    else if (userRole === 'moderator') {
+      router.push({ path: '/moderator-dashboard' })
     }
     else if (userRole === 'moderator') {
       router.push({ path: '/moderator-dashboard' })
