@@ -80,22 +80,45 @@
         <button class="close-btn" @click="closePreview" aria-label="Close preview">
           <i class="fas fa-times"></i>
         </button>
+        <!-- Rating Section -->
+        <!-- Rating Section -->
+        <div class="rating-section">
+          <label class="rating-label">Rate this document:</label>
+          <div class="star-rating">
+            <i 
+              v-for="star in 5" 
+              :key="star" 
+              :class="['fa-star', selectedRating >= star ? 'fas' : 'far']"
+              @click="setRating(star)"
+              class="star"
+            ></i>
+          </div>
+          <button class="submit-rating-btn" @click="submitRating">Submit Rating</button>
+        </div>
+
+        <!-- Styled Response for Ratings -->
+        <div v-if="ratingMessage" class="rating-message text-center mt-4 text-lg font-semibold" :class="ratingMessageClass">
+          {{ ratingMessage }}
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted,onBeforeUnmount } from 'vue';
 import { useRouter } from 'vue-router';
 import axios from 'axios';
 import defaultImage from '@/assets/documentIcon.png';
+import '@fortawesome/fontawesome-free/css/all.css';
+
 
 // Initialize reactive references
 const documents = ref({
   pending: [],
   reported: [],
   approved: [],
+  denied: [],
 });
 const searchQuery = ref('');
 const isDarkMode = ref(false);
@@ -104,13 +127,40 @@ const currentDocument = ref(null);
 const currentDocumentPreviewImages = ref([]);
 const currentImageIndex = ref(0);
 const router = useRouter();
-const modules = ref(['pending', 'reported', 'approved']);
+const modules = ref(['pending', 'reported', 'approved','denied']);
 
 // New reactive references for filters and carousel
 const selectedCategory = ref('');
 const selectedModule = ref('');
 const selectedUniversity = ref('');
 const carouselPositions = ref({});
+const itemsPerPage = ref(4); // Default to 4, dynamically adjust later
+const selectedRating = ref('');
+const ratingMessage = ref(''); // New: Message for ratings
+const ratingMessageClass = ref('text-green-500'); // New: Styling class for rating message
+
+
+// Update the number of items per page based on the screen size
+const updateItemsPerPage = () => {
+  if (window.innerWidth <= 768) {
+    itemsPerPage.value = 2; // Show 1 document on small screens
+  } else if (window.innerWidth <= 1024) {
+    itemsPerPage.value = 2; // Show 2 documents on medium screens
+  } else {
+    itemsPerPage.value = 4; // Show 4 documents on large screens
+  }
+};
+
+// Watch for window resize to update the items per page
+onMounted(() => {
+  updateItemsPerPage();
+  window.addEventListener('resize', updateItemsPerPage);
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', updateItemsPerPage);
+});
+
 
 // Computed properties for unique categories and universities
 const categories = computed(() => {
@@ -144,24 +194,23 @@ const filteredDocuments = computed(() => {
   return filtered;
 });
 
-// Function to get visible documents for each module
+// Function to get visible documents for each module based on screen size
 const visibleDocuments = (module) => {
   const start = carouselPositions.value[module] || 0;
-  return filteredDocuments.value[module].slice(start, start + 4);
+  return filteredDocuments.value[module].slice(start, start + itemsPerPage.value);
 };
-
 // Carousel navigation functions
 const nextSlide = (module) => {
   const moduleDocuments = filteredDocuments.value[module];
   carouselPositions.value[module] = Math.min(
-    (carouselPositions.value[module] || 0) + 4,
+    (carouselPositions.value[module] || 0) + 1,
     moduleDocuments.length - 4
   );
 };
 
 const prevSlide = (module) => {
   carouselPositions.value[module] = Math.max(
-    (carouselPositions.value[module] || 0) - 4,
+    (carouselPositions.value[module] || 0) - 1,
     0
   );
 };
@@ -179,13 +228,15 @@ async function fetchDocuments() {
         const responses = await Promise.allSettled([
             axios.get(`${import.meta.env.VITE_API_URL}api/v1/documents/pending`, { headers }),
             axios.get(`${import.meta.env.VITE_API_URL}api/v1/documents/reported`, { headers }),
-            axios.get(`${import.meta.env.VITE_API_URL}api/v1/documents/approved`, { headers })
+            axios.get(`${import.meta.env.VITE_API_URL}api/v1/documents/approved`, { headers }),
+            axios.get(`${import.meta.env.VITE_API_URL}api/v1/documents/denied`, { headers }),
         ]);
 
         // Store documents organized by module
         documents.value.pending = [];
         documents.value.reported = [];
         documents.value.approved = [];
+        documents.value.denied = [];
 
         // Process each response
         responses.forEach((result, index) => {
@@ -202,6 +253,9 @@ async function fetchDocuments() {
                     case 2:
                         documents.value.approved = documentsData;
                         break;
+                    case 3:
+                        documents.value.denied = documentsData;
+                        break;
                 }
             } else {
                 // If the request failed, log the error
@@ -215,6 +269,60 @@ async function fetchDocuments() {
         console.error('An unexpected error occurred:', error.message);
         console.error('Error details:', error.response ? error.response.data : error);
     }  
+}
+
+function setRating(star) {
+  selectedRating.value = star;
+}
+
+// Function to submit a rating for the current document
+
+async function submitRating() {
+  if (!selectedRating.value) {
+    ratingMessage.value = 'Please select a rating before submitting.';
+    ratingMessageClass.value = 'text-red-500'; // Error style
+  } else {
+    ratingMessage.value = `Thank you for rating ${selectedRating.value} stars!`;
+    ratingMessageClass.value = 'text-green-500'; // Success style
+  }
+  try {
+    // Fetch the userId (e.g., from local storage or your auth system)
+    const userId = localStorage.getItem('userId'); // Adjust as necessary to get the actual userId
+    const token = localStorage.getItem('token'); // Ensure the user is authenticated
+
+    if (!token || !userId) {
+      throw new Error('User not authenticated');
+    }
+
+    const headers = { Authorization: `Bearer ${token}` };
+    const ratingData = {
+      docId: currentDocument.value.id, // Document ID
+      userId: userId,                  // User ID (from auth)
+      rating: selectedRating.value      // Selected rating (1-5)
+    };
+
+    const response = await axios.post(
+      `${import.meta.env.VITE_API_URL}api/v1/ratings`,
+      ratingData,
+      { headers }
+    );
+
+    if (response.data && response.data.message) {
+      alert('Rating submitted successfully.');
+    }
+
+  } catch (error) {
+    if (error.response && error.response.data.message) {
+      ratingMessage.value = `Error: ${error.response.data.message}`;
+      ratingMessageClass.value = 'text-red-500'; // Error style
+    } else {
+      ratingMessage.value = 'An error occurred while submitting your rating. please try again';
+      ratingMessageClass.value = 'text-red-500'; // Error style
+    }
+  } finally {
+    // Clear the selected rating after submission
+    selectedRating.value = '';
+  }
 }
 
 
@@ -272,8 +380,11 @@ onMounted(() => {
 
 // Function to navigate to all documents by module
 function viewAllDocuments(module) {
-  router.push({ name: 'DocumentsByModule', params: { module } });
+  const token = localStorage.getItem('token');  
+  const routeName = `${module.charAt(0).toUpperCase() + module.slice(1)}Documents`; // Converts module to the route name format
+  router.push({ name: routeName, query: { token } });
 }
+
 </script>
 <style scoped>
 /* Base styles */
@@ -1053,4 +1164,57 @@ input:checked + .toggle-slider:before {
     transform: translateY(0);
   }
 }
+
+.rating-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 20px;
+
+}
+
+.rating-label {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.star-rating {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 15px;
+}
+
+.star {
+  font-size: 2rem;
+  color: #ffd700;
+  padding: 0 5px;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.star:hover {
+  transform: scale(1.2);
+}
+
+.submit-rating-btn {
+  padding: 10px 20px;
+  background-color: #4CAF50;
+  border: none;
+  border-radius: 20px;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.submit-rating-btn:hover {
+  background-color: #45a049;
+}
+
+/* Add custom styling for rating message */
+.rating-message {
+  transition: opacity 0.3s ease-in-out;
+}
+
+
 </style>

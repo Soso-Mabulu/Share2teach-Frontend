@@ -9,6 +9,8 @@ import TutoringServices from '@/views/TutoringServices.vue';
 import OnlineCourses from '@/views/OnlineCourses.vue';
 import StudentCounseling from '@/views/StudentCounseling.vue';
 import SearchResultsView from '@/components/SearchResults.vue';
+import ViewAllDocuments from '@/components/ViewAllDocuments.vue';
+
 import ContactUsView from '@/views/ContactUsView.vue';
 import ServiceView from '@/views/ServiceView.vue';
 
@@ -19,7 +21,6 @@ import ModeratorViewReportedView from '@/views/Moderator-ViewReportedView.vue';
 import ModeratorContributorsView from '@/views/Moderator-ContributorsView.vue';
 import ModeratorSearchResultsView from '@/views/Moderator-SearchResultsView.vue';
 import ModeratorUploadDocuments from '@/views/Moderator-UploadDocumentsView.vue';
-import ModeratorViewAllDocumentsView from '@/views/Moderator-ViewAllDocumentsView.vue';
 import ModeratorModerateDocumentsView from '@/views/Moderator-ModerateDocumentsView.vue';
 import ModeratorSubjectView from '@/views/Moderator-SubjectView.vue';
 import ModeratorSelfDirectedlearningView from '@/views/Moderator-SelfDirectedlearningView.vue';
@@ -138,6 +139,30 @@ const router = createRouter({
       name: 'StudentCounseling',
       component: StudentCounseling,
     },
+    {
+      path: '/documents/approved',
+      name: 'ViewAllDocuments',
+      component: ViewAllDocuments,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/documents/pending',
+      name: 'PendingDocuments', // Unique name
+      component: ViewAllDocuments,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/documents/reported',
+      name: 'ReportedDocuments', // Unique name
+      component: ViewAllDocuments,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/documents/denied',
+      name: 'DeniedDocuments', // Unique name
+      component: ViewAllDocuments,
+      meta: { requiresAuth: true },
+    },
     
 
     // Moderator routes
@@ -152,18 +177,6 @@ const router = createRouter({
       path: '/approved-documents',
       name: 'AllApprovedDocumentsView',
       component: ModeratorAllApprovedDocumentsView,
-      meta: { requiresAuth: true },
-    },
-    {
-      path: '/pending-documents',
-      name: 'PendingDocuments',
-      component: ModeratorViewAllDocumentsView,
-      meta: { requiresAuth: true },
-    },
-    {
-      path: '/approved-documents',
-      name: 'ApprovedDocuments',
-      component: ModeratorViewAllDocumentsView,
       meta: { requiresAuth: true },
     },
     {
