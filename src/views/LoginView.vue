@@ -45,8 +45,8 @@
           <span>{{ loading ? 'Signing in...' : 'Sign in' }}</span>
         </button>
       </form>
-      <div id="googleButton"></div>
-      <p class="text-center">
+      <div id="googleButton" class="flex justify-center"></div>
+      <p class="text-center text-purple-700">
         Don't have an account?
         <router-link to="/signup" class="font-medium text-purple-600 hover:text-purple-800">Sign up</router-link>
       </p>
