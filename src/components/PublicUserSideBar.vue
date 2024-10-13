@@ -75,7 +75,7 @@ const toggleSidebar = () => {
 
 // Navigate to the profile update page
 const goToProfileUpdate = () => {
-  router.push('/update-profile');
+  router.push('/public-user-profile');
 };
 
 // Logout function
