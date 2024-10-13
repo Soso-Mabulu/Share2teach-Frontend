@@ -11,6 +11,8 @@ import StudentCounseling from '@/views/StudentCounseling.vue';
 import SearchResultsView from '@/components/SearchResults.vue';
 import ViewAllDocuments from '@/components/ViewAllDocuments.vue';
 
+import ContactUsView from '@/views/ContactUsView.vue';
+import ServiceView from '@/views/ServiceView.vue';
 
 
 // Moderator views  
@@ -34,6 +36,7 @@ import EducatorSelfDirectedView from '@/views/Educator-SelfDirectedLearningView.
 import EducatorUpload from '@/views/Educator-Upload.vue';
 import EducatorFAQView from '@/views/Educator-FAQView.vue';
 import EducatorAllApprovedDocumentsView from '@/views/EducatorAllApproved-DocumentsView.vue';
+import EducatorSearchView from '@/views/Educator-SearchView.vue';
 import EducatorProfileView from '@/views/Educator-ProfileView.vue';
 
 
@@ -64,7 +67,6 @@ import PublicUserViewAllDocumentsView from '@/views/PublicUser-ViewAllDocumentsV
 import PublicUserProfileView from '@/components/PublicUserProfileUpdate.vue';
 
 
-
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -78,6 +80,11 @@ const router = createRouter({
       path: '/about',
       name: 'about',
       component: AboutView,
+    },
+    {
+      path: '/services',
+      name: 'ServiceView',
+      component: ServiceView,
     },
     {
       path: '/login',
@@ -98,6 +105,11 @@ const router = createRouter({
       path: '/reset-password',
       name: 'ResetPasswordView',
       component: ResetPasswordView,
+    },
+    {
+      path: '/contact',
+      name: 'ContactUsView',
+      component: ContactUsView,
     },
     {
       path: '/search-results',
@@ -335,8 +347,6 @@ const router = createRouter({
       component: EducatorDashboardView,
       meta: { requiresAuth: true },
     },
-    
-    
     {
       path: '/educator-subject',
       name: 'EducatorSubjectView',
@@ -345,8 +355,8 @@ const router = createRouter({
     },
     {
       path: '/educator-search',
-      name: 'SearchResultsView',
-      component: SearchResultsView,
+      name: 'EducatorSearchView',
+      component: EducatorSearchView,
       meta: { requiresAuth: true },
     },
     {
