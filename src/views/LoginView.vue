@@ -121,7 +121,7 @@ async function login() {
     } 
     else {
       // Handle unknown roles or redirect to a default dashboard
-      router.push({ path: '/user-dashboard', query: { token } });
+      router.push({ path: '/public-user-dashboard', query: { token } });
     }
 
   } catch (error) {
@@ -179,7 +179,7 @@ async function handleTokenFromRedirect() {
       router.push({ path: '/educator-dashboard' })
     }
     else {
-      router.push({ path: '/user-dashboard' })
+      router.push({ path: '/public-user-dashboard' })
     }
   }
 }

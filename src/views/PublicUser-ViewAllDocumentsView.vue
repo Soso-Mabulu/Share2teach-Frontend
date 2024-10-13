@@ -1,8 +1,8 @@
 <script setup>
-import Sidebar from '@/components/SideBar.vue'; // Adjust the import path as necessary
+import Sidebar from '@/components/PublicUserSideBar.vue'; // Adjust the import path as necessary
 import MainFooter from '@/components/MainFooter.vue'; // Import the Footer
 import MainNavbar from '@/components/MainNavbar.vue'; // Import the MainNavbar component
-import AllDocuments from '@/components/AllDocuments.vue';
+import AllDocuments from '@/components/PublicUserAllDocuments.vue';
 </script>
 
 <template>

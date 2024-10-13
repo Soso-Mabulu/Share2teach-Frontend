@@ -22,7 +22,7 @@
   
   <script>
   import FetchFAQ from '@/components/FetchFAQ.vue';
-  import SideBar from '@/components/SideBar.vue'; // Import EducatorSideBar
+  import SideBar from '@/components/PublicUserSideBar.vue'; // Import EducatorSideBar
   import MainNavbar from '@/components/MainNavbar.vue'; // Import EducatorNavBar
   import MainFooter from '@/components/MainFooter.vue'; // Import MainFooter
   
