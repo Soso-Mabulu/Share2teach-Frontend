@@ -3,14 +3,12 @@ import HomeView from '@/views/HomeView.vue';
 import AboutView from '@/views/AboutView.vue';
 import LoginView from '@/views/LoginView.vue';
 import SignupView from '@/views/SignupView.vue';
-import PublicUserView from '@/views/PublicUserView.vue';
 import ForgotPasswordView from '@/views/ForgotPasswordView.vue';
 import ResetPasswordView from '@/views/ResetPasswordView.vue';
-import SearchResultsView from '@/views/SearchResultsView.vue';
-import AllDocuments from '@/views/AllDocuments.vue';
 import TutoringServices from '@/views/TutoringServices.vue';
 import OnlineCourses from '@/views/OnlineCourses.vue';
 import StudentCounseling from '@/views/StudentCounseling.vue';
+import SearchResultsView from '@/components/SearchResults.vue';
 
 
 
@@ -56,6 +54,15 @@ import AdminMaintainDocuments from '@/views/Admin-MaintainDocuments.vue';
 import AdminProfile from '@/views/Admin-ProfileView.vue';
 import AdminFAQView from '@/views/Admin-FAQView.vue';
 
+// Public User views
+import PublicUserView from '@/views/PublicUserView.vue';
+import PublicUserSearchResultsView from '@/views/PublicUser-SearchResultsView.vue';
+import PublicUserContributorsView from '@/views/PublicUser-ContributorsView.vue';
+import PublicUserSelfDirectedlearningView from '@/views/PublicUser-SelfDirectedlearningView.vue';
+import PublicUserFAQView from '@/views/PublicUser-FAQView.vue';
+import PublicUserViewAllDocumentsView from '@/views/PublicUser-ViewAllDocumentsView.vue';
+
+
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -82,12 +89,6 @@ const router = createRouter({
       component: SignupView,
     },
     {
-      path: '/user-dashboard',
-      name: 'PublicUserView',
-      component: PublicUserView,
-      meta: { requiresAuth: true }
-    },
-    {
       path: '/forgot-password',
       name: 'ForgotPasswordView',
       component: ForgotPasswordView,
@@ -101,12 +102,6 @@ const router = createRouter({
       path: '/search-results',
       name: 'search-results',
       component: SearchResultsView,
-      meta: { requiresAuth: true },
-    },
-    {
-      path: '/all-documents',
-      name: 'AllDocuments',
-      component: AllDocuments,
       meta: { requiresAuth: true },
     },
     {
@@ -383,6 +378,44 @@ const router = createRouter({
       component: EducatorProfileView,
       meta: { requiresAuth: true },
     },
+    // Public User routes
+    {
+      path: '/public-user-dashboard',
+      name: 'PublicUserView',
+      component: PublicUserView,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/public-user-search-results',
+      name: 'PublicUserSearchResultsView',
+      component: PublicUserSearchResultsView,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/public-user-contributors',
+      name: 'PublicUserContributorsView',
+      component: PublicUserContributorsView,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/public-user-self-directed-learning',
+      name: 'PublicUserSelfDirectedlearningView',
+      component: PublicUserSelfDirectedlearningView,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/public-user-faq',
+      name: 'PublicUserFAQView',
+      component: PublicUserFAQView,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/public-user-view-all-documents',
+      name: 'PublicUserViewAllDocumentsView',
+      component: PublicUserViewAllDocumentsView,
+      meta: { requiresAuth: true },
+    },
+
   ],
 });
 

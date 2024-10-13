@@ -57,14 +57,16 @@ const isExpanded = ref(true);
 const router = useRouter();
 
 // Navigation links
-const links = ref([
-  { text: "Dashboard", icon: "🏠", route: "/user-dashboard" },
-  { text: "Subject", icon: "📚", route: "/subject" },
-  { text: "Search", icon: "🔍", route: "/search-results" },
-  { text: "Contributors", icon: "👥", route: "/contributors" },
-  { text: "FAQ", icon: "❓", route: "/faq" },
-  { text: "Self Directed Learning", icon: "💡", route: "/self-learning" },
-]);
+const token = localStorage.getItem('token');
+const links = [
+  { text: "Dashboard", icon: "🏠", route: `/public-user-dashboard?token=${token}` },
+  { text: "Subject", icon: "📚", route: "/public-user-view-all-documents?token=${token}" },
+  { text: "Search", icon: "🔍", route: "/public-user-search-results" },
+  { text: "Contributors", icon: "👥", route: `/public-user-contributors?token=${token}` },
+  { text: "FAQ", icon: "❓", route: `/public-user-faq?token=${token}` },
+  { text: "Self Directed Learning", icon: "💡", route: `/public-user-self-directed-learning?token=${token}` }
+];
+
 
 // Method to toggle sidebar
 const toggleSidebar = () => {
