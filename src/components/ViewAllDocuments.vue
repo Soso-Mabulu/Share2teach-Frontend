@@ -1,83 +1,115 @@
 <template>
-    <div :class="['view-all-documents', { 'dark-mode': isDarkMode }]">
-      <h1 class="page-title">{{ pageTitle }}</h1>
+  <div :class="['view-all-documents', { 'dark-mode': isDarkMode }]">
+    <!-- Go Back Button -->
+    <button class="go-back-btn" @click="goBack">Go Back</button>
+
+    <h1 class="page-title">{{ pageTitle }}</h1>
   
-      <div class="search-filter-container">
-        <div class="search-bar-wrapper">
-          <input type="text" v-model="searchQuery" placeholder="Search documents..." class="search-bar" />
-          <i class="fas fa-search search-icon"></i>
-        </div>
-        <div class="filter-options">
-          <select v-model="selectedCategory" class="category-filter">
-            <option value="">All Categories</option>
-            <option v-for="category in categories" :key="category" :value="category">
-              {{ category }}
-            </option>
-          </select>
-          <label class="dark-mode-switch">
-            <input type="checkbox" v-model="isDarkMode" @change="toggleDarkMode" />
-            <span class="toggle-slider"></span>
-            <span class="toggle-label">Dark Mode</span>
-          </label>
-        </div>
+    <div class="search-filter-container">
+      <div class="search-bar-wrapper">
+        <input type="text" v-model="searchQuery" placeholder="Search documents..." class="search-bar" />
+        <i class="fas fa-search search-icon"></i>
       </div>
+      <div class="filter-options">
+        <select v-model="selectedCategory" class="category-filter">
+          <option value="">All Categories</option>
+          <option v-for="category in categories" :key="category" :value="category">
+            {{ category }}
+          </option>
+        </select>
+        <label class="dark-mode-switch">
+          <input type="checkbox" v-model="isDarkMode" @change="toggleDarkMode" />
+          <span class="toggle-slider"></span>
+          <span class="toggle-label">Dark Mode</span>
+        </label>
+      </div>
+    </div>
   
-      <div class="documents-container">
-        <div class="documents-grid">
-          <div 
-            v-for="document in filteredDocuments" 
-            :key="document.id" 
-            class="document-card"
-            @click="showPreview(document)"
-          >
-            <img :src="document.preview_image_url || defaultImage" alt="Document Preview" class="document-image" />
-            <div class="doc-info">
-              <h3 class="doc-title">{{ document.title }}</h3>
-              <p class="description">{{ document.description }}</p>
-              <p class="author">By: {{ document.author }}</p>
-              <p class="category">Category: {{ document.category }}</p>
-              <p class="status">Status: {{ document.status }}</p>
-            </div>
+    <!-- Document List -->
+    <div class="documents-container">
+      <div class="documents-grid">
+        <div v-if="filteredDocuments.length === 0" class="no-documents">
+          <p class="text-gray-500 text-lg">No documents available.</p>
+        </div>
+        <div 
+          v-for="document in filteredDocuments" 
+          :key="document.id" 
+          class="document-card"
+          @click="showPreview(document)"
+        >
+          <img :src="document.preview_image_url || defaultImage" alt="Document Preview" class="document-image" />
+          <div class="doc-info">
+            <h3 class="doc-title">{{ document.title }}</h3>
+            <p class="description">{{ document.description }}</p>
+            <p class="author">By: {{ document.author }}</p>
+            <p class="category">Category: {{ document.category }}</p>
+            <p class="status">Status: {{ document.status }}</p>
           </div>
-        </div>
-      </div>
-  
-      <div v-if="totalPages > 1" class="pagination">
-        <button @click="prevPage" :disabled="currentPage === 1">Previous</button>
-        <span>Page {{ currentPage }} of {{ totalPages }}</span>
-        <button @click="nextPage" :disabled="currentPage === totalPages">Next</button>
-      </div>
-  
-      <!-- Preview Modal -->
-      <div v-if="showModal" class="modal-overlay" @click="closePreview">
-        <div class="modal-content" @click.stop>
-          <h2>{{ currentDocument.title }}</h2>
-          <div class="preview-images-container">
-            <button @click="prevImage" class="nav-button left">
-              <i class="fas fa-chevron-left"></i>
-            </button>
-            <img :src="currentPreviewImage" alt="Preview" class="preview-image" />
-            <button @click="nextImage" class="nav-button right">
-              <i class="fas fa-chevron-right"></i>
-            </button>
-          </div>
-          <p>{{ currentImageIndex + 1 }} / {{ currentDocumentPreviewImages.length }}</p>
-          <p class="description">{{ currentDocument.description }}</p>
-          <p class="author">By: {{ currentDocument.author }}</p>
-          <p class="category">Category: {{ currentDocument.category }}</p>
-          <p class="status">Status: {{ currentDocument.status }}</p>
-          <a :href="currentDocument.download_url" class="download-btn" download>Download Full Document</a>
-          <button class="close-btn" @click="closePreview">&times;</button>
         </div>
       </div>
     </div>
-  </template>
+  
+    <!-- Pagination -->
+    <div v-if="totalPages > 1" class="pagination">
+      <button @click="prevPage" :disabled="currentPage === 1">Previous</button>
+      <span>Page {{ currentPage }} of {{ totalPages }}</span>
+      <button @click="nextPage" :disabled="currentPage === totalPages">Next</button>
+    </div>
+  
+    <!-- Preview Modal -->
+    <div v-if="showModal" class="modal-overlay" @click="closePreview">
+      <div class="modal-content" @click.stop>
+        <h2>{{ currentDocument.title }}</h2>
+        <div class="preview-images-container">
+          <button @click="prevImage" class="nav-button left">
+            <i class="fas fa-chevron-left"></i>
+          </button>
+          <img :src="currentPreviewImage" alt="Preview" class="preview-image" />
+          <button @click="nextImage" class="nav-button right">
+            <i class="fas fa-chevron-right"></i>
+          </button>
+        </div>
+        <p>{{ currentImageIndex + 1 }} / {{ currentDocumentPreviewImages.length }}</p>
+        <p class="description">{{ currentDocument.description }}</p>
+        <p class="author">By: {{ currentDocument.author }}</p>
+        <p class="category">Category: {{ currentDocument.category }}</p>
+        <p class="status">Status: {{ currentDocument.status }}</p>
+        <a :href="currentDocument.download_url" class="download-btn" download>Download Full Document</a>
+        <button class="close-btn" @click="closePreview">&times;</button>
+        <!-- Rating Section -->
+        <div class="rating-section">
+          <label class="rating-label">Rate this document:</label>
+          <div class="star-rating">
+            <i 
+              v-for="star in 5" 
+              :key="star" 
+              :class="['fa-star', selectedRating >= star ? 'fas' : 'far']"
+              @click="setRating(star)"
+              class="star"
+            ></i>
+          </div>
+          <button class="submit-rating-btn" @click="submitRating">Submit Rating</button>
+        </div>
+
+        <!-- Styled Response for Ratings -->
+        <div v-if="ratingMessage" class="rating-message text-center mt-4 text-lg font-semibold" :class="ratingMessageClass">
+          {{ ratingMessage }}
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
   
   <script setup>
   import { ref, computed, onMounted, watch } from 'vue';
   import { useRoute } from 'vue-router';
   import axios from 'axios';
   import defaultImage from '@/assets/documentIcon.png';
+  import { useRouter } from 'vue-router';
+  import '@fortawesome/fontawesome-free/css/all.css';
+
+
+  const router = useRouter();
   
   const route = useRoute();
   const documents = ref([]);
@@ -92,9 +124,26 @@
   const currentPage = ref(1);
   const itemsPerPage = 12;
   const totalItems = ref(0);
+  const selectedRating = ref('');
+  const ratingMessage = ref(''); // New: Message for ratings
+  const ratingMessageClass = ref('text-green-500'); // New: Styling class for rating message
+
+
   
+// Inside your script setup
   const pageTitle = computed(() => {
-    return route.name === 'PendingDocuments' ? 'Pending Documents' : 'Approved Documents';
+    switch (route.name) {
+      case 'ApprovedDocuments':
+        return 'Approved Documents';
+      case 'PendingDocuments':
+        return 'Pending Documents';
+      case 'ReportedDocuments':
+        return 'Reported Documents';
+      case 'DeniedDocuments':
+        return 'Denied Documents';
+      default:
+        return 'Documents'; // Default title
+    }
   });
   
   const filteredDocuments = computed(() => {
@@ -144,9 +193,26 @@
     console.log('Token:', token); // Debug: Log token
     console.log('Headers:', headers); // Debug: Log headers
     
-    const endpoint = route.name === 'PendingDocuments' 
-      ? `${import.meta.env.VITE_API_URL}api/v1/documents/pending`
-      : `${import.meta.env.VITE_API_URL}api/v1/documents/approved`;
+    // Adjust the endpoint based on the route name
+    let endpoint = '';
+    switch (route.name) {
+      case 'PendingDocuments':
+        endpoint = `${import.meta.env.VITE_API_URL}api/v1/documents/pending`;
+        break;
+      case 'ApprovedDocuments':
+        endpoint = `${import.meta.env.VITE_API_URL}api/v1/documents/approved`;
+        break;
+      case 'ReportedDocuments':
+        endpoint = `${import.meta.env.VITE_API_URL}api/v1/documents/reported`;
+        break;
+      case 'DeniedDocuments':
+        endpoint = `${import.meta.env.VITE_API_URL}api/v1/documents/denied`;
+        break;
+      default:
+        endpoint = `${import.meta.env.VITE_API_URL}api/v1/documents`;
+        break;
+    }
+      
     
     const response = await axios.get(endpoint, { headers });
     documents.value = mapDocuments(response.data.documents);
@@ -176,12 +242,73 @@
       download_url: doc.download_url || '',
     }));
   }
+
+  // Function to set the selected rating
+  function setRating(star) {
+    selectedRating.value = star;
+  }
+
+
+  // Function to submit a rating for the current document
   
+  async function submitRating() {
+    if (!selectedRating.value) {
+      ratingMessage.value = 'Please select a rating before submitting.';
+      ratingMessageClass.value = 'text-red-500'; // Error style
+    } else {
+      ratingMessage.value = `Thank you for rating ${selectedRating.value} stars!`;
+      ratingMessageClass.value = 'text-green-500'; // Success style
+    }
+    try {
+      // Fetch the userId (e.g., from local storage or your auth system)
+      const userId = localStorage.getItem('userId'); // Adjust as necessary to get the actual userId
+      const token = localStorage.getItem('token'); // Ensure the user is authenticated
+
+      if (!token || !userId) {
+        throw new Error('User not authenticated');
+      }
+
+      const headers = { Authorization: `Bearer ${token}` };
+      const ratingData = {
+        docId: currentDocument.value.id, // Document ID
+        userId: userId,                  // User ID (from auth)
+        rating: selectedRating.value      // Selected rating (1-5)
+      };
+
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}api/v1/ratings`,
+        ratingData,
+        { headers }
+      );
+
+      if (response.data && response.data.message) {
+        alert('Rating submitted successfully.');
+      }
+
+    } catch (error) {
+      if (error.response && error.response.data.message) {
+        ratingMessage.value = `Error: ${error.response.data.message}`;
+        ratingMessageClass.value = 'text-red-500'; // Error style
+      } else {
+        ratingMessage.value = 'An error occurred while submitting your rating. please try again';
+        ratingMessageClass.value = 'text-red-500'; // Error style
+      }
+    } finally {
+      // Clear the selected rating after submission
+      selectedRating.value = '';
+    }
+  }
+
+
   function showPreview(document) {
     currentDocument.value = document;
     currentDocumentPreviewImages.value = document.light_preview_url ? document.light_preview_url.split(',') : [];
     currentImageIndex.value = 0;
     showModal.value = true;
+  }
+  // Function to go back to the previous page
+  function goBack() {
+    router.back(); // Navigate to the previous page
   }
   
   function closePreview() {
@@ -586,4 +713,56 @@
 .dark-mode .download-btn:hover {
   background: #2ecc71;
 }
+.rating-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.rating-label {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.star-rating {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 15px;
+}
+
+.star {
+  font-size: 2rem;
+  color: #ffd700;
+  padding: 0 5px;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.star:hover {
+  transform: scale(1.2);
+}
+
+.submit-rating-btn {
+  padding: 10px 20px;
+  background-color: #4CAF50;
+  border: none;
+  border-radius: 20px;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.submit-rating-btn:hover {
+  background-color: #45a049;
+}
+
+/* Add custom styling for rating message */
+.rating-message {
+  transition: opacity 0.3s ease-in-out;
+}
+
+
+
 </style>
