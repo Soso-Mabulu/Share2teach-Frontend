@@ -1,78 +1,62 @@
 <template>
-  <main class="w-full h-screen flex flex-col items-center justify-center px-4">
-    <div class="max-w-sm w-full text-gray-600 space-y-5">
-      <div class="text-center pb-8">
+  <main class="w-full min-h-screen flex flex-col items-center justify-center px-4 bg-purple-50">
+    <div class="max-w-md w-full bg-white rounded-xl shadow-lg p-8 space-y-6">
+      <div class="text-center">
         <img
           src="@/assets/logo.jpg"
-          width="150"
-          class="mx-auto rounded-xl"
+          width="120"
+          class="mx-auto rounded-full border-4 border-purple-200"
           alt="Vault-Xpence Logo"
         />
-        <div class="mt-5">
-          <h3 class="text-gray-800 text-2xl font-bold sm:text-3xl">Log in to your account</h3>
-        </div>
+        <h3 class="mt-4 text-purple-800 text-2xl font-bold">Log in to your account</h3>
       </div>
       <form @submit.prevent="login" class="space-y-5">
         <div>
-          <label class="font-medium">Email</label>
+          <label class="block text-sm font-medium text-purple-700 mb-1">Email</label>
           <input
             type="email"
             v-model="email"
             required
-            class="w-full mt-2 px-3 py-2 text-gray-500 bg-transparent outline-none border focus:border-indigo-600 shadow-sm rounded-lg"
+            class="w-full px-3 py-2 text-purple-700 bg-purple-50 border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent"
           />
         </div>
         <div>
-          <label class="font-medium">Password</label>
+          <label class="block text-sm font-medium text-purple-700 mb-1">Password</label>
           <input
             type="password"
             v-model="password"
             required
-            class="w-full mt-2 px-3 py-2 text-gray-500 bg-transparent outline-none border focus:border-indigo-600 shadow-sm rounded-lg"
+            class="w-full px-3 py-2 text-purple-700 bg-purple-50 border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent"
           />
         </div>
         <div class="flex items-center justify-between text-sm">
-          <div class="flex items-center gap-x-3">
-            <input type="checkbox" id="remember-me-checkbox" class="checkbox-item peer hidden" />
-            <label
-              for="remember-me-checkbox"
-              class="relative flex w-5 h-5 bg-white peer-checked:bg-indigo-600 rounded-md border ring-offset-2 ring-indigo-600 duration-150 peer-active:ring cursor-pointer after:absolute after:inset-x-0 after:top-[3px] after:m-auto after:w-1.5 after:h-2.5 after:border-r-2 after:border-b-2 after:border-white after:rotate-45"
-            ></label>
-            <span>Remember me</span>
+          <div class="flex items-center">
+            <input type="checkbox" id="remember-me-checkbox" class="form-checkbox h-4 w-4 text-purple-600 transition duration-150 ease-in-out" />
+            <label for="remember-me-checkbox" class="ml-2 block text-purple-700">Remember me</label>
           </div>
-          <a @click="forgotPassword" class="text-center text-indigo-600 hover:text-indigo-500">Forgot password?</a>
+          <a @click="forgotPassword" class="text-purple-600 hover:text-purple-800 font-medium">Forgot password?</a>
         </div>
         <button
           type="submit"
           :disabled="loading"
-          class="w-full px-4 py-2 text-white font-medium bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-600 rounded-lg duration-150 flex items-center justify-center gap-2"
+          class="w-full px-4 py-2 text-white font-medium bg-purple-600 hover:bg-purple-700 rounded-lg transition duration-150 ease-in-out flex items-center justify-center"
         >
-          <span v-if="loading" class="loader"></span>
-          <span v-else>Sign in</span>
+          <span v-if="loading" class="loader mr-2"></span>
+          <span>{{ loading ? 'Signing in...' : 'Sign in' }}</span>
         </button>
       </form>
-      <button
-        class="w-full flex items-center justify-center gap-x-3 py-2.5 border rounded-lg text-sm font-medium hover:bg-gray-50 duration-150 active:bg-gray-100"
-        @click="loginWithGoogle"
-      >
-        <img
-          src="https://raw.githubusercontent.com/sidiDev/remote-assets/7cd06bf1d8859c578c2efbfda2c68bd6bedc66d8/google-icon.svg"
-          alt="Google"
-          class="w-5 h-5"
-        />
-        Continue with Google
-      </button>
-      <p class="text-center">
+      <div id="googleButton" class="flex justify-center"></div>
+      <p class="text-center text-purple-700">
         Don't have an account?
-        <router-link to="/signup" class="font-medium text-indigo-600 hover:text-indigo-500">Sign up</router-link>
+        <router-link to="/signup" class="font-medium text-purple-600 hover:text-purple-800">Sign up</router-link>
       </p>
-      <p v-if="errorMessage" class="text-red-600 text-center">{{ errorMessage }}</p>
+      <p v-if="errorMessage" class="text-red-600 text-center text-sm">{{ errorMessage }}</p>
     </div>
   </main>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
 
@@ -136,15 +120,20 @@ function forgotPassword() {
   router.push('/forgot-password') // Redirect to the forgot password page
 }
 
-// Google login function
-async function loginWithGoogle() {
-  try {
-    // Redirect to your backend authentication route that handles Google OAuth
-    window.location.href = `${import.meta.env.VITE_API_URL}/api/v1/auth/google`
-  } catch (error) {
-    // Handle any errors that occur during the redirect
-    console.error('Google login error:', error) // Log the error for debugging
-  }
+// Function to handle Google Sign-In response
+function handleCredentialResponse(response) {
+  axios.post(`${import.meta.env.VITE_API_URL}/api/v1/auth/google`, {
+    token: response.credential
+  })
+  .then(res => {
+    const { token, redirectUrl } = res.data;
+    localStorage.setItem('token', token);
+    window.location.href = redirectUrl;
+  })
+  .catch(error => {
+    console.error('Google login error:', error);
+    errorMessage.value = 'Google login failed. Please try again.';
+  });
 }
 
 // Function to decode base64 URL-encoded token
@@ -154,7 +143,30 @@ function base64UrlDecode(str) {
   return JSON.parse(window.atob(padded))
 }
 
-// Use a route guard or mounted hook to handle the token after redirect
+onMounted(() => {
+  // Load the Google Sign-In API script
+  const script = document.createElement('script');
+  script.src = 'https://accounts.google.com/gsi/client';
+  script.async = true;
+  script.defer = true;
+  document.head.appendChild(script);
+
+  script.onload = () => {
+    window.google.accounts.id.initialize({
+      client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+      callback: handleCredentialResponse
+    });
+    window.google.accounts.id.renderButton(
+      document.getElementById('googleButton'),
+      { theme: 'outline', size: 'large' }  // Customization attributes
+    );
+  };
+
+  // Handle token from redirect (if any)
+  handleTokenFromRedirect();
+});
+
+// Function to handle token from redirect
 async function handleTokenFromRedirect() {
   const token = new URLSearchParams(window.location.search).get('token')
   if (token) {
@@ -171,32 +183,28 @@ async function handleTokenFromRedirect() {
     else if (userRole === 'educator') {
       router.push({ path: '/educator-dashboard' })
     }
+    else if (userRole === 'moderator') {
+      router.push({ path: '/moderator-dashboard' })
+    }
     else {
       router.push({ path: '/public-user-dashboard' })
     }
   }
 }
-
-// Call handleTokenFromRedirect() after your component mounts
-handleTokenFromRedirect()
 </script>
 
 <style scoped>
 .loader {
-  border: 2px solid #f3f3f3;
+  border: 2px solid #e2e8f0;
   border-radius: 50%;
-  border-top: 2px solid #3498db;
-  width: 16px;
-  height: 16px;
+  border-top: 2px solid #8b5cf6;
+  width: 18px;
+  height: 18px;
   animation: spin 1s linear infinite;
 }
 
 @keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 </style>

@@ -98,40 +98,19 @@
         <div>
             <h6
             class="mb-4 flex justify-center font-semibold uppercase md:justify-start">
-            Products
+            Information
             </h6>
             <p class="mb-4">
-            <a href="#!">Learning Modules</a>
+            <a href="#!">About Us</a>
             </p>
             <p class="mb-4">
-            <a href="#!">Assessments</a>
-            </p>
-            <p class="mb-4">
-            <a href="#!">Projects</a>
+            <a href="#!">Services</a>
             </p>
             <p>
             <a href="#!">Analytics</a>
             </p>
         </div>
         <!-- Useful links section -->
-        <div>
-            <h6
-            class="mb-4 flex justify-center font-semibold uppercase md:justify-start">
-            Useful links
-            </h6>
-            <p class="mb-4">
-            <a href="#!">Pricing</a>
-            </p>
-            <p class="mb-4">
-            <a href="#!">Settings</a>
-            </p>
-            <p class="mb-4">
-            <a href="#!">My Courses</a>
-            </p>
-            <p>
-            <a href="#!">Help</a>
-            </p>
-        </div>
         <!-- Contact section -->
         <div>
             <h6
