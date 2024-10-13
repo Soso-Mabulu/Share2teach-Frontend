@@ -21,9 +21,13 @@
     "axios": "^1.7.7",
     "chart.js": "^4.4.4",
 <<<<<<< HEAD
+<<<<<<< HEAD
     "gsap": "^3.12.5",
 =======
 >>>>>>> 90706d2 (Add html2canvas and jspdf dependencies)
+=======
+    "gsap": "^3.12.5",
+>>>>>>> 5313f91 (Add gsap dependency and enhance LandingNavbar UI)
     "html2canvas": "^1.4.1",
     "jspdf": "^2.5.2",
     "jwt-decode": "^4.0.0",
