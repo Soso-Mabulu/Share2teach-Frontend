@@ -1,6 +1,6 @@
 <template>
   <section class="bg-white text-gray-900 m-6">
-    <h2 class="text-2xl font-bold sm:text-4xl text-center m-6 text-purple-800">Continue Reading</h2>
+    <h2 class="text-2xl font-bold sm:text-4xl text-center m-6 text-gray-900">Continue Reading</h2>
 
     <!-- Limit to 4 Cards -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

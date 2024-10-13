@@ -8,6 +8,9 @@ import ForgotPasswordView from '@/views/ForgotPasswordView.vue';
 import ResetPasswordView from '@/views/ResetPasswordView.vue';
 import SearchResultsView from '@/views/SearchResultsView.vue';
 import AllDocuments from '@/views/AllDocuments.vue';
+import TutoringServices from '@/views/TutoringServices.vue';
+import OnlineCourses from '@/views/OnlineCourses.vue';
+import StudentCounseling from '@/views/StudentCounseling.vue';
 
 
 
@@ -113,6 +116,22 @@ const router = createRouter({
       meta: { requiresAuth: true },
 
     },
+    {
+      path: '/tutoring-services',
+      name: 'TutoringServices',
+      component: TutoringServices,
+    },
+    {
+      path: '/online-courses',
+      name: 'OnlineCourses',
+      component: OnlineCourses,
+    },
+    {
+      path: '/student-counseling',
+      name: 'StudentCounseling',
+      component: StudentCounseling,
+    },
+    
 
     // Moderator routes
     {
