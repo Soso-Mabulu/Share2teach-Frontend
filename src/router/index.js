@@ -376,19 +376,13 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
-      path: '/educator-faq',
-      name: 'EducatorFAQView',
-      component: EducatorFAQView,
-      meta: { requiresAuth: true },
-    },
-    {
       path: '/educator-upload',
       name: 'EducatorUpload',
       component: EducatorUpload,
       meta: { requiresAuth: true },
     },
     {
-      path: '/approved-documents',
+      path: '/educator-approved-documents',
       name: 'EducatorAllApprovedDocumentsView',
       component: EducatorAllApprovedDocumentsView,
       meta: { requiresAuth: true },
