@@ -51,17 +51,7 @@
           <span v-else>Sign in</span>
         </button>
       </form>
-      <button
-        class="w-full flex items-center justify-center gap-x-3 py-2.5 border rounded-lg text-sm font-medium hover:bg-gray-50 duration-150 active:bg-gray-100"
-        @click="loginWithGoogle"
-      >
-        <img
-          src="https://raw.githubusercontent.com/sidiDev/remote-assets/7cd06bf1d8859c578c2efbfda2c68bd6bedc66d8/google-icon.svg"
-          alt="Google"
-          class="w-5 h-5"
-        />
-        Continue with Google
-      </button>
+      <div id="googleButton"></div>
       <p class="text-center">
         Don't have an account?
         <router-link to="/signup" class="font-medium text-indigo-600 hover:text-indigo-500">Sign up</router-link>
@@ -72,7 +62,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
 
@@ -136,15 +126,20 @@ function forgotPassword() {
   router.push('/forgot-password') // Redirect to the forgot password page
 }
 
-// Google login function
-async function loginWithGoogle() {
-  try {
-    // Redirect to your backend authentication route that handles Google OAuth
-    window.location.href = `${import.meta.env.VITE_API_URL}/api/v1/auth/google`
-  } catch (error) {
-    // Handle any errors that occur during the redirect
-    console.error('Google login error:', error) // Log the error for debugging
-  }
+// Function to handle Google Sign-In response
+function handleCredentialResponse(response) {
+  axios.post(`${import.meta.env.VITE_API_URL}/api/v1/auth/google`, {
+    token: response.credential
+  })
+  .then(res => {
+    const { token, redirectUrl } = res.data;
+    localStorage.setItem('token', token);
+    window.location.href = redirectUrl;
+  })
+  .catch(error => {
+    console.error('Google login error:', error);
+    errorMessage.value = 'Google login failed. Please try again.';
+  });
 }
 
 // Function to decode base64 URL-encoded token
@@ -154,7 +149,30 @@ function base64UrlDecode(str) {
   return JSON.parse(window.atob(padded))
 }
 
-// Use a route guard or mounted hook to handle the token after redirect
+onMounted(() => {
+  // Load the Google Sign-In API script
+  const script = document.createElement('script');
+  script.src = 'https://accounts.google.com/gsi/client';
+  script.async = true;
+  script.defer = true;
+  document.head.appendChild(script);
+
+  script.onload = () => {
+    window.google.accounts.id.initialize({
+      client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+      callback: handleCredentialResponse
+    });
+    window.google.accounts.id.renderButton(
+      document.getElementById('googleButton'),
+      { theme: 'outline', size: 'large' }  // Customization attributes
+    );
+  };
+
+  // Handle token from redirect (if any)
+  handleTokenFromRedirect();
+});
+
+// Function to handle token from redirect
 async function handleTokenFromRedirect() {
   const token = new URLSearchParams(window.location.search).get('token')
   if (token) {
@@ -171,14 +189,14 @@ async function handleTokenFromRedirect() {
     else if (userRole === 'educator') {
       router.push({ path: '/educator-dashboard' })
     }
+    else if (userRole === 'moderator') {
+      router.push({ path: '/moderator-dashboard' })
+    }
     else {
       router.push({ path: '/public-user-dashboard' })
     }
   }
 }
-
-// Call handleTokenFromRedirect() after your component mounts
-handleTokenFromRedirect()
 </script>
 
 <style scoped>
