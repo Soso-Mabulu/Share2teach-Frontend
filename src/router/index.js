@@ -88,13 +88,11 @@ const router = createRouter({
       path: '/forgot-password',
       name: 'ForgotPasswordView',
       component: ForgotPasswordView,
-      meta: { requiresAuth: true }
     },
     {
       path: '/reset-password',
       name: 'ResetPasswordView',
       component: ResetPasswordView,
-      meta: { requiresAuth: true }
     },
     {
       path: '/search-results',
