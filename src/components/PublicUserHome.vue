@@ -25,17 +25,14 @@
       <div class="relative mb-8 md:mb-12 max-w-2xl mx-auto">
         <input 
           type="text" 
-          v-model="searchQuery" 
+          v-model="searchTerm" 
           @keyup.enter="handleSearch"
           placeholder="Search the cosmos..." 
           class="w-full py-3 md:py-4 px-4 md:px-6 rounded-full bg-white bg-opacity-20 backdrop-filter backdrop-blur-lg text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-white"
         />
-        <button @click="handleSearch" class="absolute right-2 top-2 bg-white bg-opacity-30 rounded-full p-2 hover:bg-opacity-50 transition-all duration-300 ease-in-out">
-          🔍
-        </button>
       </div>
 
-      <!-- High Rated Documents -->
+            <!-- High Rated Documents -->
       <div class="mb-8 md:mb-12">
         <h2 class="text-2xl md:text-3xl font-bold text-center text-white mb-6 md:mb-8">High Rated Documents</h2>
         <div class="relative">
@@ -44,7 +41,7 @@
           </button>
           <div ref="highRatedScrollContainer" class="flex overflow-x-auto space-x-6 pb-4 scrollbar-hide">
             <div 
-              v-for="(document, index) in highRatedDocuments" 
+              v-for="(document, index) in filteredHighRatedDocuments" 
               :key="index" 
               @click="showPreview(document)"
               class="flex-shrink-0 w-64 md:w-1/4 bg-white bg-opacity-10 backdrop-filter backdrop-blur-lg rounded-lg overflow-hidden transform hover:scale-105 transition-all duration-300 ease-in-out cursor-pointer"
@@ -77,7 +74,7 @@
           </button>
           <div ref="approvedScrollContainer" class="flex overflow-x-auto space-x-6 pb-4 scrollbar-hide">
             <div 
-              v-for="(document, index) in approvedDocuments" 
+              v-for="(document, index) in filteredApprovedDocuments" 
               :key="index" 
               @click="showPreview(document)"
               class="flex-shrink-0 w-64 md:w-1/4 bg-white bg-opacity-10 backdrop-filter backdrop-blur-lg rounded-lg overflow-hidden transform hover:scale-105 transition-all duration-300 ease-in-out cursor-pointer"
@@ -100,6 +97,7 @@
           </button>
         </div>
       </div>
+
 
       <button @click="router.push({ name: '/public-user-view-all-documents?token=${token}' })" class="block mx-auto py-2 md:py-3 px-4 md:px-6 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-full text-white font-semibold transform hover:scale-105 transition-all duration-300 ease-in-out">
         Explore Documents
@@ -181,7 +179,7 @@ const router = useRouter();
 const highRatedDocuments = ref([]);
 const approvedDocuments = ref([]);
 const ratings = ref([]);
-const searchQuery = ref('');
+const searchTerm = ref('');
 const isDarkMode = ref(false);
 const showModal = ref(false);
 const currentDocument = ref(null);
@@ -391,6 +389,21 @@ async function submitRating() {
   }
 }
 
+  const filteredHighRatedDocuments = computed(() => {
+    return highRatedDocuments.value.filter(doc => 
+      doc.title.toLowerCase().includes(searchTerm.value.toLowerCase()) ||
+      doc.description.toLowerCase().includes(searchTerm.value.toLowerCase())
+    );
+  });
+
+  const filteredApprovedDocuments = computed(() => {
+    return approvedDocuments.value.filter(doc => 
+      doc.title.toLowerCase().includes(searchTerm.value.toLowerCase()) ||
+      doc.description.toLowerCase().includes(searchTerm.value.toLowerCase())
+    );
+  });
+
+
 
 // Open and close report popup
 function openReportPopup() {
@@ -478,11 +491,6 @@ function prevImage() {
   currentImageIndex.value = (currentImageIndex.value - 1 + currentDocumentPreviewImages.value.length) % currentDocumentPreviewImages.value.length;
 }
 
-function handleSearch() {
-  if (searchQuery.value) {
-    router.push({ name: 'search-results', query: { term: searchQuery.value } });
-  }
-}
 
 function scrollDocuments(direction, section) {
   const container = section === 'highRated' ? highRatedScrollContainer.value : approvedScrollContainer.value;

@@ -1,58 +1,23 @@
 <script setup>
 import PublicUserSideBar from '@/components/PublicUserSideBar.vue';
+import MainFooter from '@/components/MainFooter.vue';
+import PublicUserNavbar from '@/components/PublicUserNavbar.vue';
 import PublicUserHome from '@/components/PublicUserHome.vue';
-import MainFooter from '@/components/MainFooter.vue'; // Import the Footer
-import MainNavbar from '@/components/MainNavbar.vue'; // Import the MainNavbar component
 </script>
 
 <template>
-  <div class="public-user-view">
-    <MainNavbar style="position: fixed; top: 0; width: 100%; z-index: 1000;"/>
-    <div class="main-content">
-      <PublicUserSideBar />
-      <div class="hero-container">
+  <div class="flex flex-col min-h-screen">
+    <PublicUserNavbar class="z-10" />
+    <div class="flex-grow flex">
+      <PublicUserSideBar class="hidden lg:block flex-shrink-0" />
+      <main class="flex-grow overflow-auto">
         <PublicUserHome />
-      </div>
+      </main>
     </div>
     <MainFooter />
   </div>
 </template>
 
 <style scoped>
-.public-user-view {
-  display: flex;
-  flex-direction: column; /* Stack navbar and footer vertically */
-  height: 100vh; /* Full viewport height */
-}
-
-.main-content {
-  display: flex; /* Side by side layout */
-  flex-grow: 1; /* Fill the space between navbar and footer */
-}
-
-.sidebar {
-  width: 30%; /* Sidebar takes 30% of the width */
-  flex-shrink: 0; /* Prevent sidebar from shrinking */
-  /* Removed background color */
-  /* Removed shadow */
-}
-
-.hero-container {
-  width: 100%; /* Adjust width as necessary */
-  padding: 20px; /* Add padding for spacing */
-  display: flex; /* Use flexbox for centering */
-  justify-content: center; /* Center horizontally */
-  align-items: center; /* Center vertically */
-}
-
-@media (max-width: 1024px) {
-  .main-content {
-    flex-direction: column; /* Stack on smaller screens */
-  }
-
-  .sidebar,
-  .hero-container {
-    width: 100%; /* Full width on mobile */
-  }
-}
+/* You can add any additional styles here if needed */
 </style>
