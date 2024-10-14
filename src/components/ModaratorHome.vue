@@ -263,9 +263,19 @@ async function submitRating() {
     }
 
   } catch (error) {
-    if (error.response && error.response.data.message) {
-      const errorMessage = error.response.data.message;
+    // Extracting error message more effectively
+    let errorMessage = 'An unexpected error occurred.';
 
+    if (error.response) {
+      // Check if error response has a data object
+      if (error.response.data) {
+        if (error.response.data.error) {
+          errorMessage = error.response.data.error; // Use the error key for the message
+        } else if (error.response.data.message) {
+          errorMessage = error.response.data.message; // Fallback to message if error key is not available
+        }
+      }
+      
       // Specific check for the duplicate rating error
       if (errorMessage === "You cannot rate the same document more than once") {
         ratingMessage.value = 'You have already rated this document. Thank you!';
@@ -275,13 +285,7 @@ async function submitRating() {
 
       ratingMessageClass.value = 'text-red-500'; // Error style
       console.log('Rating submission error:', errorMessage);
-      console.error('Error details:', error.response ? error.response.data : error.message);
-
-    } else {
-      ratingMessage.value = 'An error occurred while submitting your rating. Please try again.';
-      ratingMessageClass.value = 'text-red-500'; // Error style
-      console.error('An unexpected error occurred:', error.message);  
-      console.error('Error details:', error.response ? error.response.data : error.message);
+      console.error('Error details:', error.response.data);
     }
   } finally {
     // Clear the selected rating after submission
