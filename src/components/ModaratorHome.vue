@@ -56,8 +56,7 @@
         <p class="author">By: {{ currentDocument.author }}</p>
         <a :href="currentDocument.download_url" class="download-btn" download>Download Full Document</a>
         <button class="close-btn" @click="closePreview">Close</button>
-      </div>
-      <!-- Rating Section -->
+        <!-- Rating Section -->
       <!-- Rating Section -->
       <div class="rating-section">
         <label class="rating-label">Rate this document:</label>
@@ -89,6 +88,7 @@
         <textarea v-model="reportReason" placeholder="Enter reason for reporting this document" class="report-textarea"></textarea>
         <button class="submit-report-btn" @click="submitReport">Submit Report</button>
         <button class="cancel-report-btn" @click="closeReportPopup">Cancel</button>
+      </div>
       </div>
       </div>
     </div>
