@@ -50,7 +50,7 @@
             <div class="form-group">
               <label for="userType">Role:</label>
               <select v-model="selectedUser.userType" id="userType">
-                <option value="user">User</option>
+                <option value="public">User</option>
                 <option value="admin">Admin</option>
                 <option value="moderator">Moderator</option>
                 <option value="educator">Educator</option>

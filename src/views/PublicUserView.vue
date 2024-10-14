@@ -7,7 +7,7 @@ import MainNavbar from '@/components/MainNavbar.vue'; // Import the MainNavbar c
 
 <template>
   <div class="public-user-view">
-    <MainNavbar />
+    <MainNavbar style="position: fixed; top: 0; width: 100%; z-index: 1000;"/>
     <div class="main-content">
       <PublicUserSideBar />
       <div class="hero-container">
