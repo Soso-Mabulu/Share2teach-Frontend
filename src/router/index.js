@@ -141,7 +141,7 @@ const router = createRouter({
     },
     {
       path: '/documents/approved',
-      name: 'ViewAllDocuments',
+      name: 'ApprovedDocuments',
       component: ViewAllDocuments,
       meta: { requiresAuth: true },
     },

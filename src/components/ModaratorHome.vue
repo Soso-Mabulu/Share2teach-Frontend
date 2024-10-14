@@ -20,12 +20,12 @@
       <h2 class="section-title">{{ getSectionTitle(sectionName) }}</h2>
       <div class="documents-container">
         <div class="documents-grid">
-          <div 
-            v-for="(document, index) in limitedDocuments[sectionName]" 
-            :key="index" 
-            class="document-card"
-            @click="showPreview(document)"
-          >
+            <div 
+              v-for="(document, index) in limitedDocuments[sectionName]" 
+              :key="index" 
+              class="document-card"
+              @click="showPreview(document)"
+            >
             <img :src="document.preview_image_url || defaultImage" alt="Document Preview" class="document-image" />
             <div class="doc-info">
               <h3 class="doc-title">{{ document.title }}</h3>
@@ -62,112 +62,112 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
-import { useRouter } from 'vue-router'; // Import the router
-import axios from 'axios';
-import defaultImage from '@/assets/documentIcon.png';
+  import { ref, computed, onMounted } from 'vue';
+  import { useRouter } from 'vue-router'; // Import the router
+  import axios from 'axios';
+  import defaultImage from '@/assets/documentIcon.png';
 
-const documents = ref({
-  pending: [],
-  approved: [],
-});
-
-const searchQuery = ref('');
-const isDarkMode = ref(false);
-const showModal = ref(false);
-const currentDocument = ref(null);
-const currentDocumentPreviewImages = ref([]);
-const currentImageIndex = ref(0);
-const router = useRouter(); // Initialize router
-
-onMounted(() => {
-  console.log('Component mounted, fetching documents...');
-  fetchDocuments();
-});
-
-const filteredDocuments = computed(() => {
-  const filtered = { pending: [], approved: [] };
-  for (const key in documents.value) {
-    filtered[key] = documents.value[key].filter(document => 
-      document.title.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-      document.description.toLowerCase().includes(searchQuery.value.toLowerCase())
-    );
-  }
-  return filtered;
-});
-
-const limitedDocuments = computed(() => {
-  const limited = { pending: [], approved: [] };
-  for (const key in filteredDocuments.value) {
-    limited[key] = filteredDocuments.value[key].slice(0, 4);
-  }
-  return limited;
-});
-
-function viewAllDocuments(sectionName) {
-  if (sectionName === 'pending') {
-    router.push({ name: 'PendingDocuments' });
-  } else if (sectionName === 'approved') {
-    router.push({ name: 'ApprovedDocuments' });
-  }
-}
-
-async function fetchDocuments() {
-  try {
-    const urlParams = new URLSearchParams(window.location.search);
-    const token = urlParams.get('token');
-    const headers = { Authorization: `Bearer ${token}` };
-
-    const pendingResponse = await axios.get(`${import.meta.env.VITE_API_URL}api/v1/documents/pending`, { headers });
-    const approvedResponse = await axios.get(`${import.meta.env.VITE_API_URL}api/v1/documents/approved`, { headers });
-
-    documents.value.pending = mapDocuments(pendingResponse.data.documents);
-    documents.value.approved = mapDocuments(approvedResponse.data.documents);
-
-  } catch (error) {
-    console.error('Failed to fetch documents:', error.message);
-  }
-}
-
-function mapDocuments(docs) {
-  return docs.map(doc => ({
-    title: doc.title || 'Unknown title',
-    preview_image_url: doc.preview_image_url || defaultImage,
-    description: doc.description || 'No description available',
-    author: doc.author || 'Unknown Author',
-    light_preview_url: doc.light_preview_url || '',
-    download_url: doc.location || '',
-  }));
-}
-
-function showPreview(document) {
-  currentDocument.value = document;
-  currentDocumentPreviewImages.value = document.light_preview_url ? document.light_preview_url.split(',') : [];
-  currentImageIndex.value = 0;
-  showModal.value = true;
-}
-const currentPreviewImage = computed(() => {
-    return currentDocumentPreviewImages.value[currentImageIndex.value] || defaultImage;
+  const documents = ref({
+    pending: [],
+    approved: [],
   });
-function closePreview() {
-  showModal.value = false;
-}
 
-function toggleDarkMode() {
-  document.body.classList.toggle('dark-mode', isDarkMode.value);
-}
+  const searchQuery = ref('');
+  const isDarkMode = ref(false);
+  const showModal = ref(false);
+  const currentDocument = ref(null);
+  const currentDocumentPreviewImages = ref([]);
+  const currentImageIndex = ref(0);
+  const router = useRouter(); // Initialize router
 
-function getSectionTitle(section) {
-  return section.charAt(0).toUpperCase() + section.slice(1) + ' Documents';
-}
+  onMounted(() => {
+    console.log('Component mounted, fetching documents...');
+    fetchDocuments();
+  });
 
-function nextImage() {
-  currentImageIndex.value = (currentImageIndex.value + 1) % currentDocumentPreviewImages.value.length;
-}
+  const filteredDocuments = computed(() => {
+    const filtered = { pending: [], approved: [] };
+    for (const key in documents.value) {
+      filtered[key] = documents.value[key].filter(document => 
+        document.title.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+        document.description.toLowerCase().includes(searchQuery.value.toLowerCase())
+      );
+    }
+    return filtered;
+  });
 
-function prevImage() {
-  currentImageIndex.value = (currentImageIndex.value - 1 + currentDocumentPreviewImages.value.length) % currentDocumentPreviewImages.value.length;
-}
+  const limitedDocuments = computed(() => {
+    const limited = { pending: [], approved: [] };
+    for (const key in filteredDocuments.value) {
+      limited[key] = filteredDocuments.value[key].slice(0, 4);
+    }
+    return limited;
+  });
+
+  function viewAllDocuments(sectionName) {
+    if (sectionName === 'pending') {
+      router.push({ name: 'PendingDocuments' });
+    } else if (sectionName === 'approved') {
+      router.push({ name: 'ApprovedDocuments' });
+    }
+  }
+
+  async function fetchDocuments() {
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const token = urlParams.get('token');
+      const headers = { Authorization: `Bearer ${token}` };
+
+      const pendingResponse = await axios.get(`${import.meta.env.VITE_API_URL}api/v1/documents/pending`, { headers });
+      const approvedResponse = await axios.get(`${import.meta.env.VITE_API_URL}api/v1/documents/approved`, { headers });
+
+      documents.value.pending = mapDocuments(pendingResponse.data.documents);
+      documents.value.approved = mapDocuments(approvedResponse.data.documents);
+
+    } catch (error) {
+      console.error('Failed to fetch documents:', error.message);
+    }
+  }
+
+  function mapDocuments(docs) {
+    return docs.map(doc => ({
+      title: doc.title || 'Unknown title',
+      preview_image_url: doc.preview_image_url || defaultImage,
+      description: doc.description || 'No description available',
+      author: doc.author || 'Unknown Author',
+      light_preview_url: doc.light_preview_url || '',
+      download_url: doc.location || '',
+    }));
+  }
+
+  function showPreview(document) {
+      currentDocument.value = document;
+      currentDocumentPreviewImages.value = document.light_preview_url ? document.light_preview_url.split(',') : [];
+      currentImageIndex.value = 0;
+      showModal.value = true;
+    }
+  const currentPreviewImage = computed(() => {
+      return currentDocumentPreviewImages.value[currentImageIndex.value] || defaultImage;
+    });
+  function closePreview() {
+    showModal.value = false;
+  }
+
+  function toggleDarkMode() {
+    document.body.classList.toggle('dark-mode', isDarkMode.value);
+  }
+
+  function getSectionTitle(section) {
+    return section.charAt(0).toUpperCase() + section.slice(1) + ' Documents';
+  }
+
+  function nextImage() {
+    currentImageIndex.value = (currentImageIndex.value + 1) % currentDocumentPreviewImages.value.length;
+  }
+
+  function prevImage() {
+    currentImageIndex.value = (currentImageIndex.value - 1 + currentDocumentPreviewImages.value.length) % currentDocumentPreviewImages.value.length;
+  }
 </script>
 
 
@@ -180,7 +180,6 @@ function prevImage() {
   flex-direction: column;
   align-items: center;
   background-color: #f5f5f5;
-  z-index: -1; /* Lower than navbar */
 }
 
 .dark-mode {

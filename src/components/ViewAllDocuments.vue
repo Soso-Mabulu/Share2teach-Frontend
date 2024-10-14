@@ -231,6 +231,7 @@
   
   function mapDocuments(docs) {
     return docs.map(doc => ({
+      docId: doc.id || doc.docId || null,
       id: doc.id,
       title: doc.title || 'Unknown title',
       preview_image_url: doc.preview_image_url || defaultImage,
@@ -249,56 +250,106 @@
   }
 
 
-  // Function to submit a rating for the current document
+  function decodeToken(token) {
+  // Split the token into parts (Header, Payload, Signature)
+  const tokenParts = token.split('.');
   
-  async function submitRating() {
-    if (!selectedRating.value) {
-      ratingMessage.value = 'Please select a rating before submitting.';
-      ratingMessageClass.value = 'text-red-500'; // Error style
-    } else {
-      ratingMessage.value = `Thank you for rating ${selectedRating.value} stars!`;
-      ratingMessageClass.value = 'text-green-500'; // Success style
-    }
-    try {
-      // Fetch the userId (e.g., from local storage or your auth system)
-      const userId = localStorage.getItem('userId'); // Adjust as necessary to get the actual userId
-      const token = localStorage.getItem('token'); // Ensure the user is authenticated
-
-      if (!token || !userId) {
-        throw new Error('User not authenticated');
-      }
-
-      const headers = { Authorization: `Bearer ${token}` };
-      const ratingData = {
-        docId: currentDocument.value.id, // Document ID
-        userId: userId,                  // User ID (from auth)
-        rating: selectedRating.value      // Selected rating (1-5)
-      };
-
-      const response = await axios.post(
-        `${import.meta.env.VITE_API_URL}api/v1/ratings`,
-        ratingData,
-        { headers }
-      );
-
-      if (response.data && response.data.message) {
-        alert('Rating submitted successfully.');
-      }
-
-    } catch (error) {
-      if (error.response && error.response.data.message) {
-        ratingMessage.value = `Error: ${error.response.data.message}`;
-        ratingMessageClass.value = 'text-red-500'; // Error style
-      } else {
-        ratingMessage.value = 'An error occurred while submitting your rating. please try again';
-        ratingMessageClass.value = 'text-red-500'; // Error style
-      }
-    } finally {
-      // Clear the selected rating after submission
-      selectedRating.value = '';
-    }
+  if (tokenParts.length !== 3) {
+    throw new Error('Invalid token format');
   }
 
+  // Decode the payload (2nd part of the token)
+  const base64Url = tokenParts[1];
+  const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+  
+  // Convert the Base64-encoded payload to a JSON string
+  const jsonPayload = decodeURIComponent(
+    atob(base64)
+      .split('')
+      .map(function (c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+      })
+      .join('')
+  );
+
+  // Parse the JSON string to get the actual object
+  return JSON.parse(jsonPayload);
+}
+
+// Function to submit a rating for the current document
+async function submitRating() {
+  if (!selectedRating.value) {
+    ratingMessage.value = 'Please select a rating before submitting.';
+    ratingMessageClass.value = 'text-red-500'; // Error style
+  } else {
+    ratingMessage.value = `Thank you for rating ${selectedRating.value} stars!`;
+    ratingMessageClass.value = 'text-green-500'; // Success style
+  }
+  try {
+    // Fetch the userId (e.g., from local storage or your auth system)
+    const token = localStorage.getItem('token'); // Get the token from localStorage
+
+    if (!token) {
+      throw new Error('User not authenticated');
+    }
+
+    // Decode the token to extract the payload manually
+    const decodedToken = decodeToken(token);
+
+    // Assuming the token contains user_id in the payload
+    const userId = decodedToken.id;
+
+    if (!userId) {
+      throw new Error('User ID not found in token');
+    }
+
+    console.log('Extracted userId:', userId);
+
+    const ratingData = {
+      docId: currentDocument.value.docId, // Document ID
+      userId: userId,                  // User ID (from auth)
+      rating: selectedRating.value      // Selected rating (1-5)
+    };
+
+    console.log('Submitting rating:', ratingData);
+
+    const response = await axios.post(
+      `${import.meta.env.VITE_API_URL}api/v1/ratings`,  // Ensure this URL is correct
+      ratingData,
+    );
+    console.log('Rating submitted:', response.data);
+    
+    if (response.data && response.data.message) {
+      ratingMessage.value = 'Rating submitted successfully.';
+      ratingMessageClass.value = 'text-green-500'; // Success style
+    }
+    else {
+      ratingMessage.value = `Error: ${response.data.message}`;;
+      ratingMessageClass.value = 'text-red-500'; // Error style
+    }
+
+  } catch (error) {
+    if (error.response && error.response.data.message) {
+        const errorMessage = error.response.data.message;
+        
+        // Output the error message directly
+        ratingMessage.value = `Error: ${errorMessage}`;
+        ratingMessageClass.value = 'text-red-500'; // Error style
+
+        console.log('Rating submission error:', errorMessage);
+        console.error('Error details:', error.response ? error.response.data : error.message);
+    } else {
+        // Handle unexpected errors
+        ratingMessage.value = 'An unexpected error occurred. Please try again.';
+        ratingMessageClass.value = 'text-red-500'; // Error style
+        console.error('An unexpected error occurred:', error.message);  
+        console.error('Error details:', error.response ? error.response.data : error.message);
+    }
+  } finally {
+    // Clear the selected rating after submission
+    selectedRating.value = '';
+  }
+}
 
   function showPreview(document) {
     currentDocument.value = document;

@@ -7,7 +7,7 @@ import ModaratorHome from '@/components/ModaratorHome.vue';
 </script>
 
 <template>
-  <ModaratorNavbar />
+  <ModaratorNavbar style="position: fixed; top: 0; width: 100%; z-index: 1000;" />
   <div>
     <div class="min-h-screen flex flex-col lg:flex-row">
       <!-- Sidebar -->
