@@ -1,67 +1,64 @@
 <template>
-  <main class="w-full h-screen flex flex-col items-center justify-center px-4">
-    <div class="max-w-sm w-full text-gray-600 space-y-5">
-      <div class="text-center pb-8">
+  <main class="w-full min-h-screen flex flex-col items-center justify-center px-4 bg-purple-50">
+    <div class="max-w-md w-full bg-white rounded-xl shadow-lg p-8 space-y-6">
+      <div class="text-center">
         <img
           src="@/assets/logo.jpg"
-          width="150"
-          class="mx-auto rounded-xl"
+          width="120"
+          class="mx-auto rounded-full border-4 border-purple-200"
           alt="Vault-Xpence Logo"
         />
-        <div class="mt-5">
-          <h3 class="text-gray-800 text-2xl font-bold sm:text-3xl">Create an account</h3>
-        </div>
+        <h3 class="mt-4 text-purple-800 text-2xl font-bold">Create an account</h3>
       </div>
       <form @submit.prevent="signup" class="space-y-5">
         <div>
-          <label class="font-medium">First Name</label>
+          <label class="block text-sm font-medium text-purple-700 mb-1">First Name</label>
           <input
             type="text"
             v-model="firstname"
             required
-            class="w-full mt-2 px-3 py-2 text-gray-500 bg-transparent outline-none border focus:border-indigo-600 shadow-sm rounded-lg"
+            class="w-full px-3 py-2 text-purple-700 bg-purple-50 border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent"
           />
         </div>
         <div>
-          <label class="font-medium">Last Name</label>
+          <label class="block text-sm font-medium text-purple-700 mb-1">Last Name</label>
           <input
             type="text"
             v-model="lastname"
             required
-            class="w-full mt-2 px-3 py-2 text-gray-500 bg-transparent outline-none border focus:border-indigo-600 shadow-sm rounded-lg"
+            class="w-full px-3 py-2 text-purple-700 bg-purple-50 border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent"
           />
         </div>
         <div>
-          <label class="font-medium">Email</label>
+          <label class="block text-sm font-medium text-purple-700 mb-1">Email</label>
           <input
             type="email"
             v-model="email"
             required
-            class="w-full mt-2 px-3 py-2 text-gray-500 bg-transparent outline-none border focus:border-indigo-600 shadow-sm rounded-lg"
+            class="w-full px-3 py-2 text-purple-700 bg-purple-50 border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent"
           />
         </div>
         <div>
-          <label class="font-medium">Password</label>
+          <label class="block text-sm font-medium text-purple-700 mb-1">Password</label>
           <input
             type="password"
             v-model="password"
             required
-            class="w-full mt-2 px-3 py-2 text-gray-500 bg-transparent outline-none border focus:border-indigo-600 shadow-sm rounded-lg"
+            class="w-full px-3 py-2 text-purple-700 bg-purple-50 border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent"
           />
           <p v-if="passwordError" class="text-red-500 text-sm">{{ passwordError }}</p>
         </div>
         <button
           type="submit"
           :disabled="loading"
-          class="w-full px-4 py-2 text-white font-medium bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-600 rounded-lg duration-150 flex items-center justify-center gap-2"
+          class="w-full px-4 py-2 text-white font-medium bg-purple-600 hover:bg-purple-700 rounded-lg transition duration-150 ease-in-out flex items-center justify-center"
         >
-          <!-- Display loading spinner or text based on loading state -->
-          <span v-if="loading" class="loader"></span>
-          <span v-else>Sign up</span>
+          <span v-if="loading" class="loader mr-2"></span>
+          <span>{{ loading ? 'Signing up...' : 'Sign up' }}</span>
         </button>
       </form>
       <button
-        class="w-full flex items-center justify-center gap-x-3 py-2.5 border rounded-lg text-sm font-medium hover:bg-gray-50 duration-150 active:bg-gray-100"
+        class="w-full flex items-center justify-center gap-x-3 py-2.5 border rounded-lg text-sm font-medium text-purple-700 hover:bg-purple-100 duration-150 active:bg-purple-200"
         @click="signupWithGoogle"
       >
         <img
@@ -71,13 +68,11 @@
         />
         Continue with Google
       </button>
-      <p class="text-center">
+      <p class="text-center text-purple-700">
         Already have an account?
-        <router-link to="/login" class="font-medium text-indigo-600 hover:text-indigo-500"
-          >Log in</router-link
-        >
+        <router-link to="/login" class="font-medium text-purple-600 hover:text-purple-800">Log in</router-link>
       </p>
-      <p v-if="errorMessage" class="text-red-600 text-center">{{ errorMessage }}</p>
+      <p v-if="errorMessage" class="text-red-600 text-center text-sm">{{ errorMessage }}</p>
     </div>
   </main>
 </template>
@@ -151,9 +146,13 @@ async function signupWithGoogle() {
 }
 
 // Function to decode base64 URL-encoded token
-// (This function is already declared earlier in the script)
+function base64UrlDecode(str) {
+  const base64 = str.replace(/-/g, '+').replace(/_/g, '/')
+  const padded = base64 + '='.repeat((4 - (base64.length % 4)) % 4)
+  return JSON.parse(window.atob(padded))
+}
 
-// Use a route guard or mounted hook to handle the token after redirect
+// Handle token from redirect function (you can keep your existing logic)
 async function handleTokenFromRedirect() {
   const token = new URLSearchParams(window.location.search).get('token')
   if (token) {
@@ -174,22 +173,15 @@ async function handleTokenFromRedirect() {
 
 // Call handleTokenFromRedirect() after your component mounts
 handleTokenFromRedirect()
-
-// Function to decode base64 URL-encoded token
-function base64UrlDecode(str) {
-  const base64 = str.replace(/-/g, '+').replace(/_/g, '/')
-  const padded = base64 + '='.repeat((4 - (base64.length % 4)) % 4)
-  return JSON.parse(window.atob(padded))
-}
 </script>
+
 <style scoped>
-/* Add any additional styles if needed */
 .loader {
-  border: 2px solid #f3f3f3;
+  border: 2px solid #e2e8f0;
   border-radius: 50%;
-  border-top: 2px solid #3498db;
-  width: 16px;
-  height: 16px;
+  border-top: 2px solid #8b5cf6;
+  width: 18px;
+  height: 18px;
   animation: spin 1s linear infinite;
 }
 
