@@ -141,7 +141,7 @@
   const limitedDocuments = computed(() => {
     const limited = {  approved: [] };
     for (const key in filteredDocuments.value) {
-      limited[key] = filteredDocuments.value[key].slice(0, 4);
+      limited[key] = filteredDocuments.value[key].slice(0, 1);
     }
     return limited;
   });
