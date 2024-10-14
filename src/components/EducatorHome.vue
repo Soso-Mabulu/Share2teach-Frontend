@@ -58,6 +58,41 @@
           <p class="author">By: {{ currentDocument.author }}</p>
           <a :href="currentDocument.download_url" class="download-btn" download>Download Full Document</a>
           <button class="close-btn" @click="closePreview">Close</button>
+                  <!-- Rating Section -->
+        <!-- Rating Section -->
+        <div class="rating-section">
+          <label class="rating-label">Rate this document:</label>
+          <div class="star-rating">
+            <i 
+              v-for="star in 5" 
+              :key="star" 
+              :class="['fa-star', selectedRating >= star ? 'fas' : 'far']"
+              @click="setRating(star)"
+              class="star"
+            ></i>
+          </div>
+          <button class="submit-rating-btn" @click="submitRating">Submit Rating</button>
+        </div>
+
+        <!-- Styled Response for Ratings -->
+        <div v-if="ratingMessage" class="rating-message text-center mt-4 text-lg font-semibold" :class="ratingMessageClass">
+          {{ ratingMessage }}
+        </div>
+
+        <!-- Report Button -->
+        <button class="report-btn" @click="openReportPopup">Report Document</button>
+        <!-- Label for success message -->
+        <label id="report-success-message text-center font-semibold " style="display: none; color: green; margin-top: 10px;"></label>
+
+        <!-- Report Popup -->
+        <div v-if="showReportPopup" class="report-popup-overlay" @click="closeReportPopup">
+        <div class="report-popup-content" @click.stop>
+          <h3>Report Document</h3>
+          <textarea v-model="reportReason" placeholder="Enter reason for reporting this document" class="report-textarea"></textarea>
+          <button class="submit-report-btn" @click="submitReport">Submit Report</button>
+          <button class="cancel-report-btn" @click="closeReportPopup">Cancel</button>
+        </div>
+        </div>
         </div>
       </div>
     </div>
@@ -67,6 +102,7 @@
   import { ref, computed, onMounted } from 'vue';
   import axios from 'axios';
   import defaultImage from '@/assets/documentIcon.png';
+  import '@fortawesome/fontawesome-free/css/all.css';
   
   const documents = ref({
     approved: [],
@@ -78,6 +114,13 @@
   const currentDocument = ref(null);
   const currentDocumentPreviewImages = ref([]);
   const currentImageIndex = ref(0);
+  const selectedRating = ref('');
+  const ratingMessage = ref(''); // New: Message for ratings
+  const ratingMessageClass = ref('text-green-500'); // New: Styling class for rating message
+  // Report popup state
+  const showReportPopup = ref(false);
+  const reportReason = ref('');
+
   
   onMounted(() => {
     console.log('Component mounted, fetching documents...');
@@ -126,6 +169,7 @@
   
   function mapDocuments(docs) {
     return docs.map(doc => ({
+      docId: doc.id || doc.docId || null,
       title: doc.title || 'Unknown title',
       preview_image_url: doc.preview_image_url || defaultImage,
       description: doc.description || 'No description available',
@@ -134,6 +178,170 @@
       download_url: doc.location || '',
     }));
   }
+
+  function setRating(star) {
+  selectedRating.value = star;
+}
+
+
+function decodeToken(token) {
+  // Split the token into parts (Header, Payload, Signature)
+  const tokenParts = token.split('.');
+  
+  if (tokenParts.length !== 3) {
+    throw new Error('Invalid token format');
+  }
+
+  // Decode the payload (2nd part of the token)
+  const base64Url = tokenParts[1];
+  const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+  
+  // Convert the Base64-encoded payload to a JSON string
+  const jsonPayload = decodeURIComponent(
+    atob(base64)
+      .split('')
+      .map(function (c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+      })
+      .join('')
+  );
+
+  // Parse the JSON string to get the actual object
+  return JSON.parse(jsonPayload);
+}
+
+// Function to submit a rating for the current document
+async function submitRating() {
+  if (!selectedRating.value) {
+    ratingMessage.value = 'Please select a rating before submitting.';
+    ratingMessageClass.value = 'text-red-500'; // Error style
+  } else {
+    ratingMessage.value = `Thank you for rating ${selectedRating.value} stars!`;
+    ratingMessageClass.value = 'text-green-500'; // Success style
+  }
+  try {
+    // Fetch the userId (e.g., from local storage or your auth system)
+    const token = localStorage.getItem('token'); // Get the token from localStorage
+
+    if (!token) {
+      throw new Error('User not authenticated');
+    }
+
+    // Decode the token to extract the payload manually
+    const decodedToken = decodeToken(token);
+
+    // Assuming the token contains user_id in the payload
+    const userId = decodedToken.id;
+
+    if (!userId) {
+      throw new Error('User ID not found in token');
+    }
+
+    console.log('Extracted userId:', userId);
+
+    const ratingData = {
+      docId: currentDocument.value.docId, // Document ID
+      userId: userId,                  // User ID (from auth)
+      rating: selectedRating.value      // Selected rating (1-5)
+    };
+
+    console.log('Submitting rating:', ratingData);
+
+    const response = await axios.post(
+      `${import.meta.env.VITE_API_URL}api/v1/ratings`,  // Ensure this URL is correct
+      ratingData,
+    );
+    console.log('Rating submitted:', response.data);
+    
+    if (response.data && response.data.message) {
+      ratingMessage.value = 'Rating submitted successfully.';
+      ratingMessageClass.value = 'text-green-500'; // Success style
+    }
+
+  } catch (error) {
+    if (error.response && error.response.data.message) {
+      const errorMessage = error.response.data.message;
+
+      // Specific check for the duplicate rating error
+      if (errorMessage === "You cannot rate the same document more than once") {
+        ratingMessage.value = 'You have already rated this document. Thank you!';
+      } else {
+        ratingMessage.value = `Error: ${errorMessage}`;
+      }
+
+      ratingMessageClass.value = 'text-red-500'; // Error style
+      console.log('Rating submission error:', errorMessage);
+      console.error('Error details:', error.response ? error.response.data : error.message);
+
+    } else {
+      ratingMessage.value = 'An error occurred while submitting your rating. Please try again.';
+      ratingMessageClass.value = 'text-red-500'; // Error style
+      console.error('An unexpected error occurred:', error.message);  
+      console.error('Error details:', error.response ? error.response.data : error.message);
+    }
+  } finally {
+    // Clear the selected rating after submission
+    selectedRating.value = '';
+  }
+}
+
+
+// Open and close report popup
+function openReportPopup() {
+  showReportPopup.value = true;
+}
+
+function closeReportPopup() {
+  showReportPopup.value = false;
+  reportReason.value = ''; // Clear the reason after closing
+}
+
+// Submit the report
+async function submitReport() {
+  if (!reportReason.value) {
+    alert('Please provide a reason for reporting.');
+    return;
+  }
+
+  try {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      throw new Error('User not authenticated');
+    }
+
+    const decodedToken = decodeToken(token); // Assuming the decodeToken method is available
+    const userId = decodedToken.id;
+
+    const reportData = {
+      docId: currentDocument.value.docId,  // Document ID from the current document
+      userId: userId,                      // User ID from the decoded token
+      reporting_details: reportReason.value // The report reason from the textarea
+    };
+
+    const response = await axios.post(`${import.meta.env.VITE_API_URL}api/v1/report`, reportData, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+
+    if (response.data && response.data.message) {
+        // Show success message using label instead of alert
+        const successLabel = document.getElementById('report-success-message');
+        successLabel.innerText = 'Report submitted successfully.';
+        successLabel.style.display = 'block'; // Show the success message
+
+        // Optionally hide the label after a few seconds
+        setTimeout(() => {
+          successLabel.style.display = 'none';
+        }, 3000);
+
+        closeReportPopup(); // You can remove this if you don't want to close the modal immediately
+      }
+  } catch (error) {
+    console.error('Error reporting document:', error);
+    alert('Failed to report the document. Please try again.');
+  }
+}
+
+
   
   function showPreview(document) {
     currentDocument.value = document;
@@ -525,4 +733,147 @@
   .dark-mode .close-btn:hover {
     color: #e74c3c;
   }
+
+ 
+.rating-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 20px;
+
+}
+
+.rating-label {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.star-rating {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 15px;
+}
+
+.star {
+  font-size: 2rem;
+  color: #ffd700;
+  padding: 0 5px;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.star:hover {
+  transform: scale(1.2);
+}
+
+.submit-rating-btn {
+  padding: 10px 20px;
+  background-color: #4CAF50;
+  border: none;
+  border-radius: 20px;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.submit-rating-btn:hover {
+  background-color: #45a049;
+}
+
+/* Add custom styling for rating message */
+.rating-message {
+  transition: opacity 0.3s ease-in-out;
+}
+.report-btn {
+  margin: 10px auto;
+  display: block;
+  background-color: #f0f0f0;
+  color: #333;
+  padding: 8px 20px;
+  border-radius: 20px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.report-btn:hover {
+  background-color: #ddd;
+}
+
+/* Modal Overlay */
+.report-popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* Modal Content */
+.report-popup-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 15px; /* Rounded corners */
+  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2); /* Soft shadow for better visibility */
+  max-width: 400px;
+  width: 100%;
+  text-align: center; /* Center the content */
+  transition: transform 0.3s ease;
+}
+
+.report-popup-content h2 {
+  font-size: 18px;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+/* Textarea for input */
+.report-textarea {
+  width: 100%;
+  height: 100px;
+  margin-top: 10px;
+  padding: 10px;
+  border-radius: 10px; /* Rounded corners for textarea */
+  border: 1px solid #ccc;
+  font-size: 14px;
+  resize: none; /* Disable resizing for a cleaner look */
+}
+
+/* Buttons for submit/cancel */
+.submit-report-btn,
+.cancel-report-btn {
+  margin-top: 15px;
+  padding: 10px;
+  border-radius: 20px; /* Rounded buttons */
+  width: 100%;
+  font-size: 16px;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.3s ease;
+}
+
+.submit-report-btn {
+  background-color: #4caf50;
+  color: white;
+}
+
+.submit-report-btn:hover {
+  background-color: #45a049;
+}
+
+.cancel-report-btn {
+  background-color: #f44336;
+  color: white;
+}
+
+.cancel-report-btn:hover {
+  background-color: #e53935;
+}
   </style>

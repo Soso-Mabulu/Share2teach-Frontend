@@ -95,6 +95,21 @@
         <div v-if="ratingMessage" class="rating-message text-center mt-4 text-lg font-semibold" :class="ratingMessageClass">
           {{ ratingMessage }}
         </div>
+
+                <!-- Report Button -->
+                <button class="report-btn" @click="openReportPopup">Report Document</button>
+        <!-- Label for success message -->
+        <label id="report-success-message text-center font-semibold " style="display: none; color: green; margin-top: 10px;"></label>
+
+        <!-- Report Popup -->
+        <div v-if="showReportPopup" class="report-popup-overlay" @click="closeReportPopup">
+        <div class="report-popup-content" @click.stop>
+          <h3>Report Document</h3>
+          <textarea v-model="reportReason" placeholder="Enter reason for reporting this document" class="report-textarea"></textarea>
+          <button class="submit-report-btn" @click="submitReport">Submit Report</button>
+          <button class="cancel-report-btn" @click="closeReportPopup">Cancel</button>
+        </div>
+        </div>
       </div>
     </div>
   </div>
@@ -127,6 +142,10 @@
   const selectedRating = ref('');
   const ratingMessage = ref(''); // New: Message for ratings
   const ratingMessageClass = ref('text-green-500'); // New: Styling class for rating message
+
+  // Report popup state
+  const showReportPopup = ref(false);
+  const reportReason = ref('');
 
 
   
@@ -244,13 +263,12 @@
     }));
   }
 
-  // Function to set the selected rating
   function setRating(star) {
-    selectedRating.value = star;
-  }
+  selectedRating.value = star;
+}
 
 
-  function decodeToken(token) {
+function decodeToken(token) {
   // Split the token into parts (Header, Payload, Signature)
   const tokenParts = token.split('.');
   
@@ -323,33 +341,91 @@ async function submitRating() {
       ratingMessage.value = 'Rating submitted successfully.';
       ratingMessageClass.value = 'text-green-500'; // Success style
     }
-    else {
-      ratingMessage.value = `Error: ${response.data.message}`;;
-      ratingMessageClass.value = 'text-red-500'; // Error style
-    }
 
   } catch (error) {
     if (error.response && error.response.data.message) {
-        const errorMessage = error.response.data.message;
-        
-        // Output the error message directly
-        ratingMessage.value = `Error: ${errorMessage}`;
-        ratingMessageClass.value = 'text-red-500'; // Error style
+      const errorMessage = error.response.data.message;
 
-        console.log('Rating submission error:', errorMessage);
-        console.error('Error details:', error.response ? error.response.data : error.message);
+      // Specific check for the duplicate rating error
+      if (errorMessage === "You cannot rate the same document more than once") {
+        ratingMessage.value = 'You have already rated this document. Thank you!';
+      } else {
+        ratingMessage.value = `Error: ${errorMessage}`;
+      }
+
+      ratingMessageClass.value = 'text-red-500'; // Error style
+      console.log('Rating submission error:', errorMessage);
+      console.error('Error details:', error.response ? error.response.data : error.message);
+
     } else {
-        // Handle unexpected errors
-        ratingMessage.value = 'An unexpected error occurred. Please try again.';
-        ratingMessageClass.value = 'text-red-500'; // Error style
-        console.error('An unexpected error occurred:', error.message);  
-        console.error('Error details:', error.response ? error.response.data : error.message);
+      ratingMessage.value = 'An error occurred while submitting your rating. Please try again.';
+      ratingMessageClass.value = 'text-red-500'; // Error style
+      console.error('An unexpected error occurred:', error.message);  
+      console.error('Error details:', error.response ? error.response.data : error.message);
     }
   } finally {
     // Clear the selected rating after submission
     selectedRating.value = '';
   }
 }
+
+
+// Open and close report popup
+function openReportPopup() {
+  showReportPopup.value = true;
+}
+
+function closeReportPopup() {
+  showReportPopup.value = false;
+  reportReason.value = ''; // Clear the reason after closing
+}
+
+// Submit the report
+async function submitReport() {
+  if (!reportReason.value) {
+    alert('Please provide a reason for reporting.');
+    return;
+  }
+
+  try {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      throw new Error('User not authenticated');
+    }
+
+    const decodedToken = decodeToken(token); // Assuming the decodeToken method is available
+    const userId = decodedToken.id;
+
+    const reportData = {
+      docId: currentDocument.value.docId,  // Document ID from the current document
+      userId: userId,                      // User ID from the decoded token
+      reporting_details: reportReason.value // The report reason from the textarea
+    };
+
+    const response = await axios.post(`${import.meta.env.VITE_API_URL}api/v1/report`, reportData, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+
+    if (response.data && response.data.message) {
+        // Show success message using label instead of alert
+        const successLabel = document.getElementById('report-success-message');
+        successLabel.innerText = 'Report submitted successfully.';
+        successLabel.style.display = 'block'; // Show the success message
+
+        // Optionally hide the label after a few seconds
+        setTimeout(() => {
+          successLabel.style.display = 'none';
+        }, 3000);
+
+        closeReportPopup(); // You can remove this if you don't want to close the modal immediately
+      }
+  } catch (error) {
+    console.error('Error reporting document:', error);
+    alert('Failed to report the document. Please try again.');
+  }
+}
+
+
 
   function showPreview(document) {
     currentDocument.value = document;

@@ -128,6 +128,22 @@
         <div v-if="ratingMessage" class="rating-message text-center mt-4 text-lg font-semibold" :class="ratingMessageClass">
           {{ ratingMessage }}
         </div>
+
+
+        <!-- Report Button -->
+        <button class="report-btn" @click="openReportPopup">Report Document</button>
+        <!-- Label for success message -->
+        <label id="report-success-message text-center font-semibold " style="display: none; color: green; margin-top: 10px;"></label>
+
+        <!-- Report Popup -->
+        <div v-if="showReportPopup" class="report-popup-overlay" @click="closeReportPopup">
+        <div class="report-popup-content" @click.stop>
+          <h3>Report Document</h3>
+          <textarea v-model="reportReason" placeholder="Enter reason for reporting this document" class="report-textarea"></textarea>
+          <button class="submit-report-btn" @click="submitReport">Submit Report</button>
+          <button class="cancel-report-btn" @click="closeReportPopup">Cancel</button>
+        </div>
+        </div>
       </div>
     </div>
   </div>
@@ -156,6 +172,9 @@ const selectedYear = ref('');
 const selectedCategory = ref('');
 const ratingMessage = ref(''); // New: Message for ratings
 const ratingMessageClass = ref('text-green-500'); // New: Styling class for rating message
+// Report popup state
+const showReportPopup = ref(false);
+const reportReason = ref('');
 
 // Fetch approved documents and ratings on mount
 onMounted(() => {
@@ -317,6 +336,62 @@ async function submitRating() {
   }
 }
 
+
+// Open and close report popup
+function openReportPopup() {
+  showReportPopup.value = true;
+}
+
+function closeReportPopup() {
+  showReportPopup.value = false;
+  reportReason.value = ''; // Clear the reason after closing
+}
+
+// Submit the report
+async function submitReport() {
+  if (!reportReason.value) {
+    alert('Please provide a reason for reporting.');
+    return;
+  }
+
+  try {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      throw new Error('User not authenticated');
+    }
+
+    const decodedToken = decodeToken(token); // Assuming the decodeToken method is available
+    const userId = decodedToken.id;
+
+    const reportData = {
+      docId: currentDocument.value.docId,  // Document ID from the current document
+      userId: userId,                      // User ID from the decoded token
+      reporting_details: reportReason.value // The report reason from the textarea
+    };
+
+    const response = await axios.post(`${import.meta.env.VITE_API_URL}api/v1/report`, reportData, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+
+    if (response.data && response.data.message) {
+        // Show success message using label instead of alert
+        const successLabel = document.getElementById('report-success-message');
+        successLabel.innerText = 'Report submitted successfully.';
+        successLabel.style.display = 'block'; // Show the success message
+
+        // Optionally hide the label after a few seconds
+        setTimeout(() => {
+          successLabel.style.display = 'none';
+        }, 3000);
+
+        closeReportPopup(); // You can remove this if you don't want to close the modal immediately
+      }
+  } catch (error) {
+    console.error('Error reporting document:', error);
+    alert('Failed to report the document. Please try again.');
+  }
+}
+
 // Preview Modal Logic
 function showPreview(document) {
   currentDocument.value = document;
@@ -452,5 +527,98 @@ const currentPreviewImage = computed(() => {
 .rating-message {
   transition: opacity 0.3s ease-in-out;
 }
+
+.report-btn {
+  margin: 10px auto;
+  display: block;
+  background-color: #f0f0f0;
+  color: #333;
+  padding: 8px 20px;
+  border-radius: 20px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.report-btn:hover {
+  background-color: #ddd;
+}
+
+/* Modal Overlay */
+.report-popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* Modal Content */
+.report-popup-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 15px; /* Rounded corners */
+  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2); /* Soft shadow for better visibility */
+  max-width: 400px;
+  width: 100%;
+  text-align: center; /* Center the content */
+  transition: transform 0.3s ease;
+}
+
+.report-popup-content h2 {
+  font-size: 18px;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+/* Textarea for input */
+.report-textarea {
+  width: 100%;
+  height: 100px;
+  margin-top: 10px;
+  padding: 10px;
+  border-radius: 10px; /* Rounded corners for textarea */
+  border: 1px solid #ccc;
+  font-size: 14px;
+  resize: none; /* Disable resizing for a cleaner look */
+}
+
+/* Buttons for submit/cancel */
+.submit-report-btn,
+.cancel-report-btn {
+  margin-top: 15px;
+  padding: 10px;
+  border-radius: 20px; /* Rounded buttons */
+  width: 100%;
+  font-size: 16px;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.3s ease;
+}
+
+.submit-report-btn {
+  background-color: #4caf50;
+  color: white;
+}
+
+.submit-report-btn:hover {
+  background-color: #45a049;
+}
+
+.cancel-report-btn {
+  background-color: #f44336;
+  color: white;
+}
+
+.cancel-report-btn:hover {
+  background-color: #e53935;
+}
+
 
 </style>
