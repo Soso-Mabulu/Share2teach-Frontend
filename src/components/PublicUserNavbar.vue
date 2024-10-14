@@ -70,7 +70,7 @@ function toggleMenu() {
 
     <!-- Profile Button (visible on larger screens) -->
     <router-link
-      to="/educator-profile"
+      to="/public-user-profile"
       class="hidden lg:inline-block py-2 px-6 bg-purple-600 hover:bg-purple-800 text-sm text-white font-bold rounded-xl transition duration-200"
     >
       Profile
@@ -89,7 +89,7 @@ function toggleMenu() {
       </li>
       <li class="border-b border-gray-200">
         <RouterLink
-          to="/educator-profile"
+          to="/public-user-profile"
           class="block px-4 py-3 text-gray-700 hover:bg-gray-100 hover:text-blue-600 flex items-center space-x-2"
         >
           <span>👤</span> <!-- Profile icon -->

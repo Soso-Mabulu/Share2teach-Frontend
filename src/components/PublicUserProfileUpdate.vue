@@ -13,7 +13,7 @@
             <h1 class="text-4xl font-extrabold text-center text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-300 mb-2">
               Cosmic Profile
             </h1>
-            <p class="text-center text-purple-200 text-lg">Update Your Stellar Information</p>
+            <p class="text-center text-purple-200 text-lg">Update Personal Information</p>
           </div>
           <form @submit.prevent="updateProfile" class="mt-8 space-y-6">
             <div class="rounded-md shadow-sm -space-y-px">

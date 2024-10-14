@@ -64,7 +64,7 @@ import PublicUserContributorsView from '@/views/PublicUser-ContributorsView.vue'
 import PublicUserSelfDirectedlearningView from '@/views/PublicUser-SelfDirectedlearningView.vue';
 import PublicUserFAQView from '@/views/PublicUser-FAQView.vue';
 import PublicUserViewAllDocumentsView from '@/views/PublicUser-ViewAllDocumentsView.vue';
-import PublicUserProfileView from '@/components/PublicUserProfileUpdate.vue';
+import PublicUserProfileView from '@/views/Public-User-ProfileUpdateView.vue';
 
 
 const router = createRouter({
