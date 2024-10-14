@@ -259,7 +259,7 @@
       category: doc.category || 'Uncategorized',
       status: doc.status || (route.name === 'PendingDocuments' ? 'Pending' : 'Approved'),
       light_preview_url: doc.light_preview_url || '',
-      download_url: doc.download_url || '',
+      download_url: doc.location || '',
     }));
   }
 

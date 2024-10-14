@@ -436,6 +436,8 @@ async function submitReport() {
       reporting_details: reportReason.value // The report reason from the textarea
     };
 
+    console.log('Submitting report:', reportData);
+
     const response = await axios.post(`${import.meta.env.VITE_API_URL}api/v1/report`, reportData, {
       headers: { Authorization: `Bearer ${token}` }
     });
