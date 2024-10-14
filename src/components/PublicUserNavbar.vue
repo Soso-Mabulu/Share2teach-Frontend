@@ -14,13 +14,12 @@ const token = localStorage.getItem('token');
 
 // Navigation links
 const links = ref([
-    { text: "Dashboard", icon: "🏠", route: `/educator-dashboard?token=${token}` },
-    { text: "Subject", icon: "📚", route: `/educator-subject?token=${token}` },
-    { text: "Search", icon: "🔍", route: `/educator-search?token=${token}` },
-    { text: "Contributors", icon: "👥", route: `/educator-contributors?token=${token}` },
-    { text: "FAQ", icon: "❓", route: `/educator-faq?token=${token}` },
-    { text: "Self Directed Learning", icon: "💡", route: `/educator-self-learning?token=${token}` },
-    { text: "Upload Documents", icon: "📤", route: `/educator-upload?token=${token}` }, // New link
+  { text: "Dashboard", icon: "🏠", route: `/public-user-dashboard?token=${token}` },
+  { text: "Subject", icon: "📚", route: "/public-user-view-all-documents?token=${token}" },
+  { text: "Search", icon: "🔍", route: "/public-user-search-results" },
+  { text: "Contributors", icon: "👥", route: `/public-user-contributors?token=${token}` },
+  { text: "FAQ", icon: "❓", route: `/public-user-faq?token=${token}` },
+  { text: "Self Directed Learning", icon: "💡", route: `/public-user-self-directed-learning?token=${token}` }
 ]);
   
 
