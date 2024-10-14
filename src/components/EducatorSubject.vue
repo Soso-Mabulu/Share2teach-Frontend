@@ -259,7 +259,7 @@
   
   // Function to navigate to all documents by module
   function viewAllDocuments(module) {
-    router.push({ name: 'DocumentsByModule', params: { module } });
+    router.push({ name: 'EducatorAllApprovedDocumentsView', params: { module } });
   }
   </script>
   <style scoped>  
