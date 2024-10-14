@@ -211,7 +211,6 @@ export default {
 }
 
 .faq-card:hover {
-  transform: scale(1.03);
   box-shadow: 0 4px 10px rgba(178, 24, 178, 0.2);
 }
 
