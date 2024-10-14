@@ -108,6 +108,26 @@
             Close
           </button>
         </div>
+        <!-- Rating Section -->
+        <!-- Rating Section -->
+        <div class="rating-section">
+          <label class="rating-label">Rate this document:</label>
+          <div class="star-rating">
+            <i 
+              v-for="star in 5" 
+              :key="star" 
+              :class="['fa-star', selectedRating >= star ? 'fas' : 'far']"
+              @click="setRating(star)"
+              class="star"
+            ></i>
+          </div>
+          <button class="submit-rating-btn" @click="submitRating">Submit Rating</button>
+        </div>
+
+        <!-- Styled Response for Ratings -->
+        <div v-if="ratingMessage" class="rating-message text-center mt-4 text-lg font-semibold" :class="ratingMessageClass">
+          {{ ratingMessage }}
+        </div>
       </div>
     </div>
   </div>
@@ -116,6 +136,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import axios from 'axios';
+import '@fortawesome/fontawesome-free/css/all.css';
 
 const approvedDocuments = ref([]);
 const ratings = ref([]);
@@ -133,6 +154,8 @@ const selectedModule = ref('');
 const selectedUniversity = ref('');
 const selectedYear = ref('');
 const selectedCategory = ref('');
+const ratingMessage = ref(''); // New: Message for ratings
+const ratingMessageClass = ref('text-green-500'); // New: Styling class for rating message
 
 // Fetch approved documents and ratings on mount
 onMounted(() => {
@@ -166,7 +189,7 @@ async function fetchApprovedDocuments() {
         const documentRating = ratings.value.find(rating => rating.docId === documentId);
         
         return {
-          docId: doc.documentId,
+          docId: doc.id || doc.docId || null,
           title: doc.title || 'Unknown title',
           preview_image_url: doc.preview_image_url || defaultImage,
           description: doc.description || 'No description available',
@@ -186,6 +209,111 @@ async function fetchApprovedDocuments() {
     }
   } catch (error) {
     console.error('Failed to fetch approved documents:', error.message);
+  }
+}
+function setRating(star) {
+  selectedRating.value = star;
+}
+
+
+function decodeToken(token) {
+  // Split the token into parts (Header, Payload, Signature)
+  const tokenParts = token.split('.');
+  
+  if (tokenParts.length !== 3) {
+    throw new Error('Invalid token format');
+  }
+
+  // Decode the payload (2nd part of the token)
+  const base64Url = tokenParts[1];
+  const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+  
+  // Convert the Base64-encoded payload to a JSON string
+  const jsonPayload = decodeURIComponent(
+    atob(base64)
+      .split('')
+      .map(function (c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+      })
+      .join('')
+  );
+
+  // Parse the JSON string to get the actual object
+  return JSON.parse(jsonPayload);
+}
+
+// Function to submit a rating for the current document
+async function submitRating() {
+  if (!selectedRating.value) {
+    ratingMessage.value = 'Please select a rating before submitting.';
+    ratingMessageClass.value = 'text-red-500'; // Error style
+  } else {
+    ratingMessage.value = `Thank you for rating ${selectedRating.value} stars!`;
+    ratingMessageClass.value = 'text-green-500'; // Success style
+  }
+  try {
+    // Fetch the userId (e.g., from local storage or your auth system)
+    const token = localStorage.getItem('token'); // Get the token from localStorage
+
+    if (!token) {
+      throw new Error('User not authenticated');
+    }
+
+    // Decode the token to extract the payload manually
+    const decodedToken = decodeToken(token);
+
+    // Assuming the token contains user_id in the payload
+    const userId = decodedToken.id;
+
+    if (!userId) {
+      throw new Error('User ID not found in token');
+    }
+
+    console.log('Extracted userId:', userId);
+
+    const ratingData = {
+      docId: currentDocument.value.docId, // Document ID
+      userId: userId,                  // User ID (from auth)
+      rating: selectedRating.value      // Selected rating (1-5)
+    };
+
+    console.log('Submitting rating:', ratingData);
+
+    const response = await axios.post(
+      `${import.meta.env.VITE_API_URL}api/v1/ratings`,  // Ensure this URL is correct
+      ratingData,
+    );
+    console.log('Rating submitted:', response.data);
+    
+    if (response.data && response.data.message) {
+      ratingMessage.value = 'Rating submitted successfully.';
+      ratingMessageClass.value = 'text-green-500'; // Success style
+    }
+
+  } catch (error) {
+    if (error.response && error.response.data.message) {
+      const errorMessage = error.response.data.message;
+
+      // Specific check for the duplicate rating error
+      if (errorMessage === "You cannot rate the same document more than once") {
+        ratingMessage.value = 'You have already rated this document. Thank you!';
+      } else {
+        ratingMessage.value = `Error: ${errorMessage}`;
+      }
+
+      ratingMessageClass.value = 'text-red-500'; // Error style
+      console.log('Rating submission error:', errorMessage);
+      console.error('Error details:', error.response ? error.response.data : error.message);
+
+    } else {
+      ratingMessage.value = 'An error occurred while submitting your rating. Please try again.';
+      ratingMessageClass.value = 'text-red-500'; // Error style
+      console.error('An unexpected error occurred:', error.message);  
+      console.error('Error details:', error.response ? error.response.data : error.message);
+    }
+  } finally {
+    // Clear the selected rating after submission
+    selectedRating.value = '';
   }
 }
 
@@ -272,4 +400,57 @@ const currentPreviewImage = computed(() => {
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.5);
 }
+
+
+.rating-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 20px;
+
+}
+
+.rating-label {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.star-rating {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 15px;
+}
+
+.star {
+  font-size: 2rem;
+  color: #ffd700;
+  padding: 0 5px;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.star:hover {
+  transform: scale(1.2);
+}
+
+.submit-rating-btn {
+  padding: 10px 20px;
+  background-color: #4CAF50;
+  border: none;
+  border-radius: 20px;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.submit-rating-btn:hover {
+  background-color: #45a049;
+}
+
+/* Add custom styling for rating message */
+.rating-message {
+  transition: opacity 0.3s ease-in-out;
+}
+
 </style>

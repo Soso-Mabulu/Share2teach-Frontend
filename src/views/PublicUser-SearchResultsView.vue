@@ -1,5 +1,6 @@
 <template>
   <div class="search-results" :class="{ 'dark-mode': isDarkMode }">
+    
     <div class="container">
       <div class="header">
         <h1 class="main-title">Document Search</h1>
@@ -72,10 +73,18 @@
       </div>
     </div>
   </div>
+
+  <!-- Go Back Button -->
+  <button class="go-back-btn" @click="goBack">Go Back</button>
 </template>
 
 <script>
+import { useRouter } from 'vue-router';
 export default {
+  setup() {
+    const router = useRouter();
+    return { router };
+  },
   data() {
     return {
       results: [],
@@ -122,6 +131,10 @@ export default {
     },
   },
   methods: {
+    // Function to go back to the previous page
+    goBack() {
+      this.router.back(); // Navigate to the previous page
+    },
     async fetchDocuments(searchQuery) {
       this.isLoading = true;
       this.results = [];
@@ -430,5 +443,30 @@ input:checked + .slider:before {
   .results-container {
     grid-template-columns: 1fr;
   }
+}
+.go-back-btn {
+  background-color: purple;
+  color: #fff;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+  font-size: 1rem;
+  font-weight: bold;
+  display: block;
+  margin: 2rem auto; /* Center the button */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Add shadow for depth */
+}
+
+.go-back-btn:hover {
+  background-color: darkviolet;
+  transform: translateY(-3px); /* Slightly lift the button */
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2); /* Enhance shadow on hover */
+}
+
+.go-back-btn:active {
+  transform: translateY(1px); /* Slightly press the button */
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15); /* Reduce shadow on active */
 }
 </style>

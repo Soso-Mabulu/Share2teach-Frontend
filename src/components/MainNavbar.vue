@@ -5,15 +5,17 @@ import { ref } from 'vue';
 // State to track the menu's visibility on small screens
 const isMenuOpen = ref(false);
 
+// Retrieve the token from localStorage
+const token = localStorage.getItem('token');
+
 // Navbar links
 const links = [
-  { text: "Dashboard", icon: "🏠", route: "/dashboard" },
-  { text: "Subject", icon: "📚", route: "/subject" },
-  { text: "Search", icon: "🔍", route: "/search" },
-  { text: "Contributors", icon: "👥", route: "/contributors" },
-  { text: "FAQ", icon: "❓", route: "/faq" },
-  { text: "Self Directed Learning", icon: "💡", route: "/self-learning" },
-  { text: "Logout", icon: "🚪", route: "/logout" },
+{ text: "Dashboard", icon: "🏠", route: `/public-user-dashboard?token=${token}` },
+  { text: "Subject", icon: "📚", route: "/public-user-view-all-documents?token=${token}" },
+  { text: "Search", icon: "🔍", route: "/public-user-search-results" },
+  { text: "Contributors", icon: "👥", route: `/public-user-contributors?token=${token}` },
+  { text: "FAQ", icon: "❓", route: `/public-user-faq?token=${token}` },
+  { text: "Self Directed Learning", icon: "💡", route: `/public-user-self-directed-learning?token=${token}` }
 ];
 
 // Toggle the mobile menu
