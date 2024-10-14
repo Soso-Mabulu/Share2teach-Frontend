@@ -82,7 +82,7 @@
         <!-- Report Button -->
         <button class="report-btn" @click="openReportPopup">Report Document</button>
         <!-- Label for success message -->
-        <label id="report-success-message text-center font-semibold " style="display: none; color: green; margin-top: 10px;"></label>
+        <label id="report-success-message" class="text-center font-semibold " style="display: none; color: green; margin-top: 10px;"></label>
 
         <!-- Report Popup -->
         <div v-if="showReportPopup" class="report-popup-overlay" @click="closeReportPopup">
@@ -322,26 +322,84 @@ async function submitReport() {
       reporting_details: reportReason.value // The report reason from the textarea
     };
 
+    console.log('Submitting report:', reportData);
+
     const response = await axios.post(`${import.meta.env.VITE_API_URL}api/v1/report`, reportData, {
       headers: { Authorization: `Bearer ${token}` }
     });
 
-    if (response.data && response.data.message) {
-        // Show success message using label instead of alert
-        const successLabel = document.getElementById('report-success-message');
-        successLabel.innerText = 'Report submitted successfully.';
-        successLabel.style.display = 'block'; // Show the success message
+    // Check if the response is successful
+    if (response.status === 200 || response.status === 201) {
+      console.log('Report submitted:', response.data);
 
-        // Optionally hide the label after a few seconds
+      // Display success message
+      const successLabel = document.getElementById('report-success-message');
+      if (successLabel) {
+        successLabel.innerText = 'Report submitted successfully.';
+        successLabel.style.color = 'green'; // Set success color
+        successLabel.style.display = 'block';
+
+        // Hide the success message after a few seconds
         setTimeout(() => {
           successLabel.style.display = 'none';
         }, 3000);
-
-        closeReportPopup(); // You can remove this if you don't want to close the modal immediately
       }
+
+      // Close the modal after successful report
+      closeReportPopup();
+
+      return; // Exit the function early since it was successful
+    } else {
+      throw new Error('Unexpected response status');
+    }
   } catch (error) {
     console.error('Error reporting document:', error);
-    alert('Failed to report the document. Please try again.');
+
+    // Handle different error formats
+    const response = error.response;
+
+    if (response) {
+      const { status, statusText, data } = response;
+      const readyState = error.request.readyState;
+      const responseText = error.request.responseText;
+
+      // Show detailed error message using an alert
+      alert(`
+        Error: ${status} ${statusText}
+        Ready State: ${readyState}
+        Response Text: ${responseText || data.message || 'Unknown error'}
+      `);
+
+      // Show the error message on successLabel
+      const successLabel = document.getElementById('report-success-message');
+      if (successLabel) {
+        successLabel.innerText = `
+          Error: ${status} ${statusText}
+          Response: ${responseText || data.message || 'Unknown error'}
+        `;
+        successLabel.style.color = 'red'; // Set error color
+        successLabel.style.display = 'block';
+
+        // Hide the error message after a few seconds
+        setTimeout(() => {
+          successLabel.style.display = 'none';
+        }, 5000);
+      }
+    } else {
+      // For network or other non-HTTP errors
+      alert('An unexpected error occurred. Please try again.');
+
+      const successLabel = document.getElementById('report-success-message');
+      if (successLabel) {
+        successLabel.innerText = 'An unexpected error occurred. Please try again.';
+        successLabel.style.color = 'red'; 
+        successLabel.style.display = 'block';
+
+        setTimeout(() => {
+          successLabel.style.display = 'none';
+        }, 5000);
+      }
+    }
   }
 }
 
