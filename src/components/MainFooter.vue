@@ -101,13 +101,13 @@
             Information
             </h6>
             <p class="mb-4">
-            <a href="#!">About Us</a>
+            <a href="/about">About Us</a>
             </p>
             <p class="mb-4">
-            <a href="#!">Services</a>
+            <a href="/services">Services</a>
             </p>
             <p>
-            <a href="#!">Analytics</a>
+            <a href="#">Analytics</a>
             </p>
         </div>
         <!-- Useful links section -->
@@ -171,7 +171,7 @@
                     clip-rule="evenodd" />
                 </svg>
             </span>
-            + 27 11 123 4567
+            + 27 65 724 3048
             </p>
         </div>
         </div>
@@ -179,7 +179,7 @@
 
     <!--Copyright section-->
     <div class="bg-black/5 p-6 text-center">
-        <span>© 2023 Copyright:</span>
+        <span>© 2024 Copyright:</span>
         <a class="font-semibold" href="#"
         >Share2Teach</a
         >
