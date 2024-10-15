@@ -76,7 +76,7 @@
   const router = useRouter();
   
   const analytics = ref({
-    totalDocuments: 0,
+    pendingDocuments: 0,
     approvedDocuments: 0,
     deniedDocuments: 0,
     reportedComments: 0,
@@ -93,11 +93,11 @@
   const logs = ref([]);
   
   const documentChartData = computed(() => ({
-    labels: ['Total', 'Approved', 'Denied', 'Reported'],
+    labels: ['Pending', 'Approved', 'Denied', 'Reported'],
     datasets: [{
       label: 'Document Count',
       data: [
-        analytics.value.totalDocuments,
+        analytics.value.pendingDocuments,
         analytics.value.approvedDocuments,
         analytics.value.deniedDocuments,
         analytics.value.reportedComments,
@@ -142,7 +142,7 @@
       const pendingResponse = await axiosInstance.get(`${apiBaseUrl}api/v1/analytics/pending-documents`, {
         params: { start_date, end_date }
       });
-      analytics.value.totalDocuments = pendingResponse.data.pending_count;
+      analytics.value.pendingDocuments = pendingResponse.data.pending_count;
 
       // Mock system metrics and logs
       systemMetrics.value = {
