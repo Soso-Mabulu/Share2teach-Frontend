@@ -92,6 +92,7 @@ const isLoading = ref(true);
 
 // Analytics endpoints
 const analyticsEndpoints = [
+  { name: 'Approved Documents', key: 'approved-documents' },
   { name: 'Denied Documents', key: 'denied-documents' },
   { name: 'Reported Documents', key: 'reported-documents' },
   { name: 'Pending Documents', key: 'pending-documents' },

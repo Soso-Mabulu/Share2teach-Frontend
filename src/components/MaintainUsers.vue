@@ -161,7 +161,7 @@ const updateUser = async () => {
 const deleteUser = async () => {
   if (confirm('Are you sure you want to delete this user?')) {
     try {
-      await axiosInstance.delete(`api/v1/users/${selectedUser.value.id}`);
+      await axiosInstance.delete(`api/v1/users/${selectedUser.value.userId}`);
       users.value = users.value.filter(u => u.id !== selectedUser.value.id);
       closeUserModal();
       showNotification('User deleted successfully!');

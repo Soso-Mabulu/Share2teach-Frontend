@@ -34,13 +34,13 @@
         </div>
       </div>
   
-      <div v-for="module in modules" :key="module" class="subject-section">
+      <div v-for="sectionName in ['approved']" :key="sectionName" class="subject-section">
         <h2 class="section-title">{{ module }}</h2>
         <div class="documents-container">
           <button @click="prevSlide(module)" class="carousel-button prev">&lt;</button>
           <div class="documents-carousel">
             <div
-              v-for="(document, index) in visibleDocuments(module)"
+              v-for="(document, index) in visibleDocuments(sectionName)"
               :key="index"
               class="document-card"
               @click="showPreview(document)"
@@ -57,7 +57,7 @@
           </div>
           <button @click="nextSlide(module)" class="carousel-button next">&gt;</button>
         </div>
-        <button class="view-all-btn" @click="viewAllDocuments(module)">View All {{ module }} Documents</button>
+        <button class="view-all-btn" @click="viewAllDocuments(sectionName)">View All {{ sectionName }} Documents</button>
       </div>
   
       <!-- Preview Modal -->
@@ -258,8 +258,10 @@
   });
   
   // Function to navigate to all documents by module
-  function viewAllDocuments(module) {
-    router.push({ name: 'EducatorAllApprovedDocumentsView', params: { module } });
+  function viewAllDocuments(sectionName) {
+    if (sectionName === 'approved') {
+      router.push({ name: 'ApprovedDocuments' });
+    }
   }
   </script>
   <style scoped>  

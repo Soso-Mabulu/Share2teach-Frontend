@@ -81,7 +81,6 @@
     deniedDocuments: 0,
     reportedComments: 0,
     avgDocumentRating: 0,
-    avgFaqRating: 0,
   });
   
   const systemMetrics = ref({
@@ -121,6 +120,12 @@
     const { start_date, end_date } = getLastSixMonths();
 
     try {
+        
+      // Fetch approved documents
+      const approvedResponse = await axiosInstance.get(`${apiBaseUrl}api/v1/analytics/approved-documents`, {
+        params: { start_date, end_date }
+      });
+      analytics.value.approvedDocuments = approvedResponse.data.approved_count;
       // Fetch denied documents
       const deniedResponse = await axiosInstance.get(`${apiBaseUrl}api/v1/analytics/denied-documents`, {
         params: { start_date, end_date }

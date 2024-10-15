@@ -7,7 +7,7 @@ import EducatorHome from '@/components/EducatorHome.vue';
 </script>
 
 <template>
-  <EducatorNavbar />
+  <EducatorNavbar class="z-10"  />
   <div>
     <div class="min-h-screen flex flex-col lg:flex-row">
       <!-- Sidebar -->

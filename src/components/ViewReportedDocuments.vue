@@ -96,7 +96,7 @@
           <h3>Report Comments</h3>
           <div class="report-comments">
             <div v-for="(comment, index) in currentDocument.report_comments" :key="index" class="report-comment">
-              <p class="comment-text">{{ comment.text }}</p>
+              <p class="comment-text">{{ index + 1 }}. {{ comment.text }}</p>
               <p class="comment-date">Reported on: {{ formatDate(comment.date) }}</p>
             </div>
           </div>
@@ -110,6 +110,7 @@
           <button class="close-btn" @click="closeModal">&times;</button>
         </div>
       </div>
+
     </div>
   </template>
   
@@ -184,21 +185,40 @@
   }
   
   function mapDocuments(docs) {
-    return docs.map(doc => ({
-      id: doc.id,
-      title: doc.title || 'Unknown title',
-      preview_image_url: doc.preview_image_url || defaultImage,
-      description: doc.description || 'No description available',
-      author: doc.author || 'Unknown Author',
-      category: doc.category || 'Uncategorized',
-      module: doc.module || 'Unspecified',
-      report_count: doc.report_count || 0,
-      report_comments: doc.report_comments || [],
-      light_preview_url: doc.light_preview_url || '',
-      download_url: doc.download_url || '',
-    }));
+    const groupedDocuments = {};
+
+    docs.forEach(doc => {
+      // If the document ID is already in the grouped object, add the reporting detail
+      if (groupedDocuments[doc.docId]) {
+        groupedDocuments[doc.docId].report_count += 1;
+        groupedDocuments[doc.docId].report_comments.push({
+          text: doc.reporting_details,
+          date: doc.reporting_timestamp,
+        });
+      } else {
+        // If the document ID is not yet in the grouped object, create a new entry
+        groupedDocuments[doc.docId] = {
+          id: doc.docId,
+          title: doc.title || 'Unknown title',
+          preview_image_url: doc.preview_image_url || defaultImage,
+          description: doc.description || 'No description available',
+          author: doc.documentUserId || 'Unknown Author',
+          category: doc.category || 'Uncategorized',
+          module: doc.module || 'Unspecified',
+          report_count: 1,
+          report_comments: [{
+            text: doc.reporting_details,
+            date: doc.reporting_timestamp,
+          }],
+          light_preview_url: doc.light_preview_url || '',
+          download_url: doc.location || '',
+        };
+      }
+    });
+
+    return Object.values(groupedDocuments); // Return the grouped documents as an array
   }
-  
+
   function showDocumentDetails(document) {
     currentDocument.value = document;
     currentDocumentPreviewImages.value = document.light_preview_url ? document.light_preview_url.split(',') : [];
@@ -243,24 +263,36 @@
     return new Date(dateString).toLocaleString();
   }
   
-  async function approveDocument() {
+  async function approveDocument(action = 'approve', comments = '') {
     try {
       const token = localStorage.getItem('token');
       if (!token) {
         throw new Error('No authentication token found');
       }
-      
-      const headers = { Authorization: `Bearer ${token}` };
-      await axios.post(`${import.meta.env.VITE_API_URL}api/v1/documents/${currentDocument.value.id}/approve`, {}, { headers });
-      // Remove the document from the list and close the modal
-      documents.value = documents.value.filter(doc => doc.id !== currentDocument.value.id);
+
+      const headers = { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' };
+      const requestBody = {
+        docid: currentDocument.value.id,
+        action,  // 'approve' or 'disapprove'
+        comments // Optional comments for disapproval
+      };
+
+      await axios.post(`${import.meta.env.VITE_API_URL}api/v1/moderation`, requestBody, { headers });
+
+      // Remove the document from the list and close the modal if approved
+      if (action === 'approve') {
+        documents.value = documents.value.filter(doc => doc.id !== currentDocument.value.id);
+      }
       closeModal();
+
       // Optionally, show a success message
+      console.log('Document moderated successfully');
     } catch (error) {
-      console.error('Failed to approve document:', error);
+      console.error('Failed to moderate document:', error);
       // Handle error (e.g., show error message to user)
     }
-  }
+}
+
   
   async function deleteDocument() {
     if (confirm('Are you sure you want to delete this document? This action cannot be undone.')) {
@@ -272,6 +304,7 @@
         
         const headers = { Authorization: `Bearer ${token}` };
         await axios.delete(`${import.meta.env.VITE_API_URL}api/v1/documents/${currentDocument.value.id}`, { headers });
+        console.log(currentDocument.value.id, headers);
         // Remove the document from the list and close the modal
         documents.value = documents.value.filter(doc => doc.id !== currentDocument.value.id);
         closeModal();

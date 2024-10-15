@@ -496,7 +496,7 @@ async function submitReport() {
   width: 100%;
   max-width: 600px;
   position: relative; /* or absolute */
-  z-index: 1; /* Ensure this is lower than the navbar */
+  z-index: 0; /* Ensure this is lower than the navbar */
 }
 
 .search-bar-wrapper {
