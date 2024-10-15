@@ -95,7 +95,7 @@
               <p><span class="font-medium text-gray-700 dark:text-gray-300">Creation Date:</span> {{ formatDate(selectedDocument.creationDate) }}</p>
               <p><span class="font-medium text-gray-700 dark:text-gray-300">Modification Date:</span> {{ formatDate(selectedDocument.modificationDate) }}</p>
             </div>
-            <button @click="downloadDocument(selectedDocument)" class="mt-6 w-full bg-purple-500 text-white py-2 rounded-md hover:bg-purple-600 transition-colors duration-300">
+            <button @click="downloadDocument(selectedDocument.location)" class="mt-6 w-full bg-purple-500 text-white py-2 rounded-md hover:bg-purple-600 transition-colors duration-300">
               Download
             </button>
           </div>
