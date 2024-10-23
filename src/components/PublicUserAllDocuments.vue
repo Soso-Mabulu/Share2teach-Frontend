@@ -213,7 +213,7 @@ async function fetchApprovedDocuments() {
           preview_image_url: doc.preview_image_url || defaultImage,
           description: doc.description || 'No description available',
           author: doc.author || 'Unknown Author',
-          download_url: doc.download_url || '',
+          download_url: doc.location || '',
           rating: documentRating ? documentRating.rating : 0,
           module: doc.module || 'Unknown Module',
           university: doc.university || 'Unknown University',
