@@ -74,7 +74,7 @@ async function login() {
   loading.value = true // Set loading to true at the beginning
   errorMessage.value = '' // Reset error message
   try {
-    const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/v1/auth/login`, {
+    const response = await axios.post(`${import.meta.env.VITE_API_URL}api/v1/auth/login`, {
       email: email.value,
       password: password.value
     })
@@ -122,7 +122,7 @@ function forgotPassword() {
 
 // Function to handle Google Sign-In response
 function handleCredentialResponse(response) {
-  axios.post(`${import.meta.env.VITE_API_URL}/api/v1/auth/google`, {
+  axios.post(`${import.meta.env.VITE_API_URL}api/v1/auth/google`, {
     token: response.credential
   })
   .then(res => {

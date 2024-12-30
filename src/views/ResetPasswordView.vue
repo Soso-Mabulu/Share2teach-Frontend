@@ -160,7 +160,7 @@ const handleSubmit = async () => {
 
   try {
     const response = await axios.post(
-      `${import.meta.env.VITE_API_URL}/api/v1/auth/reset-password`,
+      `${import.meta.env.VITE_API_URL}api/v1/auth/reset-password`,
       {
         token: token.value,
         newPassword: newPassword.value

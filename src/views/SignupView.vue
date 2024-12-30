@@ -113,7 +113,7 @@ async function signup() {
   }
 
   try {
-    const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/v1/auth/signup`, {
+    const response = await axios.post(`${import.meta.env.VITE_API_URL}api/v1/auth/signup`, {
       userName: firstname.value,
       userLName: lastname.value,
       email: email.value,
@@ -138,7 +138,7 @@ async function signup() {
 async function signupWithGoogle() {
   try {
     // Redirect to your backend authentication route that handles Google OAuth
-    window.location.href = `${import.meta.env.VITE_API_URL}/api/v1/auth/google`
+    window.location.href = `${import.meta.env.VITE_API_URL}api/v1/auth/google`
   } catch (error) {
     // Handle any errors that occur during the redirect
     console.error('Google login error:', error) // Log the error for debugging
