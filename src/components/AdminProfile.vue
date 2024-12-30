@@ -74,7 +74,7 @@
       const { userId, role } = parseToken(token);
       userRole.value = role;
   
-      const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/v1/users/${userId}`, {
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}api/v1/users/${userId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
   

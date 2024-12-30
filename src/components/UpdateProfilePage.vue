@@ -109,7 +109,7 @@ const updateProfile = async () => {
       email: form.value.email,
     };
 
-    const response = await axios.put(`${import.meta.env.VITE_API_URL}/api/v1/users/update`, requestData, {
+    const response = await axios.put(`${import.meta.env.VITE_API_URL}api/v1/users/update`, requestData, {
       headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
